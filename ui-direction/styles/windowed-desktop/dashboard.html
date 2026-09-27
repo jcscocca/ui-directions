@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evals: Runs (windowed desktop)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { width: 1440px; height: 900px; overflow: hidden; position: relative; }
+
+  /* z-order is the hierarchy: selection windows above collection windows */
+  #runs   { left: 8px;   top: 32px;  width: 842px; height: 500px; z-index: 2; }
+  #score  { left: 834px; top: 34px;  width: 522px; height: 400px; z-index: 3; }
+  #log    { left: 24px;  top: 508px; width: 548px; height: 150px; z-index: 3; }
+  #alert  { left: 56px;  top: 626px; width: 560px; height: 172px; z-index: 4; }
+  #pinned { left: 24px;  top: 824px; width: 440px; z-index: 2; }
+  #info   { left: 590px; top: 410px; width: 716px; height: 438px; z-index: 5; }
+
+  /* runs window */
+  .strip { display: flex; align-items: center; gap: 12px; height: 36px; padding: 0 10px; border-bottom: 1px solid var(--frame); }
+  .strip .count { font-size: 12px; }
+  .strip .count b { font-weight: 800; }
+  .strip .field { margin-left: auto; margin-right: 18px; width: 290px; }
+  .listwrap { position: absolute; top: 37px; left: 0; right: 0; bottom: 0; background: var(--paper); }
+  .listwrap .list { width: calc(100% - 16px); }
+  .tri { display: inline-block; width: 9px; margin-right: 3px; }
+  .ic16 { display: inline-block; vertical-align: -3px; margin-right: 5px; }
+  .fold td { font-weight: 700; }
+  .fold .cnt { font-weight: 400; color: var(--muted); }
+  .run td:first-child { padding-left: 22px; }
+  .run.sel td { background: var(--select-soft); }
+  .run.sel td:first-child { box-shadow: inset 2px 0 0 var(--select); }
+  .wrap2 { white-space: normal !important; line-height: 1.2; padding-top: 2px !important; padding-bottom: 2px !important; }
+  .muted { color: var(--muted); }
+  .minibar { display: inline-block; width: 40px; height: 9px; vertical-align: -1px; margin: 0 5px; }
+  .errrow td { height: auto; padding-top: 1px; padding-bottom: 5px; white-space: normal; }
+  .err { font-family: var(--font-code); font-size: 11px; color: var(--stop); }
+  .errsub { font-size: 11px; color: var(--ink); }
+  .neg { font-weight: 700; }
+
+  /* score window */
+  #score .wb { padding: 10px 14px; }
+  .charthead { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; }
+  .charthead b { font-size: 13px; }
+  .legend { display: flex; gap: 14px; font-size: 11px; margin-top: 4px; color: var(--ink); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .sw-band { width: 18px; height: 10px; border: 1px solid var(--bevel-lo); background: repeating-conic-gradient(#A8A8A8 0 25%, var(--paper) 0 50%) 0 0 / 2px 2px; }
+  .sw-base { width: 18px; border-top: 1px dashed var(--frame); }
+  #score .well { margin-top: 8px; }
+
+  /* log window: plain text document */
+  #log .wb { background: var(--paper); box-shadow: none; }
+  #log pre { margin: 0; padding: 7px 26px 0 10px; font-family: var(--font-code); font-size: 12px; line-height: 17px; }
+  #log pre b { font-weight: 500; }
+
+  /* alert */
+  #alert .wb { display: grid; grid-template-columns: 44px 1fr; gap: 0 14px; padding: 14px 44px 12px 16px; }
+  #alert h3 { margin: 0 0 4px; font-size: 13px; font-weight: 800; }
+  #alert p { margin: 0 0 6px; font-size: 12px; }
+  #alert .err { display: block; margin-bottom: 6px; font-size: 11.5px; }
+  #alert .actions { grid-column: 2; display: flex; justify-content: flex-end; gap: 16px; margin-top: 4px; }
+
+  /* info window */
+  #info .wb { padding: 14px 18px 14px; display: grid; grid-template-columns: 300px 1fr; grid-template-rows: auto 1fr auto; gap: 12px 26px; }
+  .ihead { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--bevel-lo); box-shadow: 0 1px 0 var(--bevel-hi); }
+  .ihead h1 { margin: 0; font-size: var(--t-title); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; }
+  .ihead .sub { font-size: 12px; margin-top: 2px; }
+  .big { font-size: var(--t-display); font-weight: 800; line-height: .95; letter-spacing: -0.02em; }
+  .bigsub { font-size: var(--t-sub); margin-top: 4px; }
+  .bigsub b { font-weight: 800; }
+  .caution { display: flex; gap: 10px; margin-top: 12px; padding: 9px 10px; background: var(--paper); border: 1px solid var(--frame); box-shadow: 2px 2px 0 var(--bevel-lo); font-size: 12px; line-height: 1.4; }
+  .props { display: grid; grid-template-columns: 86px 1fr; gap: 3px 10px; margin-top: 14px; font-size: 12px; }
+  .props dt { text-align: right; font-weight: 700; }
+  .props dd { margin: 0; }
+  .metrics .list td { height: 24px; font-size: 13px; }
+  .metrics .list tr.hl td { background: var(--select); color: #fff; }
+  .metrics .note { font-size: 11px; margin-top: 8px; }
+  .noise { margin-top: 14px; font-size: 12px; }
+  .actions-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 18px; padding-top: 12px; border-top: 1px solid var(--bevel-lo); box-shadow: inset 0 1px 0 var(--bevel-hi); }
+  .actions-row .why { font-size: 11px; color: var(--ink); max-width: 230px; line-height: 1.3; }
+  .actions-row .push { margin-left: auto; }
+
+  /* desktop icons */
+  .desk { position: absolute; left: 1360px; width: 78px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 1; }
+  #disk { top: 40px; }
+  #nav { top: 456px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="dith" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="2" height="2" fill="#fff"/><rect width="1" height="1" fill="#A8A8A8"/><rect x="1" y="1" width="1" height="1" fill="#A8A8A8"/></pattern>
+    <pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse"><rect width="3" height="3" fill="#C9CCE6"/><rect width="1" height="1" fill="#555"/></pattern>
+    <symbol id="folder" viewBox="0 0 32 32"><path d="M2 8h10l2 3h16v17H2z" fill="#A9B0E8" stroke="#222"/><path d="M3 12h26" stroke="#fff"/><path d="M2 11h28" stroke="#222"/></symbol>
+    <symbol id="folder-open" viewBox="0 0 32 32"><path d="M2 8h10l2 3h16v17H2z" fill="url(#hatch)" stroke="#222"/><path d="M2 11h28" stroke="#222"/></symbol>
+    <symbol id="folder16" viewBox="0 0 16 16"><path d="M1.5 3.5h5l1 1.5h7v8.5h-13z" fill="#A9B0E8" stroke="#222"/><path d="M1.5 5.5h13" stroke="#222"/></symbol>
+    <symbol id="doc16" viewBox="0 0 16 16"><path d="M3.5 1.5h6l3 3v10h-9z" fill="#fff" stroke="#222"/><path d="M9.5 1.5v3h3" fill="none" stroke="#222"/><path d="M5 8h5M5 10h5M5 12h3" stroke="#888"/></symbol>
+    <symbol id="doc32" viewBox="0 0 32 32"><path d="M6.5 2.5h13l6 6v21h-19z" fill="#fff" stroke="#222"/><path d="M19.5 2.5v6h6" fill="#DDD" stroke="#222"/><path d="M10 22l4-5 3 3 5-8" fill="none" stroke="#3A4FC7" stroke-width="2"/><path d="M10 26h12" stroke="#888"/></symbol>
+    <symbol id="disk" viewBox="0 0 32 32"><rect x="2.5" y="10.5" width="27" height="12" fill="#DDD" stroke="#222"/><path d="M3 11h26" stroke="#fff"/><rect x="5" y="18" width="4" height="2" fill="#2C9A3E"/><path d="M13 19h13" stroke="#888"/><path d="M4 23.5h24" stroke="#222"/></symbol>
+    <symbol id="panel" viewBox="0 0 32 32"><rect x="3.5" y="5.5" width="25" height="21" fill="#DDD" stroke="#222"/><path d="M10 9v14M16 9v14M22 9v14" stroke="#888"/><rect x="7.5" y="12.5" width="5" height="3" fill="#fff" stroke="#222"/><rect x="13.5" y="17.5" width="5" height="3" fill="#fff" stroke="#222"/><rect x="19.5" y="10.5" width="5" height="3" fill="#fff" stroke="#222"/></symbol>
+    <symbol id="stop" viewBox="0 0 32 32"><path d="M10 1.5h12l8.5 8.5v12L22 30.5H10L1.5 22V10z" fill="#C42B1C" stroke="#222"/><rect x="8" y="13.5" width="16" height="5" fill="#fff"/></symbol>
+    <symbol id="caution" viewBox="0 0 32 32"><path d="M16 2.5L30.5 29h-29z" fill="#F2C230" stroke="#222" stroke-linejoin="round"/><rect x="14.5" y="11" width="3" height="10" fill="#222"/><rect x="14.5" y="23" width="3" height="3" fill="#222"/></symbol>
+    <symbol id="logo" viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" fill="#fff" stroke="#222"/><path d="M1.5 5.5h13" stroke="#222"/><path d="M4 11l3-3 2 2 3-4" fill="none" stroke="#3A4FC7" stroke-width="1.5"/></symbol>
+    <symbol id="tri-down" viewBox="0 0 9 9"><path d="M0.5 2h8L4.5 7.5z" fill="#222"/></symbol>
+    <symbol id="tri-right" viewBox="0 0 9 9"><path d="M2 0.5v8L7.5 4.5z" fill="#222"/></symbol>
+  </defs>
+</svg>
+
+<nav class="menubar" aria-label="Menu bar">
+  <span class="logo"><svg width="16" height="16"><use href="#logo"/></svg></span>
+  <button class="m app">Evals</button>
+  <button class="m">File</button>
+  <button class="m">Edit</button>
+  <button class="m">View</button>
+  <button class="m">Run</button>
+  <button class="m">Window</button>
+  <span class="spacer"></span>
+  <button class="m" title="Help menu: Balloon Help is on"><svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.5c3.6 0 6.5 2 6.5 4.5S11.6 10.5 8 10.5c-.7 0-1.3-.1-1.9-.2L2.5 12.5l1.2-3C2.3 8.6 1.5 7.4 1.5 6 1.5 3.5 4.4 1.5 8 1.5z" fill="#fff" stroke="#222"/><path d="M6.5 5a1.6 1.6 0 1 1 2 1.5V7.5" fill="none" stroke="#222"/></svg><span class="sr">Help</span></button>
+</nav>
+
+<!-- desktop: workspace disk top-right, sections as folders -->
+<div class="desk" id="disk">
+  <a class="icon" href="#" title="Workspace"><svg width="32" height="32"><use href="#disk"/></svg><span class="label">atlas-research</span></a>
+</div>
+<nav class="desk" id="nav" aria-label="Sections">
+  <a class="icon current" href="#" aria-current="page"><svg width="32" height="32"><use href="#folder-open"/></svg><span class="label">Runs</span></a>
+  <a class="icon" href="#"><svg width="32" height="32"><use href="#folder"/></svg><span class="label">Datasets</span></a>
+  <a class="icon" href="#"><svg width="32" height="32"><use href="#folder"/></svg><span class="label">Models</span></a>
+  <a class="icon" href="#"><svg width="32" height="32"><use href="#folder"/></svg><span class="label">Baselines</span></a>
+  <a class="icon" href="#"><svg width="32" height="32"><use href="#panel"/></svg><span class="label">Settings</span></a>
+</nav>
+
+<!-- RUNS: the collection, behind everything about the selection -->
+<section class="win" id="runs" aria-label="Runs">
+  <header class="tb"><span class="box close"></span><h2>Runs</h2><span class="box zoom"></span><span class="box shade"></span></header>
+  <div class="wb">
+    <div class="strip">
+      <span class="count"><b>8 runs</b>, 5 passed, 1 failed, 1 running, 1 queued</span>
+      <label class="field"><span class="sr">Search</span><input type="search" placeholder="Search runs, models, datasets"><span class="key" title="Press / to search">/</span></label>
+    </div>
+    <div class="listwrap">
+      <table class="list">
+        <colgroup><col style="width:130px"><col style="width:204px"><col style="width:58px"><col style="width:64px"><col style="width:140px"><col style="width:88px"><col style="width:84px"><col style="width:56px"></colgroup>
+        <thead><tr><th>Name</th><th>Dataset</th><th class="num">Score</th><th class="num">&Delta; base</th><th>Status</th><th>Duration</th><th>Triggered by</th><th class="sorted num">Started &#9662;</th></tr></thead>
+        <tbody>
+          <tr class="fold"><td colspan="2"><svg class="tri" width="9" height="9"><use href="#tri-down"/></svg><svg class="ic16" width="16" height="16"><use href="#folder16"/></svg>summarize-v3 <span class="cnt">2 runs</span></td><td></td><td></td><td></td><td></td><td></td><td class="sorted"></td></tr>
+          <tr class="run sel"><td><svg class="tri" width="9" height="9"><use href="#tri-right"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2291</td><td>news-digest-2k</td><td class="num">0.812</td><td class="num neg"><svg class="glyph" width="12" height="12"><use href="#caution"/></svg> &minus;0.041</td><td>Passed</td><td>14m 02s</td><td>schedule</td><td class="num sorted">02:00</td></tr>
+          <tr class="run"><td><svg class="tri" width="9" height="9"><use href="#tri-right"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2290</td><td class="wrap2">multilingual-legal-contracts-longform-eval-2026-q3</td><td class="num">0.774</td><td class="num">+0.006</td><td>Passed</td><td>41m 55s</td><td>M. Okafor</td><td class="num sorted">01:12</td></tr>
+          <tr class="fold"><td colspan="2"><svg class="tri" width="9" height="9"><use href="#tri-down"/></svg><svg class="ic16" width="16" height="16"><use href="#folder16"/></svg>router-small <span class="cnt">2 runs</span></td><td></td><td></td><td></td><td></td><td></td><td class="sorted"></td></tr>
+          <tr class="run"><td><svg class="tri" width="9" height="9"><use href="#tri-right"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2289</td><td>intent-routing-v7</td><td class="num">0.931</td><td class="num">+0.012</td><td>Passed</td><td>3m 48s</td><td>schedule</td><td class="num sorted">01:00</td></tr>
+          <tr class="run"><td><svg class="tri" width="9" height="9"><use href="#tri-right"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2288</td><td>adversarial-prompts</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td>Running<span class="progress minibar"><i style="width:62%"></i></span>62%</td><td>9m 10s so far</td><td>CI #4812</td><td class="num sorted">00:51</td></tr>
+          <tr class="fold"><td colspan="2"><svg class="tri" width="9" height="9"><use href="#tri-down"/></svg><svg class="ic16" width="16" height="16"><use href="#folder16"/></svg>extract-json <span class="cnt">2 runs</span></td><td></td><td></td><td></td><td></td><td></td><td class="sorted"></td></tr>
+          <tr class="run"><td><svg class="tri" width="9" height="9"><use href="#tri-down"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2287</td><td>invoices-ocr</td><td class="num">0.000</td><td class="num">&minus;0.884</td><td><svg class="glyph" width="12" height="12"><use href="#stop"/></svg> <b>Failed</b></td><td>0m 41s</td><td>CI #4809</td><td class="num sorted">00:40</td></tr>
+          <tr class="errrow"><td></td><td colspan="6"><span class="err">KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation</span></td><td class="sorted"></td></tr>
+          <tr class="run"><td><svg class="tri" width="9" height="9"><use href="#tri-right"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2286</td><td>receipts-small</td><td class="num">0.902</td><td class="num">+0.000</td><td>Passed</td><td>2m 15s</td><td>L. Brandt</td><td class="num sorted">23:58</td></tr>
+          <tr class="fold"><td colspan="2"><svg class="tri" width="9" height="9"><use href="#tri-down"/></svg><svg class="ic16" width="16" height="16"><use href="#folder16"/></svg>chat-core-8b <span class="cnt">2 runs</span></td><td></td><td></td><td></td><td></td><td></td><td class="sorted"></td></tr>
+          <tr class="run"><td><svg class="tri" width="9" height="9"><use href="#tri-right"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2285</td><td>helpfulness-pairwise</td><td class="num">0.668</td><td class="num">+0.021</td><td>Passed</td><td>1h 06m</td><td>schedule</td><td class="num sorted">23:00</td></tr>
+          <tr class="run"><td><svg class="tri" width="9" height="9"><use href="#tri-right"/></svg><svg class="ic16" width="16" height="16"><use href="#doc16"/></svg>r-2284</td><td>safety-refusals</td><td class="num" id="dash">&mdash;</td><td class="num">&mdash;</td><td class="muted">Queued</td><td>&mdash;</td><td>schedule</td><td class="num sorted">&mdash;</td></tr>
+        </tbody>
+      </table>
+      <div class="vscroll"><i class="arr up"></i><i class="thumb" style="top:15px"></i><i class="arr dn"></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- Balloon Help: explains the dash -->
+<div class="balloon" style="left:196px; top:410px; width:340px;" role="note">
+  <svg class="tail" width="30" height="20" style="left:198px; top:-19px"><path d="M4 19.5 L22 1 L16 19.5" fill="#fff" stroke="#222"/><rect x="5" y="18" width="10" height="3" fill="#fff"/></svg>
+  <b>&mdash; means not computed.</b> This run is queued or still running, so it has no score yet. <b>0.000</b> (r-2287) is a score that was computed and came out zero.
+</div>
+
+<!-- SCORE HISTORY: about the selection, above Runs, partly under Info -->
+<section class="win" id="score" aria-label="Score history">
+  <header class="tb"><span class="box close"></span><h2>Score history</h2><span class="box zoom"></span><span class="box shade"></span></header>
+  <div class="wb">
+    <div class="charthead"><b>summarize-v3 on news-digest-2k</b><span>last 12 runs, oldest first</span></div>
+    <div class="legend"><span><i class="sw-band"></i>noise band 0.833 to 0.873</span><span><i class="sw-base"></i>baseline 0.853 (r-2203)</span></div>
+    <div class="well">
+      <svg width="490" height="268" viewBox="0 0 490 268" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the noise band.">
+        <g font-family="Nunito Sans, sans-serif" font-size="11" fill="#1A1A1A" style="font-variant-numeric:tabular-nums">
+          <rect x="44" y="41" width="430" height="120" fill="url(#dith)"/>
+          <path d="M44 41.5h430M44 160.5h430" stroke="#888"/>
+          <path d="M44 20.5h430M44 80.5h430M44 140.5h430M44 200.5h430M44 260.5h430" stroke="#E4E4E4"/>
+          <path d="M44.5 14v247" stroke="#222"/>
+          <text x="38" y="24" text-anchor="end">0.88</text>
+          <text x="38" y="84" text-anchor="end">0.86</text>
+          <text x="38" y="144" text-anchor="end">0.84</text>
+          <text x="38" y="204" text-anchor="end">0.82</text>
+          <text x="38" y="264" text-anchor="end">0.80</text>
+          <path d="M44 101.5h430" stroke="#222" stroke-dasharray="4 3"/>
+          <polyline points="64,122 101,107 138,113 176,95 213,101 250,110 288,89 325,104 362,116 400,107 437,101 462,224" fill="none" stroke="#222" stroke-width="1.5"/>
+          <g fill="#222">
+            <rect x="61" y="119" width="6" height="6"/><rect x="98" y="104" width="6" height="6"/><rect x="135" y="110" width="6" height="6"/><rect x="173" y="92" width="6" height="6"/><rect x="210" y="98" width="6" height="6"/><rect x="247" y="107" width="6" height="6"/><rect x="285" y="86" width="6" height="6"/><rect x="322" y="101" width="6" height="6"/><rect x="359" y="113" width="6" height="6"/><rect x="397" y="104" width="6" height="6"/><rect x="434" y="98" width="6" height="6"/>
+          </g>
+          <rect x="457.5" y="219.5" width="9" height="9" fill="#fff" stroke="#222" stroke-width="2"/>
+          <use href="#caution" x="344" y="208" width="16" height="16"/>
+          <text x="446" y="220" text-anchor="end" font-weight="800">0.812 r-2291</text>
+          <text x="446" y="234" text-anchor="end">below the band</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- LOG: SimpleText-style plain document -->
+<section class="win" id="log" aria-label="Log">
+  <header class="tb"><span class="box close"></span><h2>r-2291.log (last 5 lines)</h2><span class="box zoom"></span><span class="box shade"></span></header>
+  <div class="wb">
+<pre>02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+02:13:55  <b>warn</b>  length_ratio above 1.15 on 38% of samples
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</pre>
+    <div class="vscroll"><i class="arr up"></i><i class="thumb"></i><i class="arr dn"></i></div>
+  </div>
+</section>
+
+<!-- ALERT: the failed run, a real dialog, behind the front window -->
+<section class="win" id="alert" role="alertdialog" aria-labelledby="alert-h">
+  <header class="tb"><h2>Run failed</h2></header>
+  <div class="wb">
+    <svg width="40" height="40"><use href="#stop"/></svg>
+    <div>
+      <h3 id="alert-h">r-2287 failed: extract-json on invoices-ocr</h3>
+      <span class="err">KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation</span>
+      <p>This is a failure, not a regression. Every sample failed validation, so its 0.000 is a computed zero. Fix the extractor's output schema, then rerun.</p>
+      <div class="actions"><button class="btn">Rerun r-2287</button><button class="btn default">OK</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- windowshaded: the empty state -->
+<section class="win shaded" id="pinned" aria-label="Pinned comparisons">
+  <header class="tb"><h2>Pinned comparisons: none yet</h2></header>
+</section>
+
+<!-- INFO: the selection, front and active -->
+<section class="win front" id="info" aria-label="r-2291 Info">
+  <header class="tb"><span class="box close"></span><h2>r-2291 Info</h2><span class="box zoom"></span><span class="box shade"></span></header>
+  <div class="wb">
+    <div class="ihead">
+      <svg width="32" height="32"><use href="#doc32"/></svg>
+      <div>
+        <h1>summarize-v3 on news-digest-2k</h1>
+        <div class="sub">Run r-2291. Baseline summarize-v2 @ r-2203 (0.853)</div>
+      </div>
+    </div>
+    <div>
+      <div class="big">0.812</div>
+      <div class="bigsub"><b>&minus;0.041</b> vs baseline 0.853</div>
+      <div class="caution" role="status">
+        <svg class="glyph" width="28" height="28"><use href="#caution"/></svg>
+        <div><b>Regression.</b> 0.041 below baseline, twice the &plusmn;0.02 noise band. The 11 runs before it all stayed inside the band.</div>
+      </div>
+      <dl class="props">
+        <dt>Status</dt><dd>Passed</dd>
+        <dt>Duration</dt><dd>14m 02s</dd>
+        <dt>Triggered by</dt><dd>schedule</dd>
+        <dt>Started</dt><dd>02:00</dd>
+      </dl>
+    </div>
+    <div class="metrics">
+      <div class="group">
+        <span class="legend">Metrics</span>
+        <div class="well">
+          <table class="list">
+            <colgroup><col><col style="width:62px"><col style="width:70px"><col style="width:64px"></colgroup>
+            <thead><tr><th>Metric</th><th class="num">Score</th><th class="num">Baseline</th><th class="num">&Delta;</th></tr></thead>
+            <tbody>
+              <tr><td>ROUGE-L</td><td class="num">0.412</td><td class="num">0.447</td><td class="num">&minus;0.035</td></tr>
+              <tr class="hl"><td>Faithfulness</td><td class="num">0.861</td><td class="num">0.902</td><td class="num"><b>&minus;0.041</b></td></tr>
+              <tr><td>Coverage</td><td class="num">0.790</td><td class="num">0.801</td><td class="num">&minus;0.011</td></tr>
+              <tr><td>Length ratio</td><td class="num">1.18</td><td class="num">1.02</td><td class="num">+0.16</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Faithfulness drops the most. Length ratio went up: the log warns it is above 1.15 on 38% of samples.</p>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn" disabled>Cancel</button>
+      <span class="why">Cancel is dimmed: r-2291 already finished at 02:14:02.</span>
+      <button class="btn push">Compare with baseline</button>
+      <button class="btn default">Rerun</button>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

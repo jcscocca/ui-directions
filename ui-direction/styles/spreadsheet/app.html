@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: Today</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+
+.app { height: 100vh; height: 100dvh; }
+.titlebar { height: 46px; padding: 0 14px; }
+.titlebar .book { font-size: 18px; }
+.titlebar .date { margin-left: auto; font-size: 14px; color: #fff; }
+.fbar { height: 36px; }
+.namebox { width: 62px; }
+.fx { width: 30px; }
+.sheetwrap { overflow: auto; }
+.sheet { width: 100%; min-width: 330px; overflow: hidden; }
+.tabs { height: 50px; }
+.tab { flex: 1; justify-content: center; padding: 0 4px; font-size: 14px; }
+.tab:last-child { border-right: 0; }
+.x.wrap { overflow-wrap: anywhere; }
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="titlebar">
+  <svg class="logo" viewBox="0 0 18 18" aria-hidden="true"><rect x="0.5" y="0.5" width="17" height="17" fill="none" stroke="#fff"/><path d="M0.5 6.5H17.5M0.5 12H17.5M6 0.5V17.5M12 0.5V17.5" stroke="#fff"/><rect x="6" y="6.5" width="6" height="5.5" fill="#fff"/></svg>
+  <span class="book">Shelf</span>
+  <span class="date">Thu 24 Sep</span>
+</header>
+<div class="fbar">
+  <div class="namebox" aria-label="Selected cell">D6</div>
+  <div class="fx" aria-hidden="true">fx</div>
+  <div class="formula" aria-label="Formula">=<span class="r1">B6</span>/<span class="r2">C6</span></div>
+</div>
+<main class="sheetwrap">
+<div class="sheet" role="grid" aria-label="Today" style="grid-template-columns:24px minmax(0,1.5fr) minmax(0,1fr) minmax(0,.85fr) minmax(0,.85fr) 12px;grid-template-rows:var(--colhdr) 28px 30px 30px 30px 30px 28px 48px 28px 28px 28px 28px 28px minmax(28px,auto) minmax(28px,auto) minmax(28px,auto) 28px 28px minmax(28px,auto) 28px 28px 28px 28px">
+<div class="corner" style="grid-area:1/1" aria-hidden="true"></div>
+<div class="ch" style="grid-area:1/2" aria-hidden="true">A</div>
+<div class="ch" style="grid-area:1/3" aria-hidden="true">B</div>
+<div class="ch" style="grid-area:1/4" aria-hidden="true">C</div>
+<div class="ch on" style="grid-area:1/5" aria-hidden="true">D</div>
+<div class="ch" style="grid-area:1/6" aria-hidden="true">E</div>
+<div class="rh" style="grid-area:2/1" aria-hidden="true">1</div>
+<div class="rh" style="grid-area:3/1" aria-hidden="true">2</div>
+<div class="rh" style="grid-area:4/1" aria-hidden="true">3</div>
+<div class="rh" style="grid-area:5/1" aria-hidden="true">4</div>
+<div class="rh" style="grid-area:6/1" aria-hidden="true">5</div>
+<div class="rh on" style="grid-area:7/1" aria-hidden="true">6</div>
+<div class="rh" style="grid-area:8/1" aria-hidden="true">7</div>
+<div class="rh" style="grid-area:9/1" aria-hidden="true">8</div>
+<div class="rh" style="grid-area:10/1" aria-hidden="true">9</div>
+<div class="rh" style="grid-area:11/1" aria-hidden="true">10</div>
+<div class="rh" style="grid-area:12/1" aria-hidden="true">11</div>
+<div class="rh" style="grid-area:13/1" aria-hidden="true">12</div>
+<div class="rh" style="grid-area:14/1" aria-hidden="true">13</div>
+<div class="rh" style="grid-area:15/1" aria-hidden="true">14</div>
+<div class="rh" style="grid-area:16/1" aria-hidden="true">15</div>
+<div class="rh" style="grid-area:17/1" aria-hidden="true">16</div>
+<div class="rh" style="grid-area:18/1" aria-hidden="true">17</div>
+<div class="rh" style="grid-area:19/1" aria-hidden="true">18</div>
+<div class="rh" style="grid-area:20/1" aria-hidden="true">19</div>
+<div class="rh" style="grid-area:21/1" aria-hidden="true">20</div>
+<div class="rh" style="grid-area:22/1" aria-hidden="true">21</div>
+<div class="rh" style="grid-area:23/1" aria-hidden="true">22</div>
+<i class="c" style="grid-area:2/6"></i>
+<i class="c" style="grid-area:3/6"></i>
+<i class="c" style="grid-area:4/6"></i>
+<i class="c" style="grid-area:5/6"></i>
+<i class="c" style="grid-area:6/6"></i>
+<i class="c" style="grid-area:7/6"></i>
+<i class="c" style="grid-area:8/2"></i>
+<i class="c" style="grid-area:8/6"></i>
+<i class="c" style="grid-area:9/6"></i>
+<i class="c" style="grid-area:10/6"></i>
+<i class="c" style="grid-area:11/2"></i>
+<i class="c" style="grid-area:11/6"></i>
+<i class="c" style="grid-area:12/2"></i>
+<i class="c" style="grid-area:12/3"></i>
+<i class="c" style="grid-area:12/4"></i>
+<i class="c" style="grid-area:12/5"></i>
+<i class="c" style="grid-area:12/6"></i>
+<i class="c" style="grid-area:13/6"></i>
+<i class="c" style="grid-area:14/6"></i>
+<i class="c" style="grid-area:15/6"></i>
+<i class="c" style="grid-area:16/6"></i>
+<i class="c" style="grid-area:17/2"></i>
+<i class="c" style="grid-area:17/3"></i>
+<i class="c" style="grid-area:17/4"></i>
+<i class="c" style="grid-area:17/5"></i>
+<i class="c" style="grid-area:17/6"></i>
+<i class="c" style="grid-area:18/6"></i>
+<i class="c" style="grid-area:19/6"></i>
+<i class="c" style="grid-area:20/2"></i>
+<i class="c" style="grid-area:20/3"></i>
+<i class="c" style="grid-area:20/4"></i>
+<i class="c" style="grid-area:20/5"></i>
+<i class="c" style="grid-area:20/6"></i>
+<i class="c" style="grid-area:21/2"></i>
+<i class="c" style="grid-area:21/3"></i>
+<i class="c" style="grid-area:21/4"></i>
+<i class="c" style="grid-area:21/5"></i>
+<i class="c" style="grid-area:21/6"></i>
+<i class="c" style="grid-area:22/2"></i>
+<i class="c" style="grid-area:22/3"></i>
+<i class="c" style="grid-area:22/4"></i>
+<i class="c" style="grid-area:22/5"></i>
+<i class="c" style="grid-area:22/6"></i>
+<i class="c" style="grid-area:23/2"></i>
+<i class="c" style="grid-area:23/3"></i>
+<i class="c" style="grid-area:23/4"></i>
+<i class="c" style="grid-area:23/5"></i>
+<i class="c" style="grid-area:23/6"></i>
+<div class="x th" style="grid-area:2/2/3/3;">Currently reading</div>
+<div class="x th" style="grid-area:2/3/3/6;"></div>
+<div class="x ctr" style="grid-area:3/2/7/3;padding:4px"><svg viewBox="0 0 76 108" width="76" height="108" role="img" aria-label="Cover: The Left Hand of Darkness">
+<rect width="76" height="108" fill="#2E4057"/>
+<rect x="0" y="0" width="5" height="108" fill="#22303F"/>
+<circle cx="40" cy="44" r="16" fill="#E9E4D8"/>
+<path d="M40 28 A16 16 0 0 0 40 60 Z" fill="#22303F"/>
+<text x="40" y="78" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="7.2" font-weight="700" fill="#E9E4D8" letter-spacing=".3">THE LEFT HAND</text>
+<text x="40" y="87" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="7.2" font-weight="700" fill="#E9E4D8" letter-spacing=".3">OF DARKNESS</text>
+<text x="40" y="100" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="6.4" fill="#B8C4D1">LE GUIN</text>
+</svg></div>
+<div class="x wrap b i" style="grid-area:3/3/5/6;font-size:15px;line-height:1.2;align-items:center">The Left Hand of Darkness</div>
+<div class="x " style="grid-area:5/3/6/6;">Ursula K. Le Guin</div>
+<div class="x sub" style="grid-area:6/3/7/4;">Last read</div>
+<div class="x " style="grid-area:6/4/7/6;">yesterday</div>
+<div class="x sub" style="grid-area:7/2/8/3;">Page</div>
+<div class="x r b" style="grid-area:7/3/8/4;">184</div>
+<div class="x r" style="grid-area:7/4/8/5;" title="Stored as 304, formatted as &quot;of &quot;0">of 304</div>
+<div class="x r b" style="grid-area:7/5/8/6;"><span class="bar" style="width:61%"></span><span style="margin-left:auto">61%</span></div>
+<div class="x btncell" style="grid-area:8/3/9/6;padding:5px 6px"><button class="btn pri" style="font-size:15px">Log pages</button></div>
+<div class="x sub" style="grid-area:9/2/10/3;">Streak</div>
+<div class="x b" style="grid-area:9/3/10/6;">11 days</div>
+<div class="x sub" style="grid-area:10/2/11/3;">Today&rsquo;s goal</div>
+<div class="x r" style="grid-area:10/3/11/4;">20 pages</div>
+<div class="x r" style="grid-area:10/4/11/5;"><span class="bar" style="width:40%"></span><span style="margin-left:auto">8 read</span></div>
+<div class="x r warn b flag" style="grid-area:10/5/11/6;" title="Goal not met yet: 12 of 20 pages left today.">12 to go</div>
+<div class="x sub i" style="grid-area:11/3/12/6;">Not met yet: 8 of 20 pages read today.</div>
+<div class="x th" style="grid-area:13/2/14/3;">Up next (3)</div>
+<div class="x th" style="grid-area:13/3/14/5;">Author</div>
+<div class="x th r" style="grid-area:13/5/14/6;">Pages</div>
+<div class="x wrap i" style="grid-area:14/2/15/3;gap:6px"><span class="dim" style="font-style:normal">1</span><span>Piranesi</span></div>
+<div class="x wrap" style="grid-area:14/3/15/5;">Susanna Clarke</div>
+<div class="x r" style="grid-area:14/5/15/6;align-items:flex-start;padding-top:3px">272 pp</div>
+<div class="x wrap i" style="grid-area:15/2/16/3;gap:6px"><span class="dim" style="font-style:normal">2</span><span>The Remains of the Day</span></div>
+<div class="x wrap" style="grid-area:15/3/16/5;">Kazuo Ishiguro</div>
+<div class="x r" style="grid-area:15/5/16/6;align-items:flex-start;padding-top:3px">245 pp</div>
+<div class="x wrap i" style="grid-area:16/2/17/3;gap:6px"><span class="dim" style="font-style:normal">3</span><span>A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</span></div>
+<div class="x wrap" style="grid-area:16/3/17/5;">J. Placeholder-Smythe</div>
+<div class="x r" style="grid-area:16/5/17/6;align-items:flex-start;padding-top:3px">1,104 pp</div>
+<div class="x th" style="grid-area:18/2/19/3;">Saved highlight</div>
+<div class="x th" style="grid-area:18/3/19/6;"></div>
+<div class="x sub" style="grid-area:19/2/20/3;align-items:flex-start;padding-top:6px">p. 222</div>
+<div class="x wrap i" style="grid-area:19/3/20/6;font-size:14px;line-height:1.35;padding-top:5px;padding-bottom:5px">&ldquo;Light is the left hand of darkness and darkness the right hand of light.&rdquo;</div>
+<div class="freeze-v" style="grid-area:2/2/24/3;" aria-hidden="true"></div>
+<div class="refbox" style="grid-area:7/3/8/4;" aria-hidden="true"></div>
+<div class="refbox r2" style="grid-area:7/4/8/5;" aria-hidden="true"></div>
+<div class="selbox " style="grid-area:7/5/8/6;" aria-hidden="true"></div>
+</div>
+</main>
+<nav class="tabs" aria-label="Sections">
+  <a class="tab" href="#" aria-current="page">Today</a>
+  <a class="tab" href="#">Library</a>
+  <a class="tab" href="#">Highlights</a>
+  <a class="tab" href="#">Stats</a>
+</nav>
+</div>
+</body>
+</html>

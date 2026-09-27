@@ -1,0 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Overpass+Mono:wght@400;600;700&display=swap");
+
+:root {
+  --font-sign: "Overpass", "Segoe UI", sans-serif;
+  --font-board: "Overpass Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* the map */
+  --paper: #FFFFFF;
+  --zone: #F1F3F4;
+  --ink: #111418;
+  --ink-2: #3C434B;
+  --grey: #8A929A;
+  --rule: #D5D9DD;
+  --planned: #B4BAC0;
+
+  /* lines: one colour per entity, never used for status */
+  --line-blue: #1466B8;
+  --line-green: #13925A;
+  --line-purple: #7A3FA6;
+  --line-brown: #8E5625;
+  --line-orange: #E07A12;
+
+  /* status: red is only for closures and disruptions */
+  --closed: #D7263D;
+  --closed-soft: #FBE3E6;
+
+  /* the departures board */
+  --board: #15181C;
+  --flap: #262B31;
+  --flap-hinge: #0A0C0E;
+  --flap-ink: #F6C744;
+  --flap-dim: #8C7A45;
+  --flap-red: #FF6B7A;
+
+  /* line weights: the diagram's grammar */
+  --w-line: 8px;
+  --w-casing: 3px;
+  --w-tick: 5px;
+  --r-sign: 6px;
+  --r-flap: 2px;
+
+  /* type scale */
+  --t-11: 11px;
+  --t-12: 12px;
+  --t-13: 13px;
+  --t-15: 15px;
+  --t-18: 18px;
+  --t-22: 22px;
+  --t-30: 30px;
+  --t-44: 44px;
+
+  --u: 4px;
+}

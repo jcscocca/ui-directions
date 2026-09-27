@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..700&family=Azeret+Mono:wght@400;500&display=swap");
+
+:root {
+  --font: "Outfit", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-code: "Azeret Mono", Consolas, "Courier New", monospace;
+
+  /* surface: OLED black, flat tiles, no borders, no radius, no shadow */
+  --bg: #000000;
+  --ink: #FFFFFF;
+  --ink-2: #A6A6A6;      /* secondary text, 8.6:1 on black */
+  --ink-faded: #666666;  /* inactive pivot headers (large text only), 3.7:1 */
+  --tile: #1F1F1F;       /* neutral tile */
+  --tile-2: #333333;     /* neutral tile, raised / running fill */
+  --slot: #111111;       /* empty slot */
+
+  --accent: #0050EF;     /* cobalt: selection, primary, live tiles */
+  --accent-ink: #FFFFFF;
+  --fail: #E51400;       /* failure only: tile fill, white text on it 4.7:1 */
+  --fail-text: #FF5A45;  /* failure as text on black, 6.8:1 */
+  --warn: #F0A30A;       /* regression / needs attention */
+
+  /* collection rarity tiles (collection screen only) */
+  --r-uncommon: #00827F;
+  --r-rare: #0050EF;
+  --r-mythic: #D80073;
+
+  /* type scale: 12 / 14 / 16 / 20 / 28 / 48 / 96 / 150 */
+  --t-xs: 12px;
+  --t-s: 14px;
+  --t-m: 16px;
+  --t-l: 20px;
+  --t-xl: 28px;
+  --t-pivot: 48px;
+  --t-title: 96px;
+  --t-hero: 150px;
+
+  --w-hero: 100;
+  --w-title: 200;
+  --w-pivot: 300;
+  --w-body: 400;
+  --w-label: 600;
+
+  /* spacing: tight inside tiles, generous between sections */
+  --u: 4px;
+  --gap-tile: 8px;
+  --gutter: 48px;
+  --section-gap: 72px;
+  --appbar-h: 80px;
+
+  --focus: 2px solid #FFFFFF;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body {
+  font-family: var(--font);
+  font-weight: var(--w-body);
+  font-size: var(--t-m);
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: var(--focus); outline-offset: 3px; }
+button { font: inherit; color: inherit; }

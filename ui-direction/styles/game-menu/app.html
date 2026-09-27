@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today, game menu</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--void); color: var(--text);
+    font-size: var(--t-body); line-height: var(--line);
+  }
+  .screen { padding: 12px 12px 124px; display: grid; gap: 26px; }
+  .win { position: relative; }
+  .lbl { color: var(--label); }
+  svg.px { image-rendering: pixelated; shape-rendering: crispEdges; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+
+  .bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; }
+  .bar h1 { font-size: var(--t-head); font-weight: 400; color: var(--gold); margin: 0; line-height: 32px; }
+
+  .member { padding: 22px 14px 14px; display: grid; grid-template-columns: 84px minmax(0, 1fr); column-gap: 14px; }
+  .cover {
+    width: 84px; height: 124px; border: 3px solid var(--frame); border-radius: 4px;
+    background: #CFE0E6; color: #13205A; padding: 6px 5px; display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .cover::before { content: ""; position: absolute; left: 0; right: 0; top: 64px; height: 18px; background: #13205A; }
+  .cover::after { content: ""; position: absolute; left: 50%; top: 67px; width: 12px; height: 12px; margin-left: -6px; background: #CFE0E6; }
+  .cover b { font-weight: 400; line-height: 18px; position: relative; }
+  .cover small { font-size: 16px; line-height: 18px; position: relative; text-align: right; }
+  .member h2 { font-size: var(--t-head); font-weight: 400; line-height: 28px; margin: 0; }
+  .member .by { color: var(--label); margin: 2px 0 8px; }
+  .row { display: flex; justify-content: space-between; }
+  .gauge { margin: 4px 0 6px; }
+
+  .pair { display: grid; grid-template-columns: minmax(0, 1fr) 118px; gap: 12px; }
+  .goal { padding: 22px 14px 12px; }
+  .goal .big { font-size: var(--t-big); line-height: 36px; }
+  .goal .gauge { margin: 6px 0 4px; }
+  .goal .togo { color: var(--charge); }
+  .streak { padding: 22px 12px 12px; text-align: right; }
+  .streak .big { font-size: var(--t-big); line-height: 36px; color: var(--gold); }
+
+  .cmd { padding: 8px 10px; }
+  .cmd button {
+    width: 100%; min-height: 52px; display: flex; align-items: center; gap: 10px;
+    font-size: var(--t-head); color: var(--gold); border-radius: 6px; padding: 0 8px;
+  }
+  .cmd button:hover { background: var(--select); }
+  .cmd .cursor { width: 40px; height: 25px; }
+  .cmd .hint { display: block; color: var(--label); padding: 0 8px 6px 58px; line-height: 20px; }
+
+  .dialog { padding: 22px 16px 22px; }
+  .dialog q { quotes: "\201C" "\201D"; display: block; font-size: 20px; line-height: 30px; }
+  .next { position: absolute; right: 16px; bottom: 10px; width: 16px; height: 10px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .next { animation: bob 1s steps(2) infinite; }
+    @keyframes bob { 50% { transform: translateY(4px); } }
+  }
+
+  .queue { padding: 22px 14px 10px; }
+  .queue ol { list-style: none; margin: 0; padding: 0; }
+  .queue li { display: grid; grid-template-columns: 22px 20px minmax(0, 1fr); column-gap: 10px; padding: 8px 0; border-top: 2px solid var(--window-deep); }
+  .queue li:first-child { border-top: 0; }
+  .queue .n { color: var(--gold); }
+  .chip { width: 20px; height: 30px; border: 2px solid var(--frame); border-radius: 2px; margin-top: 2px; }
+  .queue .t { overflow-wrap: anywhere; }
+  .queue .m { display: flex; justify-content: space-between; gap: 8px; color: var(--label); }
+  .queue .m span:last-child { color: var(--text); white-space: nowrap; }
+
+  .nav {
+    position: fixed; left: 12px; right: 12px; bottom: 12px;
+    padding: 8px 10px; display: grid; grid-template-columns: 1fr 1fr; row-gap: 2px;
+    box-shadow: inset 0 0 0 2px var(--window), inset 0 0 0 3px var(--frame-inner), 0 0 0 12px var(--void);
+  }
+  .nav a { display: flex; align-items: center; gap: 6px; color: var(--text); text-decoration: none; min-height: 36px; border-radius: 6px; padding-right: 4px; }
+  .nav a .cursor { visibility: hidden; }
+  .nav a[aria-current] { color: var(--gold); }
+  .nav a[aria-current] .cursor { visibility: visible; }
+  .nav a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="px-hand" viewBox="0 0 16 10"><path fill="#080C26" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h8v1h-8zM0 2h1v1h-1zM15 2h1v1h-1zM0 3h1v1h-1zM9 3h6v1h-6zM0 4h1v1h-1zM10 4h1v1h-1zM0 5h1v1h-1zM9 5h2v1h-2zM0 6h1v1h-1zM10 6h1v1h-1zM0 7h1v1h-1zM9 7h1v1h-1zM1 8h1v1h-1zM9 8h1v1h-1zM2 9h7v1h-7z"/><path fill="#EDEFF7" d="M2 1h5v1h-5zM2 2h13v1h-13zM2 3h6v1h-6zM2 4h8v1h-8zM2 5h6v1h-6zM2 6h8v1h-8zM2 7h6v1h-6zM3 8h6v1h-6z"/><path fill="#B9C3E8" d="M1 2h1v1h-1zM1 3h1v1h-1zM1 4h1v1h-1zM1 5h1v1h-1zM1 6h1v1h-1zM1 7h1v1h-1zM2 8h1v1h-1z"/><path fill="#8FA3EE" d="M8 3h1v1h-1zM8 5h1v1h-1zM8 7h1v1h-1z"/></symbol><symbol id="px-scroll" viewBox="0 0 16 16"><path fill="#080C26" d="M2 1h12v1h-12zM1 2h1v1h-1zM14 2h1v1h-1zM1 3h1v1h-1zM4 3h1v1h-1zM14 3h1v1h-1zM2 4h2v1h-2zM13 4h1v1h-1zM3 5h1v1h-1zM13 5h1v1h-1zM3 6h1v1h-1zM13 6h1v1h-1zM3 7h1v1h-1zM13 7h1v1h-1zM3 8h1v1h-1zM13 8h1v1h-1zM3 9h1v1h-1zM13 9h1v1h-1zM3 10h1v1h-1zM13 10h1v1h-1zM3 11h1v1h-1zM13 11h2v1h-2zM2 12h11v1h-11zM15 12h1v1h-1zM1 13h1v1h-1zM15 13h1v1h-1zM2 14h13v1h-13z"/><path fill="#F4C542" d="M2 2h2v1h-2zM2 3h2v1h-2zM13 12h2v1h-2zM2 13h2v1h-2zM13 13h2v1h-2z"/><path fill="#EDEFF7" d="M4 2h10v1h-10zM5 3h9v1h-9zM4 4h1v1h-1zM12 4h1v1h-1zM4 5h9v1h-9zM4 6h1v1h-1zM11 6h2v1h-2zM4 7h9v1h-9zM4 8h1v1h-1zM12 8h1v1h-1zM4 9h9v1h-9zM4 10h1v1h-1zM10 10h3v1h-3zM4 11h9v1h-9zM4 13h9v1h-9z"/><path fill="#8FA3EE" d="M5 4h7v1h-7zM5 6h6v1h-6zM5 8h7v1h-7zM5 10h5v1h-5z"/></symbol><symbol id="px-sign" viewBox="0 0 16 16"><path fill="#080C26" d="M7 0h2v1h-2zM2 1h12v1h-12zM2 2h1v1h-1zM14 2h1v1h-1zM2 3h1v1h-1zM15 3h1v1h-1zM2 4h1v1h-1zM14 4h1v1h-1zM2 5h12v1h-12zM7 6h1v1h-1zM9 6h1v1h-1zM2 7h12v1h-12zM1 8h1v1h-1zM13 8h1v1h-1zM0 9h1v1h-1zM13 9h1v1h-1zM1 10h1v1h-1zM13 10h1v1h-1zM2 11h12v1h-12zM7 12h1v1h-1zM9 12h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM6 14h5v1h-5z"/><path fill="#EDEFF7" d="M3 2h10v1h-10zM3 3h1v1h-1zM11 3h3v1h-3zM3 4h10v1h-10zM3 8h10v1h-10zM2 9h3v1h-3zM12 9h1v1h-1zM3 10h10v1h-10z"/><path fill="#F4C542" d="M13 2h1v1h-1zM14 3h1v1h-1zM13 4h1v1h-1zM8 6h1v1h-1zM2 8h1v1h-1zM1 9h1v1h-1zM2 10h1v1h-1zM8 12h1v1h-1zM8 13h1v1h-1z"/><path fill="#8FA3EE" d="M4 3h7v1h-7zM5 9h7v1h-7z"/></symbol><symbol id="px-braces" viewBox="0 0 16 16"><path fill="#080C26" d="M3 1h3v1h-3zM10 1h3v1h-3zM2 2h1v1h-1zM5 2h1v1h-1zM10 2h1v1h-1zM13 2h1v1h-1zM2 3h1v1h-1zM4 3h1v1h-1zM11 3h1v1h-1zM13 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM11 5h1v1h-1zM13 5h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM6 6h3v1h-3zM12 6h1v1h-1zM14 6h1v1h-1zM0 7h1v1h-1zM2 7h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1zM13 7h1v1h-1zM15 7h1v1h-1zM1 8h1v1h-1zM3 8h1v1h-1zM6 8h3v1h-3zM12 8h1v1h-1zM14 8h1v1h-1zM2 9h1v1h-1zM4 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM11 10h1v1h-1zM13 10h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM2 12h1v1h-1zM5 12h1v1h-1zM10 12h1v1h-1zM13 12h1v1h-1zM3 13h3v1h-3zM10 13h3v1h-3z"/><path fill="#EDEFF7" d="M3 2h2v1h-2zM11 2h2v1h-2zM3 3h1v1h-1zM12 3h1v1h-1zM3 4h1v1h-1zM12 4h1v1h-1zM3 5h1v1h-1zM12 5h1v1h-1zM2 6h1v1h-1zM13 6h1v1h-1zM1 7h1v1h-1zM14 7h1v1h-1zM2 8h1v1h-1zM13 8h1v1h-1zM3 9h1v1h-1zM12 9h1v1h-1zM3 10h1v1h-1zM12 10h1v1h-1zM3 11h1v1h-1zM12 11h1v1h-1zM3 12h2v1h-2zM11 12h2v1h-2z"/><path fill="#F4C542" d="M7 7h1v1h-1z"/></symbol><symbol id="px-bubble" viewBox="0 0 16 16"><path fill="#080C26" d="M2 1h12v1h-12zM1 2h1v1h-1zM14 2h1v1h-1zM0 3h1v1h-1zM15 3h1v1h-1zM0 4h1v1h-1zM15 4h1v1h-1zM0 5h1v1h-1zM15 5h1v1h-1zM0 6h1v1h-1zM15 6h1v1h-1zM1 7h1v1h-1zM14 7h1v1h-1zM2 8h3v1h-3zM7 8h7v1h-7zM4 9h1v1h-1zM6 9h1v1h-1zM3 10h1v1h-1zM5 10h1v1h-1zM2 11h2v1h-2z"/><path fill="#EDEFF7" d="M2 2h12v1h-12zM1 3h14v1h-14zM1 4h2v1h-2zM5 4h2v1h-2zM9 4h2v1h-2zM13 4h2v1h-2zM1 5h2v1h-2zM5 5h2v1h-2zM9 5h2v1h-2zM13 5h2v1h-2zM1 6h14v1h-14zM2 7h12v1h-12zM5 8h2v1h-2zM5 9h1v1h-1zM4 10h1v1h-1z"/><path fill="#8FA3EE" d="M3 4h2v1h-2zM7 4h2v1h-2zM11 4h2v1h-2zM3 5h2v1h-2zM7 5h2v1h-2zM11 5h2v1h-2z"/></symbol></svg>
+<main class="screen">
+
+  <header class="win bar">
+    <h1>Shelf</h1>
+    <span>Thu 24 Sep</span>
+  </header>
+
+  <section class="win member" aria-label="Currently reading">
+    <span class="plate">Reading now</span>
+    <div class="cover" aria-hidden="true"><b>The Left Hand of Darkness</b><small>Le Guin</small></div>
+    <div>
+      <h2>The Left Hand of Darkness</h2>
+      <p class="by">Ursula K. Le Guin</p>
+      <div class="row"><span class="lbl">Page</span><span>184 / 304</span></div>
+      <span class="gauge" role="progressbar" aria-valuenow="184" aria-valuemin="0" aria-valuemax="304" aria-label="Page 184 of 304"><i style="width:61%"></i></span>
+      <div class="row"><span class="lbl">61%</span><span class="lbl">Last read yesterday</span></div>
+    </div>
+  </section>
+
+  <div class="pair">
+    <section class="win goal" aria-label="Today's goal">
+      <span class="plate">Today's goal</span>
+      <div><span class="big">8</span> / 20 pages</div>
+      <span class="gauge charge" role="progressbar" aria-valuenow="8" aria-valuemin="0" aria-valuemax="20" aria-label="8 of 20 pages read today"><i style="width:40%"></i></span>
+      <div class="togo">12 to go. Not done yet.</div>
+    </section>
+    <section class="win streak" aria-label="Streak">
+      <span class="plate">Streak</span>
+      <div class="big">11</div>
+      <div>days</div>
+    </section>
+  </div>
+
+  <div class="win cmd">
+    <button type="button" autofocus><svg class="cursor px" viewBox="0 0 16 10" aria-hidden="true"><use href="#px-hand"/></svg>Log pages</button>
+    <span class="hint">Add today's pages to this book.</span>
+  </div>
+
+  <section class="win dialog" aria-label="Saved highlight">
+    <span class="plate">Highlight, p. 222</span>
+    <q>Light is the left hand of darkness and darkness the right hand of light.</q>
+    <svg class="next px" viewBox="0 0 8 5" aria-hidden="true"><path fill="#F4C542" d="M0 0h8v1h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1z"/></svg>
+  </section>
+
+  <section class="win queue" aria-label="Up next">
+    <span class="plate">Up next (3)</span>
+    <ol>
+      <li><span class="n">1</span><span class="chip" style="background:#2F7A5B"></span><div><div class="t">Piranesi</div><div class="m"><span>Susanna Clarke</span><span>272 pp</span></div></div></li>
+      <li><span class="n">2</span><span class="chip" style="background:#A8553A"></span><div><div class="t">The Remains of the Day</div><div class="m"><span>Kazuo Ishiguro</span><span>245 pp</span></div></div></li>
+      <li><span class="n">3</span><span class="chip" style="background:#6B5AA8"></span><div><div class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</div><div class="m"><span>J. Placeholder-Smythe</span><span>1,104 pp</span></div></div></li>
+    </ol>
+  </section>
+
+</main>
+
+<nav class="win nav" aria-label="Sections">
+  <a href="#" aria-current="page"><svg class="cursor px held" viewBox="0 0 16 10" aria-hidden="true"><use href="#px-hand"/></svg>Today</a>
+  <a href="#"><svg class="cursor px" viewBox="0 0 16 10" aria-hidden="true"><use href="#px-hand"/></svg>Library</a>
+  <a href="#"><svg class="cursor px" viewBox="0 0 16 10" aria-hidden="true"><use href="#px-hand"/></svg>Highlights</a>
+  <a href="#"><svg class="cursor px" viewBox="0 0 16 10" aria-hidden="true"><use href="#px-hand"/></svg>Stats</a>
+</nav>
+</body>
+</html>

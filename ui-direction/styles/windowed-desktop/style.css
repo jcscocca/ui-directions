@@ -1,0 +1,212 @@
+/* Windowed desktop: shared chrome (menu bar, windows, controls). Layout lives in each page. */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: 1.35;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  background-color: var(--desktop);
+  background-image:
+    linear-gradient(45deg, var(--desktop-dot) 25%, transparent 25%, transparent 75%, var(--desktop-dot) 75%),
+    linear-gradient(45deg, var(--desktop-dot) 25%, transparent 25%, transparent 75%, var(--desktop-dot) 75%);
+  background-size: 4px 4px;
+  background-position: 0 0, 2px 2px;
+}
+button, input { font: inherit; color: inherit; }
+a { color: inherit; }
+
+/* ---------- menu bar ---------- */
+.menubar {
+  position: relative;
+  height: var(--menubar);
+  display: flex;
+  align-items: stretch;
+  background: var(--platinum);
+  border-bottom: 1px solid var(--frame);
+  box-shadow: inset 0 1px 0 var(--bevel-hi);
+  font-family: var(--font-chrome);
+  font-size: var(--t-chrome);
+  font-synthesis: none;
+  z-index: 50;
+}
+.menubar::before, .menubar::after {
+  content: ""; position: absolute; top: 0; width: 8px; height: 8px;
+  background: radial-gradient(circle at 100% 100%, transparent 7px, #000 7.5px);
+}
+.menubar::before { left: 0; }
+.menubar::after { right: 0; transform: scaleX(-1); }
+.menubar .m {
+  display: flex; align-items: center; padding: 0 9px;
+  text-decoration: none; color: var(--ink); border: 0; background: none; cursor: default;
+}
+.menubar .m.app { padding-left: 4px; }
+.menubar .m:hover, .menubar .m.open { background: var(--select); color: #fff; }
+.menubar .m:focus-visible { outline: 2px solid var(--select); outline-offset: -2px; }
+.menubar .spacer { flex: 1; }
+.menubar .logo { padding: 0 8px 0 14px; display: flex; align-items: center; }
+
+/* ---------- windows ---------- */
+.win {
+  position: absolute;
+  display: flex; flex-direction: column;
+  background: var(--platinum);
+  border: 1px solid var(--frame);
+  box-shadow: var(--shadow-back);
+}
+.win.front { box-shadow: var(--shadow-front); }
+.tb {
+  position: relative; flex: none;
+  height: var(--titlebar);
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid var(--frame);
+  background: var(--platinum);
+  box-shadow: inset 1px 1px 0 var(--bevel-hi);
+  font-family: var(--font-chrome);
+  font-size: var(--t-chrome);
+}
+.tb h2, .tb .t {
+  margin: 0; padding: 0 8px; font-size: inherit; font-weight: 400; font-synthesis: none; line-height: 1;
+  color: #6A6A6A; white-space: nowrap; background: var(--platinum); position: relative; z-index: 1;
+}
+.front .tb {
+  background:
+    repeating-linear-gradient(180deg, var(--bevel-hi) 0 1px, var(--bevel-lo) 1px 2px) 4px 4px / calc(100% - 8px) 12px no-repeat,
+    var(--platinum);
+}
+.front .tb h2, .front .tb .t { color: var(--ink); }
+.tb .box {
+  position: absolute; top: 4px; width: 12px; height: 12px;
+  background: var(--platinum); border: 1px solid #3a3a3a;
+  box-shadow: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo), 0 0 0 2px var(--platinum);
+  display: none; z-index: 1;
+}
+.front .tb .box { display: block; }
+.tb .close { left: 8px; }
+.tb .zoom { right: 26px; }
+.tb .zoom::after { content: ""; position: absolute; inset: 2px 4px 4px 2px; border: 1px solid #3a3a3a; }
+.tb .shade { right: 8px; }
+.tb .shade::after { content: ""; position: absolute; left: 1px; right: 1px; top: 4px; height: 2px; border-top: 1px solid #3a3a3a; border-bottom: 1px solid #3a3a3a; }
+.wb { flex: 1; min-height: 0; position: relative; box-shadow: var(--bevel-out); }
+
+/* windowshade: title bar only */
+.win.shaded { height: auto; }
+
+/* ---------- scroll bars (drawn) ---------- */
+.vscroll {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 16px;
+  border-left: 1px solid var(--frame); background: var(--platinum);
+}
+.front .vscroll, .vscroll.live {
+  background:
+    linear-gradient(var(--bevel-hi), var(--bevel-hi)) 0 15px / 1px calc(100% - 30px) no-repeat,
+    repeating-conic-gradient(#C4C4C4 0 25%, #D4D4D4 0 50%) 0 0 / 2px 2px;
+}
+.vscroll .arr {
+  display: none; position: absolute; left: 0; right: 0; height: 15px;
+  background: var(--platinum); box-shadow: var(--bevel-out);
+}
+.front .vscroll .arr, .vscroll.live .arr { display: block; }
+.vscroll .arr.up { top: 0; border-bottom: 1px solid var(--frame); }
+.vscroll .arr.dn { bottom: 0; border-top: 1px solid var(--frame); }
+.vscroll .arr::after {
+  content: ""; position: absolute; left: 4px; top: 5px;
+  border: 3.5px solid transparent;
+}
+.vscroll .arr.up::after { border-bottom: 4px solid var(--frame); top: 2px; }
+.vscroll .arr.dn::after { border-top: 4px solid var(--frame); top: 5px; }
+.vscroll .thumb {
+  display: none; position: absolute; left: 0; right: 0; height: 26px;
+  background: #B8BEE6; border-top: 1px solid var(--frame); border-bottom: 1px solid var(--frame);
+  box-shadow: inset 1px 1px 0 #E4E7F8, inset -1px -1px 0 #7E88C4;
+}
+.front .vscroll .thumb, .vscroll.live .thumb { display: block; }
+
+/* ---------- buttons ---------- */
+.btn {
+  font-family: var(--font-chrome); font-size: var(--t-chrome); font-weight: 400; font-synthesis: none; line-height: 1;
+  min-height: 22px; padding: 2px 14px 3px;
+  background: var(--platinum); color: var(--ink);
+  border: 1px solid var(--frame); border-radius: var(--radius-button);
+  box-shadow: var(--bevel-out);
+  cursor: default; white-space: nowrap;
+}
+.btn:hover { background: #E8E8E8; }
+.btn:active { background: #9A9A9A; box-shadow: var(--bevel-in); color: #fff; }
+.btn:focus-visible { outline: 2px solid var(--select); outline-offset: 2px; }
+.btn.default { outline: 3px solid var(--frame); outline-offset: 2px; border-radius: 4px; }
+.btn.default:focus-visible { outline-color: var(--select); }
+.btn:disabled, .btn[aria-disabled="true"] {
+  color: var(--disabled); border-color: var(--disabled); box-shadow: none; background: var(--platinum);
+}
+
+/* ---------- text field ---------- */
+.field {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--paper); border: 1px solid var(--frame);
+  box-shadow: inset 1px 1px 0 var(--bevel-lo), 1px 1px 0 var(--bevel-hi), -1px -1px 0 var(--bevel-lo);
+  height: 22px; padding: 0 4px 0 6px;
+}
+.field input { border: 0; outline: 0; background: transparent; flex: 1; min-width: 0; font-size: 12px; }
+.field input::placeholder { color: #6A6A6A; }
+.field:focus-within { outline: 2px solid var(--progress); outline-offset: 1px; }
+.key {
+  font-family: var(--font-chrome); font-size: 14px; line-height: 1;
+  padding: 1px 5px 2px; background: var(--platinum); border: 1px solid var(--bevel-lo);
+  border-radius: 3px; box-shadow: var(--bevel-out); color: var(--ink);
+}
+
+/* ---------- inset wells, progress, group boxes ---------- */
+.well { background: var(--paper); border: 1px solid var(--frame); box-shadow: 1px 1px 0 var(--bevel-hi), -1px -1px 0 var(--bevel-lo); }
+.progress {
+  position: relative; height: 12px; background: #EEEEEE;
+  border: 1px solid var(--frame); box-shadow: inset 1px 1px 0 var(--bevel-lo);
+}
+.progress > i {
+  position: absolute; left: 0; top: 0; bottom: 0; display: block;
+  background: var(--progress);
+  box-shadow: inset 1px 1px 0 #B8BEE6, inset -1px -1px 0 #3E4AA0;
+  border-right: 1px solid var(--frame);
+}
+.group { position: relative; border: 1px solid var(--bevel-lo); box-shadow: 1px 1px 0 var(--bevel-hi), inset 1px 1px 0 var(--bevel-hi); padding: 14px 12px 12px; }
+.group > .legend {
+  position: absolute; top: -8px; left: 9px; padding: 0 4px; background: var(--platinum);
+  font-weight: 700; font-size: 12px; line-height: 15px;
+}
+
+/* ---------- desktop icons ---------- */
+.icon { display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; width: 76px; color: var(--ink); }
+.icon svg { display: block; }
+.icon .label {
+  font-size: 11px; font-weight: 600; line-height: 1.2; text-align: center;
+  background: var(--paper); padding: 0 3px; max-width: 76px; overflow-wrap: anywhere;
+}
+.icon:focus-visible { outline: none; }
+.icon:focus-visible .label, .icon:hover .label { background: var(--select); color: #fff; }
+.icon.current .label { background: var(--frame); color: #fff; }
+
+/* ---------- balloon help ---------- */
+.balloon {
+  position: absolute; z-index: 40;
+  background: var(--paper); border: 1px solid var(--frame); border-radius: 12px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.35);
+  padding: 8px 12px; font-size: 12px; line-height: 1.4;
+}
+.balloon .tail { position: absolute; display: block; overflow: visible; }
+
+/* ---------- alert glyphs ---------- */
+.glyph { flex: none; display: inline-block; vertical-align: -2px; }
+
+/* ---------- list view ---------- */
+.list { width: 100%; border-collapse: collapse; table-layout: fixed; background: var(--paper); }
+.list th {
+  font-weight: 700; font-size: 11px; text-align: left; height: 19px; padding: 0 6px;
+  background: var(--platinum); border-right: 1px solid var(--bevel-lo); border-bottom: 1px solid var(--frame);
+  box-shadow: inset 1px 1px 0 var(--bevel-hi); white-space: nowrap;
+}
+.list th.sorted { background: var(--platinum-deep); }
+.list td { padding: 0 6px; height: 20px; font-size: 12px; vertical-align: middle; white-space: nowrap; }
+.list .num { text-align: right; }
+.list td.sorted { background: var(--sorted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

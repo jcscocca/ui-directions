@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>evals: runs</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #BDBEBA; color: var(--graphite);
+    font-family: var(--font-label); font-size: var(--t-body); line-height: 1.3;
+    font-variant-numeric: tabular-nums; padding: 10px;
+  }
+  h1, h2, h3, p, ol, ul, dl, dd { margin: 0; padding: 0; }
+  ol, ul { list-style: none; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--graphite); outline-offset: 2px; }
+
+  .ss { font-size: var(--t-label); text-transform: lowercase; color: var(--graphite); letter-spacing: .01em; }
+  .nt { text-transform: none; }
+  .ss.m { font-size: var(--t-micro); color: var(--print); }
+  .dp { display: inline-block; width: .13em; height: .13em; background: currentColor; margin: 0 .07em; vertical-align: baseline; }
+  .lcd {
+    background: var(--lcd); color: var(--lcd-on); border-radius: var(--r-lcd);
+    box-shadow: inset 0 2px 0 rgba(0,0,0,.45), 0 1px 0 var(--alu-hi);
+    font-family: var(--font-lcd); font-weight: 700;
+  }
+  .dots { background-image: radial-gradient(circle, var(--lcd-ghost) 0.9px, transparent 1.3px); background-size: 4px 4px; }
+
+  /* device */
+  .device {
+    height: 880px; background: var(--seam); border-radius: var(--r-body); padding: 2px; position: relative;
+    display: grid; grid-template-rows: 74px 1fr; gap: var(--seam-w);
+  }
+  .screw { position: absolute; width: 11px; height: 11px; border-radius: 50%; background: var(--alu-hi); border: 1px solid var(--seam); z-index: 2; }
+  .screw::after { content: ""; position: absolute; left: 2px; right: 2px; top: 4px; height: 1.5px; background: var(--print); transform: rotate(35deg); }
+  .screw.tl { left: 9px; top: 9px; } .screw.tr { right: 9px; top: 9px; } .screw.bl { left: 9px; bottom: 9px; } .screw.br { right: 9px; bottom: 9px; }
+  .mod { background: var(--alu); box-shadow: inset 1px 1px 0 var(--alu-hi); position: relative; min-width: 0; min-height: 0; }
+  .device > .row { display: grid; gap: var(--seam-w); min-height: 0; }
+  .top { grid-template-columns: 250px 1fr 420px; }
+  .top .mod:first-child { border-top-left-radius: 20px; }
+  .top .mod:last-child { border-top-right-radius: 20px; }
+  .main { grid-template-columns: 832px 1fr; }
+  .col { display: grid; gap: var(--seam-w); min-height: 0; }
+  .col.left { grid-template-rows: 1fr 196px; }
+  .col.right { grid-template-rows: 178px 214px 132px 136px 1fr; }
+  .lower { display: grid; grid-template-columns: 300px 170px 1fr; gap: var(--seam-w); }
+  .lower .mod:first-child { border-bottom-left-radius: 20px; }
+  .col.right .mod:last-child { border-bottom-right-radius: 20px; }
+
+  /* top row */
+  .brand { display: flex; align-items: center; gap: 12px; padding: 0 28px; }
+  .brand b { font-size: 24px; font-weight: 700; letter-spacing: -.02em; text-transform: lowercase; }
+  .brand .ws { display: flex; flex-direction: column; }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: var(--led-off); display: inline-block; box-shadow: inset 0 -1px 0 rgba(0,0,0,.25); flex: none; }
+  .led.on { background: var(--led-ok); }
+  .led.fault { background: var(--led-fault); }
+  .led.blink { animation: blink 1.2s steps(2, start) infinite; }
+  @keyframes blink { to { background: var(--led-off); } }
+  @media (prefers-reduced-motion: reduce) { .led.blink { animation: none; } }
+
+  .nav { display: flex; align-items: center; gap: 18px; padding: 0 22px; }
+  .nav .ss.m { margin-right: 6px; }
+  .navkey { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .navkey .led { width: 6px; height: 6px; }
+  .navkey span.cap {
+    width: 42px; height: 22px; border-radius: 5px; background: var(--alu-hi);
+    box-shadow: inset 0 -3px 0 var(--seam), 0 0 0 1px var(--seam);
+  }
+  .navkey:hover span.cap { background: #EDEEEA; }
+  .navkey[aria-current] span.cap { background: var(--graphite); box-shadow: inset 0 -3px 0 #111, 0 0 0 1px #111; }
+  .navkey .ss { font-size: 11px; }
+  .navkey[aria-current] .ss { font-weight: 700; }
+
+  .search { display: flex; align-items: center; gap: 10px; padding: 0 28px 0 18px; }
+  .search .lcd { flex: 1; height: 38px; display: flex; align-items: center; padding: 0 10px; }
+  .search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--lcd-on); font-family: var(--font-lcd); font-weight: 700; font-size: 15px; }
+  .search input::placeholder { color: var(--lcd-dim); }
+  .search .lcd:focus-within { box-shadow: inset 0 2px 0 rgba(0,0,0,.45), 0 0 0 2px var(--graphite); }
+  .kcap { min-width: 30px; height: 30px; display: grid; place-items: center; border-radius: 6px; background: var(--alu-hi); box-shadow: inset 0 -3px 0 var(--seam), 0 0 0 1px var(--seam); font-weight: 600; font-size: 13px; }
+
+  /* channel strips */
+  .strips { padding: 14px 18px 12px 30px; display: flex; flex-direction: column; }
+  .strips-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
+  .strips-head h2 { font-size: 13px; font-weight: 700; text-transform: lowercase; }
+  .strips-head .legend { margin-left: auto; display: flex; gap: 16px; }
+  .strips-head .legend b { font-family: var(--font-lcd); font-weight: 800; font-size: 14px; margin-right: 4px; }
+  .bank { flex: 1; display: grid; grid-template-columns: repeat(8, 1fr); border: 1px solid var(--seam); border-radius: var(--r-module); overflow: hidden; }
+  .ch { display: flex; flex-direction: column; align-items: stretch; padding: 8px 7px 8px; border-left: 1px solid var(--seam); position: relative; min-width: 0; }
+  .ch:first-child { border-left: 0; }
+  .ch.sel { background: #DDDED9; }
+  .ch-top { display: flex; align-items: center; gap: 5px; height: 14px; }
+  .rid { font-family: var(--font-lcd); font-weight: 800; font-size: 20px; line-height: 1; margin-top: 5px; }
+  .rid small { font-family: var(--font-label); font-size: 10px; font-weight: 500; color: var(--print); margin-right: 1px; }
+  .scribble { margin-top: 6px; height: 82px; padding: 5px 6px; font-family: var(--font-label); font-weight: 400; font-size: 10px; line-height: 1.2; overflow: hidden; }
+  .scribble b { display: block; font-weight: 700; font-size: 11px; margin-bottom: 2px; overflow-wrap: anywhere; }
+  .scribble span { overflow-wrap: anywhere; color: #9DB894; }
+  .meterwrap { display: flex; gap: 5px; margin-top: 8px; height: 226px; }
+  .meter { flex: 1; display: flex; flex-direction: column-reverse; gap: 2px; padding: 4px; }
+  .meter i { flex: 1; background: var(--lcd-ghost); border-radius: 1px; }
+  .meter i.on { background: var(--lcd-on); }
+  .scale { display: flex; flex-direction: column; justify-content: space-between; font-size: 9px; color: var(--print); text-align: right; padding: 2px 0; width: 14px; }
+  .val { font-family: var(--font-lcd); font-weight: 800; font-size: 24px; line-height: 1; margin-top: 8px; text-align: right; }
+  .kv { display: grid; grid-template-columns: auto 1fr; column-gap: 4px; row-gap: 1px; font-size: 10.5px; margin-top: 6px; }
+  .kv dt { color: var(--print); font-size: 10px; }
+  .kv dd { text-align: right; font-weight: 600; overflow-wrap: anywhere; }
+  .dl { font-family: var(--font-lcd); font-weight: 800; font-size: 14px !important; }
+  .flag { display: flex; align-items: center; gap: 4px; justify-content: flex-end; font-size: 10px; height: 14px; margin-top: 3px; }
+  .runbar { height: 8px; margin: 6px 0 0; background: var(--lcd-ghost); border-radius: 2px; position: relative; overflow: hidden; }
+  .runbar i { position: absolute; inset: 0 38% 0 0; background: var(--lcd-on); }
+  .selkey { margin-top: auto; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: 0; padding: 6px 0 0; cursor: pointer; }
+  .selkey span.cap { width: 46px; height: 20px; border-radius: 5px; background: var(--alu-hi); box-shadow: inset 0 -3px 0 var(--seam), 0 0 0 1px var(--seam); }
+  .selkey:hover span.cap { background: #EDEEEA; }
+  .ch.sel .selkey span.cap { background: var(--lcd-on); box-shadow: inset 0 2px 0 rgba(0,0,0,.18), 0 0 0 1px #7E9A76; }
+
+  /* lower modules */
+  .lowmod { padding: 14px 18px; }
+  .lowmod h3 { font-size: 11px; font-weight: 700; text-transform: lowercase; }
+  .toggles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; }
+  .tg { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .tg .n { font-family: var(--font-lcd); font-weight: 800; font-size: 24px; line-height: 1; }
+  .sw { width: 22px; height: 44px; border-radius: 11px; background: var(--graphite); position: relative; box-shadow: inset 0 2px 3px rgba(0,0,0,.5); cursor: pointer; border: 0; padding: 0; }
+  .sw::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 18px; border-radius: 8px; background: var(--alu-hi); box-shadow: inset 0 -2px 0 var(--seam); }
+  .sw[aria-pressed="false"]::after { top: auto; bottom: 3px; }
+  .tg .ss { display: flex; align-items: center; gap: 4px; }
+  .total { margin-top: 12px; }
+
+  .knobmod { display: flex; flex-direction: column; align-items: center; }
+  .knob { width: 118px; height: 118px; margin-top: 4px; }
+  .knobmod .ss { text-align: center; }
+
+  .faultmod { display: grid; grid-template-rows: auto auto 1fr; gap: 8px; }
+  .faultlcd { padding: 8px 10px; font-size: 13px; font-weight: 700; line-height: 1.35; }
+  .faultlcd .hd { display: flex; align-items: center; gap: 6px; font-family: var(--font-label); font-size: 10px; font-weight: 600; color: var(--lcd-dim); text-transform: lowercase; margin-bottom: 3px; }
+  .pinned { display: flex; align-items: center; gap: 10px; }
+  .pinned .lcd { padding: 4px 10px; font-size: 13px; color: var(--lcd-dim); }
+
+  /* right column */
+  .rmod { padding: 12px 30px 12px 18px; }
+  .rmod .lab:not(.mhead) { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+  .readout { height: 136px; padding: 10px 14px; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; }
+  .readout .line { font-size: 16px; grid-column: 1 / -1; display: flex; justify-content: space-between; }
+  .readout .big { font-size: var(--t-lcd-l); line-height: .9; font-weight: 800; letter-spacing: -.02em; align-self: center; }
+  .readout .delta { text-align: right; align-self: center; }
+  .readout .delta b { display: block; font-size: 34px; font-weight: 800; line-height: 1; }
+  .readout .delta span { font-size: 13px; color: var(--lcd-dim); }
+  .readout .foot { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; font-size: 13px; }
+  .seg { padding: 0 5px; border-radius: 2px; font-size: 12px; line-height: 16px; }
+  .seg.lit { background: var(--lcd-on); color: var(--lcd); }
+  .seg.off { color: var(--lcd-ghost); background: none; box-shadow: inset 0 0 0 1px var(--lcd-ghost); }
+  .readout .foot .base { margin-left: auto; color: var(--lcd-dim); }
+
+  .chart { height: 174px; padding: 6px 8px; }
+  .chart svg { display: block; width: 100%; height: 100%; }
+  .chart text { font-family: var(--font-label); font-weight: 600; font-size: 11px; fill: var(--lcd-dim); }
+
+  .metrics { padding: 6px 12px; font-size: 15px; }
+  .metrics table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .metrics td { padding: 1px 0; text-align: right; }
+  .metrics td:first-child { text-align: left; }
+  .metrics tr.hot td:last-child { background: var(--lcd-on); color: var(--lcd); padding-right: 3px; }
+  .rmod .mhead { margin-bottom: 5px; display: grid; grid-template-columns: 1fr 84px 84px 84px; text-align: right; padding: 0 12px; }
+  .mhead span:first-child { text-align: left; }
+  .metrics col.c { width: 84px; }
+
+  .log { padding: 6px 10px; font-size: 12.5px; line-height: 1.42; font-weight: 600; white-space: pre; overflow: hidden; }
+  .log .w { color: var(--lcd); background: var(--lcd-on); }
+
+  .keys { display: flex; align-items: flex-start; gap: 22px; padding-top: 16px; }
+  .key { display: flex; flex-direction: column; align-items: center; gap: 7px; background: none; border: 0; padding: 0; cursor: pointer; }
+  .key .cap {
+    width: 92px; height: 58px; border-radius: var(--r-key); background: var(--alu-hi);
+    box-shadow: inset 0 -5px 0 var(--seam), 0 0 0 1px var(--seam), 0 2px 0 #9E9F9A;
+    display: grid; place-items: center; font-size: 12px; font-weight: 600; text-transform: lowercase; transition: transform .05s;
+  }
+  .key.primary .cap { background: var(--orange); color: #2A1406; box-shadow: inset 0 -5px 0 #C24F0F, 0 0 0 1px #B8490E, 0 2px 0 #9E9F9A; }
+  .key:hover .cap { filter: brightness(1.04); }
+  .key:active .cap { transform: translateY(2px); box-shadow: inset 0 -2px 0 var(--seam), 0 0 0 1px var(--seam); }
+  .key.primary:active .cap { box-shadow: inset 0 -2px 0 #C24F0F, 0 0 0 1px #B8490E; }
+  .key:disabled { cursor: not-allowed; }
+  .key:disabled .cap { background: #C9CAC6; color: #8C8D89; box-shadow: 0 0 0 1px var(--seam); transform: translateY(2px); }
+  .key .ss { text-align: center; max-width: 118px; }
+  .key:focus-visible { outline: none; }
+  .key:focus-visible .cap { outline: 2px solid var(--graphite); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="device">
+  <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+
+  <div class="row top">
+    <div class="mod brand">
+      <span class="led on" aria-hidden="true"></span>
+      <b>evals</b>
+      <span class="ws"><span class="ss m">workspace</span><span class="ss">atlas-research</span></span>
+    </div>
+    <nav class="mod nav" aria-label="Sections">
+      <span class="ss m">mode</span>
+      <a href="#" class="navkey" aria-current="page"><span class="led on"></span><span class="cap"></span><span class="ss">runs</span></a>
+      <a href="#" class="navkey"><span class="led"></span><span class="cap"></span><span class="ss">datasets</span></a>
+      <a href="#" class="navkey"><span class="led"></span><span class="cap"></span><span class="ss">models</span></a>
+      <a href="#" class="navkey"><span class="led"></span><span class="cap"></span><span class="ss">baselines</span></a>
+      <a href="#" class="navkey"><span class="led"></span><span class="cap"></span><span class="ss">settings</span></a>
+    </nav>
+    <label class="mod search">
+      <span class="ss m">find</span>
+      <span class="lcd"><input type="search" placeholder="search runs, models, datasets" aria-label="Search runs, models, datasets"></span>
+      <span class="kcap" aria-label="Press slash to search">/</span>
+    </label>
+  </div>
+
+  <div class="row main">
+    <div class="col left">
+      <section class="mod strips" aria-label="Runs">
+        <div class="strips-head">
+          <h2>runs, last night</h2>
+          <span class="ss m">one channel per run, newest left. meter = score 0 to 1</span>
+          <p class="legend ss"><span><b>—</b>not computed</span><span><b>0<i class="dp"></i>000</b>scored zero</span></p>
+        </div>
+        <div class="bank">
+          <!-- r-2291 -->
+          <div class="ch sel">
+            <div class="ch-top"><span class="led on"></span><span class="ss">pass</span></div>
+            <div class="rid"><small>r-</small>2291</div>
+            <div class="scribble lcd"><b>summarize-v3</b><span>news-digest-2k</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="val">0<i class="dp"></i>812</div>
+            <p class="flag"><span class="led fault"></span><span>regression</span></p>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">−0<i class="dp"></i>041</dd><dt>time</dt><dd>14m 02s</dd><dt>by</dt><dd>schedule</dd><dt>start</dt><dd>02:00</dd></dl>
+            <button class="selkey" type="button" aria-pressed="true"><span class="cap"></span><span class="ss m">selected</span></button>
+          </div>
+          <!-- r-2290 -->
+          <div class="ch">
+            <div class="ch-top"><span class="led on"></span><span class="ss">pass</span></div>
+            <div class="rid"><small>r-</small>2290</div>
+            <div class="scribble lcd"><b>summarize-v3</b><span>multilingual-legal-contracts-longform-eval-2026-q3</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="val">0<i class="dp"></i>774</div>
+            <p class="flag"></p>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">+0<i class="dp"></i>006</dd><dt>time</dt><dd>41m 55s</dd><dt>by</dt><dd>M. Okafor</dd><dt>start</dt><dd>01:12</dd></dl>
+            <button class="selkey" type="button" aria-pressed="false"><span class="cap"></span><span class="ss m">select</span></button>
+          </div>
+          <!-- r-2289 -->
+          <div class="ch">
+            <div class="ch-top"><span class="led on"></span><span class="ss">pass</span></div>
+            <div class="rid"><small>r-</small>2289</div>
+            <div class="scribble lcd"><b>router-small</b><span>intent-routing-v7</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></div>
+            <div class="val">0<i class="dp"></i>931</div>
+            <p class="flag"></p>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">+0<i class="dp"></i>012</dd><dt>time</dt><dd>3m 48s</dd><dt>by</dt><dd>schedule</dd><dt>start</dt><dd>01:00</dd></dl>
+            <button class="selkey" type="button" aria-pressed="false"><span class="cap"></span><span class="ss m">select</span></button>
+          </div>
+          <!-- r-2288 -->
+          <div class="ch">
+            <div class="ch-top"><span class="led on blink"></span><span class="ss">running 62%</span></div>
+            <div class="rid"><small>r-</small>2288</div>
+            <div class="scribble lcd"><b>router-small</b><span>adversarial-prompts</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="val">—</div>
+            <div class="runbar lcd" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="r-2288 progress"><i></i></div>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">—</dd><dt>time</dt><dd>9m 10s<br>so far</dd><dt>by</dt><dd>CI #4812</dd><dt>start</dt><dd>00:51</dd></dl>
+            <button class="selkey" type="button" aria-pressed="false"><span class="cap"></span><span class="ss m">select</span></button>
+          </div>
+          <!-- r-2287 -->
+          <div class="ch">
+            <div class="ch-top"><span class="led fault"></span><span class="ss">failed</span></div>
+            <div class="rid"><small>r-</small>2287</div>
+            <div class="scribble lcd"><b>extract-json</b><span>invoices-ocr</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="val">0<i class="dp"></i>000</div>
+            <p class="flag"><span>see fault</span></p>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">−0<i class="dp"></i>884</dd><dt>time</dt><dd>0m 41s</dd><dt>by</dt><dd>CI #4809</dd><dt>start</dt><dd>00:40</dd></dl>
+            <button class="selkey" type="button" aria-pressed="false"><span class="cap"></span><span class="ss m">select</span></button>
+          </div>
+          <!-- r-2286 -->
+          <div class="ch">
+            <div class="ch-top"><span class="led on"></span><span class="ss">pass</span></div>
+            <div class="rid"><small>r-</small>2286</div>
+            <div class="scribble lcd"><b>extract-json</b><span>receipts-small</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div></div>
+            <div class="val">0<i class="dp"></i>902</div>
+            <p class="flag"></p>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">+0<i class="dp"></i>000</dd><dt>time</dt><dd>2m 15s</dd><dt>by</dt><dd>L. Brandt</dd><dt>start</dt><dd>23:58</dd></dl>
+            <button class="selkey" type="button" aria-pressed="false"><span class="cap"></span><span class="ss m">select</span></button>
+          </div>
+          <!-- r-2285 -->
+          <div class="ch">
+            <div class="ch-top"><span class="led on"></span><span class="ss">pass</span></div>
+            <div class="rid"><small>r-</small>2285</div>
+            <div class="scribble lcd"><b>chat-core-8b</b><span>helpfulness-pairwise</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="val">0<i class="dp"></i>668</div>
+            <p class="flag"></p>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">+0<i class="dp"></i>021</dd><dt>time</dt><dd>1h 06m</dd><dt>by</dt><dd>schedule</dd><dt>start</dt><dd>23:00</dd></dl>
+            <button class="selkey" type="button" aria-pressed="false"><span class="cap"></span><span class="ss m">select</span></button>
+          </div>
+          <!-- r-2284 -->
+          <div class="ch">
+            <div class="ch-top"><span class="led"></span><span class="ss">queued</span></div>
+            <div class="rid"><small>r-</small>2284</div>
+            <div class="scribble lcd"><b>chat-core-8b</b><span>safety-refusals</span></div>
+            <div class="meterwrap"><div class="scale"><span>1</span><span>.5</span><span>0</span></div><div class="meter lcd"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="val">—</div>
+            <p class="flag"><span>not started</span></p>
+            <dl class="kv"><dt>Δ</dt><dd class="dl">—</dd><dt>time</dt><dd>—</dd><dt>by</dt><dd>schedule</dd><dt>start</dt><dd>—</dd></dl>
+            <button class="selkey" type="button" aria-pressed="false"><span class="cap"></span><span class="ss m">select</span></button>
+          </div>
+        </div>
+      </section>
+
+      <div class="lower">
+        <section class="mod lowmod" aria-label="Status filter">
+          <h3>show status</h3>
+          <div class="toggles">
+            <div class="tg"><span class="n">5</span><button class="sw" type="button" aria-pressed="true" aria-label="Show passed"></button><span class="ss"><span class="led on"></span>passed</span></div>
+            <div class="tg"><span class="n">1</span><button class="sw" type="button" aria-pressed="true" aria-label="Show failed"></button><span class="ss"><span class="led fault"></span>failed</span></div>
+            <div class="tg"><span class="n">1</span><button class="sw" type="button" aria-pressed="true" aria-label="Show running"></button><span class="ss"><span class="led on"></span>running</span></div>
+            <div class="tg"><span class="n">1</span><button class="sw" type="button" aria-pressed="true" aria-label="Show queued"></button><span class="ss"><span class="led"></span>queued</span></div>
+          </div>
+          <p class="ss m total">8 runs in total. switch up = shown</p>
+        </section>
+
+        <section class="mod lowmod knobmod" aria-label="Noise band">
+          <h3>noise band</h3>
+          <svg class="knob" viewBox="0 0 118 118" role="img" aria-label="Noise band set to plus or minus 0.020">
+            <g stroke="#2A2B2A" stroke-width="1.5">
+              <line x1="23" y1="86" x2="29" y2="82"/><line x1="17" y1="52" x2="24" y2="53"/><line x1="36" y1="22" x2="40" y2="28"/>
+              <line x1="59" y1="12" x2="59" y2="19"/><line x1="82" y1="22" x2="78" y2="28"/><line x1="101" y1="52" x2="94" y2="53"/><line x1="95" y1="86" x2="89" y2="82"/>
+            </g>
+            <text x="16" y="99" font-size="9" fill="#4B4C4A" font-family="Hanken Grotesk">.01</text>
+            <text x="3" y="48" font-size="9" fill="#2A2B2A" font-weight="700" font-family="Hanken Grotesk">.02</text>
+            <text x="50" y="9" font-size="9" fill="#4B4C4A" font-family="Hanken Grotesk">.03</text>
+            <text x="96" y="99" font-size="9" fill="#4B4C4A" font-family="Hanken Grotesk">.05</text>
+            <circle cx="59" cy="60" r="31" fill="#BFC0BC" stroke="#A9AAA5" stroke-width="1"/>
+            <circle cx="59" cy="60" r="26" fill="#2A2B2A"/>
+            <circle cx="59" cy="60" r="21" fill="#3A3B3A"/>
+            <line x1="59" y1="60" x2="37" y2="54" stroke="#E3E4E0" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <p class="ss">±0.020 around baseline</p>
+        </section>
+
+        <section class="mod lowmod faultmod" aria-label="Fault display">
+          <h3>fault display</h3>
+          <div class="lcd faultlcd" role="status">
+            <div class="hd"><span class="led fault"></span>r-2287 extract-json on invoices-ocr</div>
+            KeyError: 'line_items' — 212 of 212 samples failed schema validation
+          </div>
+          <p class="ss">Failed, not a regression: no output passed the schema. Fix the extractor and rerun.</p>
+          <div class="pinned"><span class="ss">pinned comparisons</span><span class="lcd">none yet</span></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="col right">
+      <section class="mod rmod" aria-label="Selected run readout">
+        <div class="lab"><span class="ss">selected run</span><span class="ss m">score / <span class="nt">Δ</span> vs baseline</span></div>
+        <div class="lcd readout dots">
+          <div class="line"><span>r-2291 summarize-v3</span><span>news-digest-2k</span></div>
+          <div class="big">0<i class="dp"></i>812</div>
+          <div class="delta"><b>−0<i class="dp"></i>041</b><span>vs base</span></div>
+          <div class="foot"><span class="seg lit">pass</span><span class="seg lit">regression</span><span class="seg off">fail</span><span class="base">base 0<i class="dp"></i>853 summarize-v2 @ r-2203</span></div>
+        </div>
+      </section>
+
+      <section class="mod rmod" aria-label="Score history">
+        <div class="lab"><span class="ss">score, last 12 runs</span><span class="ss m">band 0.833 to 0.873 is noise</span></div>
+        <div class="lcd chart dots">
+          <svg viewBox="0 0 500 160" role="img" aria-label="Last 12 scores: 0.846 to 0.857 inside the noise band, then 0.812.">
+            <rect x="46" y="20.25" width="446" height="70.0" fill="#2C3A30"/>
+            <line x1="46" y1="55.25" x2="492" y2="55.25" stroke="#6E8468" stroke-width="1" stroke-dasharray="3 4"/>
+            <text x="2" y="12.0">0.88</text>
+            <text x="2" y="59.25">0.853</text>
+            <text x="2" y="152.0">0.80</text>
+            <text x="52" y="84.25">noise band</text>
+            <polyline fill="none" stroke="#B9D4B0" stroke-width="2" points="60,67.5 98,58.75 136,62.25 174,51.75 212,55.25 250,60.5 288,48.25 326,57.0 364,64.0 402,58.75 440,55.25 478,127.0"/>
+            <g fill="#B9D4B0"><rect x="56" y="63.5" width="8" height="8"/><rect x="94" y="54.75" width="8" height="8"/><rect x="132" y="58.25" width="8" height="8"/><rect x="170" y="47.75" width="8" height="8"/><rect x="208" y="51.25" width="8" height="8"/><rect x="246" y="56.5" width="8" height="8"/><rect x="284" y="44.25" width="8" height="8"/><rect x="322" y="53.0" width="8" height="8"/><rect x="360" y="60.0" width="8" height="8"/><rect x="398" y="54.75" width="8" height="8"/><rect x="436" y="51.25" width="8" height="8"/></g>
+            <rect x="471" y="120.0" width="14" height="14" fill="#B9D4B0"/>
+            <text x="464" y="131.0" text-anchor="end" style="fill:#B9D4B0">0.812</text>
+          </svg>
+        </div>
+      </section>
+
+      <section class="mod rmod" aria-label="Metrics">
+        <div class="lab mhead ss m"><span>metric</span><span>score</span><span>base</span><span class="nt">Δ</span></div>
+        <div class="lcd metrics">
+          <table>
+            <colgroup><col><col class="c"><col class="c"><col class="c"></colgroup>
+            <tr><td>rouge-l</td><td>0<i class="dp"></i>412</td><td>0<i class="dp"></i>447</td><td>−0<i class="dp"></i>035</td></tr>
+            <tr class="hot"><td>faithfulness</td><td>0<i class="dp"></i>861</td><td>0<i class="dp"></i>902</td><td>−0<i class="dp"></i>041</td></tr>
+            <tr><td>coverage</td><td>0<i class="dp"></i>790</td><td>0<i class="dp"></i>801</td><td>−0<i class="dp"></i>011</td></tr>
+            <tr><td>length ratio</td><td>1<i class="dp"></i>18</td><td>1<i class="dp"></i>02</td><td>+0<i class="dp"></i>16</td></tr>
+          </table>
+        </div>
+      </section>
+
+      <section class="mod rmod" aria-label="Log tail">
+        <div class="lab"><span class="ss">log, last 5 lines</span><span class="ss m">r-2291</span></div>
+<div class="lcd log">02:13:48 eval 1996/2000 samples scored
+02:13:55 eval 2000/2000 samples scored
+<span class="w">02:13:55 warn length_ratio above 1<i class="dp"></i>15 on 38% of samples</span>
+02:14:01 agg  faithfulness=0<i class="dp"></i>861 (baseline 0<i class="dp"></i>902)
+02:14:02 done run r-2291 finished in 14m 02s</div>
+      </section>
+
+      <section class="mod rmod keys" aria-label="Actions">
+        <button class="key primary" type="button"><span class="cap">rerun</span><span class="ss">rerun evaluation</span></button>
+        <button class="key" type="button"><span class="cap">compare</span><span class="ss">compare with baseline</span></button>
+        <button class="key" type="button" disabled aria-describedby="cx"><span class="cap">cancel</span><span class="ss m" id="cx">cancel run: off, the run already finished</span></button>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

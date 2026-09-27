@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--wall); color: var(--ink); font: 400 14px/1.45 var(--font-label); font-variant-numeric: lining-nums; padding-bottom: 64px; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+.top { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 24px 14px; }
+.top h1 { margin: 0; font: italic 500 28px/1 var(--font-object); }
+.top time { font-size: 13px; color: var(--muted); }
+
+/* the painted room with one exhibit */
+.room { background: var(--room); color: var(--on-room); padding: 34px 24px 30px 34px; display: grid; grid-template-columns: 138px 1fr; column-gap: 22px; align-items: end; }
+.cover { display: block; }
+.label { font-size: 13px; line-height: 1.45; color: var(--on-room-muted); padding-bottom: 2px; }
+.label .who { color: var(--on-room); font-weight: 600; }
+.label h2 { margin: 2px 0 8px; font: italic 400 23px/1.1 var(--font-object); color: var(--on-room); }
+.label p { margin: 0 0 6px; }
+
+/* numerals as objects */
+.page { padding: 24px 24px 0; }
+.page .n { font: 400 118px/0.8 var(--font-object); letter-spacing: -0.03em; display: inline-block; }
+.page .of { font-size: 14px; color: var(--muted); margin-left: 6px; }
+.rail { position: relative; height: 1px; background: #C9C6BC; margin: 16px 0 6px; }
+.rail span { position: absolute; left: 0; top: -1px; height: 3px; background: var(--brass); }
+.rail-note { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 24px 0; }
+.pair .n { font: 500 60px/0.8 var(--font-object); letter-spacing: -0.02em; display: block; margin-bottom: 8px; }
+.pair p { margin: 0; font-size: 13px; }
+.pair .muted { color: var(--muted); }
+.pair .rail { margin: 10px 0 0; background: none; border-top: 1px dashed var(--muted); height: 0; }
+
+.log { margin: 22px 24px 0; }
+.log button { width: 100%; height: 50px; font: 600 15px/1 var(--font-label); color: var(--wall); background: var(--ink); border: 0; cursor: pointer; }
+.log button:hover { background: var(--room); }
+.log button:active { transform: translateY(1px); }
+
+h3 { margin: 38px 24px 10px; font: italic 400 24px/1.1 var(--font-object); }
+.soon { list-style: none; margin: 0 24px; padding: 0; }
+.soon li { display: grid; grid-template-columns: 1fr auto; column-gap: 16px; padding: 10px 0; border-top: 1px solid var(--brass); }
+.soon li:last-child { border-bottom: 1px solid var(--brass); }
+.soon .t { font: italic 400 18px/1.2 var(--font-object); overflow-wrap: anywhere; }
+.soon .a { grid-column: 1; font-size: 13px; color: var(--muted); }
+.soon .pp { grid-column: 2; grid-row: 1 / span 2; font-size: 13px; color: var(--muted); align-self: start; padding-top: 3px; white-space: nowrap; }
+
+blockquote { margin: 0 24px 28px 44px; font: italic 400 24px/1.25 var(--font-object); }
+blockquote footer { margin-top: 10px; font: 400 13px/1.4 var(--font-label); color: var(--muted); }
+
+nav.bar { position: fixed; left: 0; right: 0; bottom: 0; height: 58px; background: var(--wall); border-top: 1px solid var(--brass); display: grid; grid-template-columns: repeat(4, 1fr); }
+nav.bar a { display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--muted); }
+nav.bar a[aria-current] { color: var(--ink); font-weight: 600; }
+nav.bar a[aria-current] span { border-bottom: 1px solid var(--brass); padding-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Shelf</h1>
+  <time datetime="2026-09-24">Thu 24 Sep</time>
+</header>
+
+<section class="room" aria-label="Currently reading">
+  <svg class="cover" width="138" height="207" viewBox="0 0 138 207" role="img" aria-label="Cover of The Left Hand of Darkness">
+    <rect width="138" height="207" fill="#E4E4DE"/>
+    <rect y="118" width="138" height="89" fill="#1A1A1A"/>
+    <rect width="7" height="207" fill="#000" fill-opacity="0.12"/>
+    <line x1="18" y1="118" x2="124" y2="118" stroke="#A88B4A" stroke-width="1.5"/>
+    <g font-family="Bodoni Moda, serif" fill="#1A1A1A" font-size="21">
+      <text x="18" y="42">The Left</text>
+      <text x="18" y="66">Hand of</text>
+      <text x="18" y="90" font-style="italic">Darkness</text>
+    </g>
+    <text x="18" y="186" font-family="Schibsted Grotesk, sans-serif" font-size="10.5" fill="#E4E4DE" letter-spacing="0.02em">Ursula K. Le Guin</text>
+  </svg>
+  <div class="label">
+    <span class="who">Ursula K. Le Guin</span>
+    <h2>The Left Hand of Darkness</h2>
+    <p>304 pages. You are on page 184.</p>
+    <p>On view since: last read yesterday.</p>
+  </div>
+</section>
+
+<section class="page" aria-label="Progress">
+  <span class="n">184</span><span class="of">of 304 pages, 61%</span>
+  <div class="rail" role="progressbar" aria-valuemin="0" aria-valuemax="304" aria-valuenow="184"><span style="width:61%"></span></div>
+  <div class="rail-note"><span>184 read</span><span>120 left</span></div>
+</section>
+
+<section class="pair" aria-label="Today">
+  <div>
+    <span class="n">8</span>
+    <p>of today's 20 pages.</p>
+    <p class="muted">12 to go. Not met yet.</p>
+    <div class="rail" role="progressbar" aria-label="Today's goal" aria-valuemin="0" aria-valuemax="20" aria-valuenow="8"><span style="width:40%"></span></div>
+  </div>
+  <div>
+    <span class="n">11</span>
+    <p>days in a row.</p>
+    <p class="muted">Reading streak.</p>
+  </div>
+</section>
+
+<div class="log"><button type="button">Log pages</button></div>
+
+<h3>Coming soon to this room</h3>
+<ol class="soon">
+  <li><a href="#" class="t">Piranesi</a><span class="a">Susanna Clarke</span><span class="pp">272 pp</span></li>
+  <li><a href="#" class="t">The Remains of the Day</a><span class="a">Kazuo Ishiguro</span><span class="pp">245 pp</span></li>
+  <li><a href="#" class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</a><span class="a">J. Placeholder-Smythe</span><span class="pp">1,104 pp</span></li>
+</ol>
+
+<h3>Saved highlight</h3>
+<blockquote>&ldquo;Light is the left hand of darkness and darkness the right hand of light.&rdquo;
+  <footer>The Left Hand of Darkness, p. 222</footer>
+</blockquote>
+
+<nav class="bar" aria-label="Sections">
+  <a href="#" aria-current="page"><span>Today</span></a>
+  <a href="#"><span>Library</span></a>
+  <a href="#"><span>Highlights</span></a>
+  <a href="#"><span>Stats</span></a>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Martian+Mono:wdth,wght@75..112.5,400..600&display=swap");
+
+:root {
+  --font: "Bricolage Grotesque", "Trebuchet MS", sans-serif;
+  --font-code: "Martian Mono", ui-monospace, Consolas, monospace;
+
+  --white: #FFFFFF;
+  --ink: #1E1B3A;
+  --ink-soft: #4A4668;
+  --line-off: #B9B6CC;
+  --tint: #F1F0F7;
+
+  /* meaning */
+  --sky: #4DA8FF;        /* selection + primary action */
+  --sky-pale: #D9ECFF;
+  --grass: #2DBE6C;      /* passed, done */
+  --tomato: #FF5A36;     /* failed, regression, attention */
+  --sunflower: #FFC933;  /* in progress: running, partial goal */
+
+  /* model identity (chips only) */
+  --m-violet: #8F6BFF;
+  --m-pink: #FF8CC8;
+  --m-teal: #19BFB0;
+  --m-wood: #C9905C;
+  --m-lime: #A8D13F;
+
+  --stroke: 3px;
+  --r-slab: 44px;
+  --r-inset: 26px;
+  --r-row: 22px;
+  --r-field: 14px;
+  --r-chip: 8px;
+
+  --t-xs: 12px;
+  --t-s: 14px;
+  --t-m: 17px;
+  --t-l: 24px;
+  --t-xl: 36px;
+  --t-xxl: 88px;
+}

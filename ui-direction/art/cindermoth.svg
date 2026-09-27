@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<ellipse cx="128" cy="228" rx="46" ry="7" fill="#000" opacity=".12"/>
+<g id="w">
+<path d="M120 112C92 62 44 50 28 80C16 110 52 142 120 136Z" fill="#E27A36"/>
+<path d="M120 140C82 146 52 178 68 200C86 216 114 186 124 152Z" fill="#E27A36"/>
+<path d="M120 140C90 150 70 172 76 190C90 196 110 176 122 152Z" fill="#7A3320" opacity=".3"/>
+<circle cx="66" cy="96" r="15" fill="#F3BE54"/>
+<circle cx="66" cy="96" r="6" fill="#7A3320"/>
+<circle cx="84" cy="176" r="6" fill="#F3BE54"/>
+<path d="M120 90C110 62 96 46 82 36C94 54 106 72 114 94Z" fill="#7A3320"/>
+</g>
+<use href="#w" transform="matrix(-1 0 0 1 256 0)"/>
+<ellipse cx="128" cy="154" rx="17" ry="42" fill="#F3BE54"/>
+<path d="M114 150h28M114 166h28M116 182h24" stroke="#7A3320" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+<circle cx="128" cy="110" r="24" fill="#F3BE54"/>
+<circle cx="118" cy="108" r="7" fill="#7A3320"/>
+<circle cx="138" cy="108" r="7" fill="#7A3320"/>
+<circle cx="120.3" cy="105.7" r="2.4" fill="#fff"/>
+<circle cx="140.3" cy="105.7" r="2.4" fill="#fff"/>
+</svg>

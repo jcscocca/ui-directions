@@ -1,0 +1,148 @@
+/* Panorama mechanics shared by the three specimens */
+
+.screen {
+  height: 100vh;
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* top strip: app name, context, search. Small, quiet. */
+.topline {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 52px;
+  padding: 0 var(--gutter);
+  position: relative;
+  flex: none;
+}
+.appname { font-weight: var(--w-label); font-size: var(--t-s); letter-spacing: .02em; }
+.context { font-size: var(--t-s); color: var(--ink-2); }
+.topline .spacer { flex: 1; }
+
+.search {
+  display: flex; align-items: center;
+  width: 320px; height: 34px;
+  background: var(--tile);
+  padding: 0 6px 0 12px;
+}
+.search input {
+  flex: 1; min-width: 0;
+  background: transparent; border: 0; color: var(--ink);
+  font: inherit; font-size: var(--t-s);
+}
+.search input::placeholder { color: var(--ink-2); }
+.search input:focus { outline: none; }
+.search:focus-within { background: var(--ink); outline: var(--focus); outline-offset: 3px; }
+.search:focus-within input { color: #000; }
+.search kbd {
+  font-family: var(--font-code); font-size: var(--t-xs);
+  background: var(--tile-2); color: var(--ink);
+  padding: 1px 7px;
+}
+
+/* the one indeterminate progress: five dots marching along the top edge */
+.dots { position: absolute; left: 0; right: 0; top: 0; height: 4px; overflow: hidden; }
+.dots i {
+  position: absolute; top: 0; width: 4px; height: 4px; background: var(--accent);
+  animation: march 3.2s cubic-bezier(.1,.7,.9,.3) infinite;
+}
+.dots i:nth-child(1) { left: 30%; animation-delay: 0s; }
+.dots i:nth-child(2) { left: 32%; animation-delay: .12s; }
+.dots i:nth-child(3) { left: 34%; animation-delay: .24s; }
+.dots i:nth-child(4) { left: 36%; animation-delay: .36s; }
+.dots i:nth-child(5) { left: 38%; animation-delay: .48s; }
+@keyframes march { from { transform: translateX(-40vw); } to { transform: translateX(80vw); } }
+@media (prefers-reduced-motion: reduce) { .dots i { animation: none; } }
+
+/* pivot headers: app navigation, inactive ones faded, row clipped at the right */
+.pivot {
+  display: flex;
+  gap: 32px;
+  padding: 0 var(--gutter);
+  height: 64px;
+  align-items: flex-start;
+  white-space: nowrap;
+  overflow: hidden;
+  flex: none;
+}
+.pivot a {
+  font-size: var(--t-pivot);
+  font-weight: var(--w-pivot);
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--ink-faded);
+  text-decoration: none;
+}
+.pivot a[aria-current] { color: var(--ink); }
+.pivot a:hover { color: var(--ink-2); }
+.pivot a[aria-current]:hover { color: var(--ink); }
+
+/* the panorama: the only horizontal scroller on the page */
+.pano {
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.pano::-webkit-scrollbar { display: none; }
+.pano:focus-visible { outline-offset: -4px; }
+.strip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--section-gap);
+  width: max-content;
+  height: 100%;
+  padding: 0 var(--gutter);
+  position: relative;
+}
+/* the resting position of the panorama: a snap point that leaves the previous section's edge in view */
+.rest { position: absolute; top: 0; width: 1px; height: 1px; scroll-snap-align: start; }
+.sec { flex: none; height: 100%; scroll-snap-align: start; scroll-margin-left: var(--gutter); }
+.sec-title {
+  margin: 0 0 12px;
+  font-size: var(--t-title);
+  font-weight: var(--w-title);
+  line-height: .95;
+  letter-spacing: -.035em;
+  white-space: nowrap;
+}
+
+/* app bar: round glyph buttons with lowercase labels below */
+.appbar {
+  flex: none;
+  height: var(--appbar-h);
+  background: var(--tile);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 var(--gutter);
+}
+.ab {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  min-width: 96px;
+  background: none; border: 0; padding: 6px 4px; cursor: pointer;
+  font-size: var(--t-xs); color: var(--ink);
+}
+.ab .ring {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid currentColor;
+  display: grid; place-items: center;
+}
+.ab svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+.ab:hover .ring { background: var(--ink); color: #000; border-color: var(--ink); }
+.ab:hover .ring svg { stroke: #000; }
+.ab:active .ring { background: var(--accent); border-color: var(--accent); }
+.ab.primary .ring { background: var(--accent); border-color: var(--accent); }
+.ab:disabled { color: var(--ink-faded); cursor: not-allowed; }
+.ab:disabled:hover .ring { background: none; color: var(--ink-faded); border-color: currentColor; }
+.ab:disabled:hover .ring svg { stroke: currentColor; }
+.ab-note { font-size: var(--t-xs); color: var(--ink-2); max-width: 300px; margin-left: 12px; }
+
+/* tilt: the one physical response, only on press */
+.tilt { transition: transform .12s ease-out; transform-origin: 50% 50%; }
+.tilt:active { transform: perspective(500px) rotateX(4deg) rotateY(-6deg) scale(.97); }

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Find the creatures you still need in Saltmarsh Reach - Wildbook</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html { background: var(--white); }
+  body {
+    margin: 0; color: var(--text); background: var(--white);
+    font-family: var(--font-body); font-size: var(--t-body); line-height: 1.32;
+    font-variant-numeric: tabular-nums;
+  }
+  h1, h2, h3, p, ul, ol, dl, dd, fieldset, legend { margin: 0; }
+  fieldset { border: 0; padding: 0; }
+  .width { max-width: var(--page-width); margin: 0 auto; padding: 0 var(--gutter); }
+  .vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
+  a:hover { color: var(--link-hover); text-decoration-thickness: 3px; }
+  a:focus-visible { outline: 3px solid transparent; color: var(--text); background: var(--focus); box-shadow: 0 -2px var(--focus), 0 4px var(--text); text-decoration: none; }
+
+  .header { background: var(--text); color: var(--white); border-bottom: 10px solid var(--link); }
+  .header .width { display: flex; align-items: center; gap: 24px; height: 60px; }
+  .header .product { color: var(--white); font-weight: 700; font-size: 30px; line-height: 1; text-decoration: none; }
+  .header .product:focus-visible { color: var(--text); }
+  .header .ws { font-size: 19px; }
+  .search { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .search label { font-size: 16px; }
+  .search .row { display: flex; }
+  .search input { font: inherit; font-size: 16px; width: 300px; height: 40px; padding: 5px 8px; border: 2px solid var(--white); border-right: 0; border-radius: 0; }
+  .search input::placeholder { color: var(--secondary); }
+  .search button { font: inherit; font-size: 16px; font-weight: 700; height: 40px; padding: 0 14px; border: 0; background: var(--link); color: var(--white); cursor: pointer; }
+  .search button:hover { background: var(--link-hover); }
+  .search input:focus, .search button:focus { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: inset 0 0 0 2px var(--text); }
+  .search button:focus { background: var(--focus); color: var(--text); }
+
+  .service-nav { border-bottom: 1px solid var(--border); background: #F4F8FB; }
+  .service-nav ul { list-style: none; padding: 0; display: flex; gap: 30px; }
+  .service-nav li { padding: 13px 0 10px; border-bottom: 5px solid transparent; }
+  .service-nav li[aria-current] { border-bottom-color: var(--link); }
+  .service-nav li[aria-current] a { color: var(--text); font-weight: 700; text-decoration: none; }
+
+  .crumbs { font-size: 16px; padding: 15px 0 0; }
+  .crumbs ol { list-style: none; padding: 0; display: flex; }
+  .crumbs li + li::before { content: ""; display: inline-block; width: 7px; height: 7px; margin: 0 10px 0 8px; border: solid var(--secondary); border-width: 1px 1px 0 0; transform: rotate(45deg); vertical-align: 1px; }
+  .crumbs a { color: var(--text); }
+
+  main { padding: 25px 0 60px; }
+  .grid { display: grid; grid-template-columns: 2fr 1fr; column-gap: var(--gutter); }
+  h1 { font-size: var(--t-h1); line-height: 1.1; margin-bottom: 15px; }
+  .lead { margin-bottom: 12px; }
+  .meter { display: flex; height: 20px; border: 2px solid var(--text); max-width: 520px; }
+  .meter i { display: block; background: var(--text); }
+  .meter i.seen { background: repeating-linear-gradient(135deg, var(--text) 0 2px, var(--white) 2px 6px); }
+  .meter-key { font-size: 16px; margin-top: 6px; color: var(--secondary); }
+
+  .related { border-top: 5px solid var(--link); padding-top: 12px; }
+  .related h2 { font-size: 24px; line-height: 1.2; margin-bottom: 10px; }
+  .glance { display: grid; grid-template-columns: 110px 1fr; gap: 15px; align-items: start; }
+  .glance img { width: 110px; height: 110px; border: 1px solid var(--border); display: block; }
+  .glance p { font-size: 16px; }
+  .glance p + p { margin-top: 6px; }
+
+  .tofind { margin-top: 25px; }
+  .tofind h2 { font-size: 24px; margin-bottom: 10px; }
+  .tofind ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 20px; border-top: 1px solid var(--border); }
+  .tofind li { display: grid; grid-template-columns: 50px 1fr; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 16px; }
+  .tofind li .tag { margin-top: 3px; }
+  .img-note { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 16px; }
+  .img-note .thumb { flex: none; }
+  /* filters + table */
+  .results { display: grid; grid-template-columns: 1fr 3fr; column-gap: var(--gutter); margin-top: 40px; }
+  .filter { background: var(--panel); padding: 15px 18px 20px; align-self: start; }
+  .filter h2 { font-size: 24px; margin-bottom: 10px; }
+  .filter fieldset + fieldset { margin-top: 18px; }
+  .filter legend { font-weight: 700; font-size: 19px; margin-bottom: 6px; }
+  .choice { display: flex; align-items: center; gap: 10px; font-size: 16px; margin-bottom: 6px; }
+  .choice input { width: 24px; height: 24px; margin: 0; accent-color: var(--text); }
+  .choice input:focus { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: 0 0 0 5px var(--text); }
+  .apply { margin-top: 18px; }
+
+  .table-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .table-top h2 { font-size: 27px; }
+  .sort { display: flex; align-items: center; gap: 10px; font-size: 16px; }
+  .sort select { font: inherit; font-size: 16px; height: 40px; padding: 5px; border: 2px solid var(--text); border-radius: 0; background: var(--white); }
+  .sort select:focus { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: inset 0 0 0 2px var(--text); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 16px; }
+  th, td { text-align: left; padding: 8px 20px 8px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  th { font-weight: 700; }
+  th:first-child, td:first-child { padding-left: 12px; width: 80px; }
+  th:last-child, td:last-child { padding-right: 12px; }
+  .num { text-align: right; }
+  td.name { font-size: 19px; }
+  .none, .hint-cell { color: var(--secondary); }
+  tr.selected td { background: #F4F8FB; }
+  tr.selected td:first-child { box-shadow: inset 5px 0 0 var(--link); }
+  .tag { display: inline-block; font-size: 16px; line-height: 1.2; padding: 2px 8px 3px; }
+  .tag.green { background: var(--tag-green-bg); color: var(--tag-green); }
+  .tag.yellow { background: #FFF7BF; color: #594D00; }
+  .tag.grey { background: var(--tag-grey-bg); color: var(--tag-grey); }
+  .tag.purple { background: #3D2375; color: var(--white); }
+
+  /* plain images: fixed box, 1px border, white ground */
+  .thumb { position: relative; display: block; width: 50px; height: 50px; border: 1px solid var(--border); background: var(--white); }
+  .thumb img { display: block; width: 48px; height: 48px; }
+  .thumb.seen img { filter: brightness(0); opacity: .55; }
+  .thumb.empty { background: var(--white); border-style: dashed; }
+  .ph { display: none; position: absolute; inset: 0; background: var(--panel); color: var(--secondary); font-size: 11px; line-height: 1.1; align-items: center; justify-content: center; text-align: center; }
+  .broken img { display: none; }
+  .broken .ph { display: flex; }
+
+  /* detail */
+  .detail { margin-top: 45px; }
+  .detail h2 { font-size: 36px; line-height: 1.1; margin-bottom: 6px; }
+  .detail .caption { color: var(--secondary); font-size: 19px; margin-bottom: 20px; }
+  .top { display: grid; grid-template-columns: 240px 1fr; gap: 30px; align-items: start; margin-bottom: 30px; }
+  .top img { width: 240px; height: 240px; border: 1px solid var(--border); display: block; }
+  .top figcaption { font-size: 16px; color: var(--secondary); margin-top: 6px; }
+  figure { margin: 0; }
+  .summary { display: grid; grid-template-columns: 35% 1fr; font-size: 19px; }
+  .summary > div { display: contents; }
+  .summary dt, .summary dd { padding: 10px 20px 10px 0; border-bottom: 1px solid var(--border); }
+  .summary dt { font-weight: 700; }
+  h3 { font-size: 24px; margin-bottom: 10px; }
+  .desc { margin-bottom: 30px; max-width: 34em; }
+  .stats { width: 100%; max-width: 640px; margin-bottom: 8px; }
+  .stats td.bar { width: 60%; }
+  .stats .track { height: 16px; background: var(--panel); border: 1px solid var(--border); }
+  .stats .track i { display: block; height: 100%; background: var(--text); }
+  .stats-note { font-size: 16px; color: var(--secondary); margin-bottom: 30px; }
+  .evo { list-style: none; padding: 0; display: flex; gap: 15px; align-items: flex-start; margin-bottom: 30px; }
+  .evo li { width: 150px; font-size: 16px; }
+  .evo .box { width: 100px; height: 100px; border: 1px solid var(--border); margin-bottom: 6px; display: flex; align-items: center; justify-content: center; }
+  .evo .box img { width: 98px; height: 98px; }
+  .evo .box.empty { border-style: dashed; color: var(--secondary); }
+  .evo .current { font-weight: 700; }
+  .evo .step { width: auto; padding-top: 38px; color: var(--secondary); }
+  ul.bullets { padding-left: 20px; margin-bottom: 30px; }
+  ul.bullets li { margin-bottom: 5px; }
+
+  .buttons { display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap; }
+  .button { font: inherit; font-size: 19px; line-height: 1.2; padding: 8px 12px 7px; border: 2px solid transparent; border-radius: 0; color: var(--white); background: var(--button); box-shadow: 0 2px 0 var(--button-shadow); cursor: pointer; }
+  .button:hover { background: var(--button-hover); }
+  .button:active { transform: translateY(2px); box-shadow: none; }
+  .button.secondary { color: var(--text); background: var(--secondary-button); box-shadow: 0 2px 0 var(--secondary-shadow); }
+  .button.secondary:hover { background: #DBDAD9; }
+  .button:focus-visible { outline: 3px solid transparent; border-color: var(--focus); color: var(--text); background: var(--focus); box-shadow: inset 0 0 0 1px var(--focus), 0 2px 0 var(--text); }
+  .button:disabled { opacity: .5; cursor: not-allowed; }
+  .button:disabled:active { transform: none; box-shadow: 0 2px 0 var(--secondary-shadow); }
+  .dis { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .hint { color: var(--secondary); font-size: 16px; max-width: 20em; }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="width">
+    <a class="product" href="#">Wildbook</a>
+    <span class="ws">Saltmarsh Reach</span>
+    <form class="search" role="search" onsubmit="return false">
+      <label for="q">Search</label>
+      <div class="row"><input id="q" type="search" placeholder="Search by name, number or type"><button type="submit">Search</button></div>
+    </form>
+  </div>
+</header>
+<nav class="service-nav" aria-label="Sections">
+  <div class="width"><ul>
+    <li aria-current="page"><a href="#">Index</a></li><li><a href="#">Team</a></li><li><a href="#">Map</a></li><li><a href="#">Items</a></li>
+  </ul></div>
+</nav>
+
+<div class="width">
+  <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="#">Wildbook</a></li><li><a href="#">Saltmarsh Reach</a></li><li><a href="#">Index</a></li></ol></nav>
+  <main>
+    <div class="grid">
+      <div>
+        <h1>Find the creatures you still need in Saltmarsh Reach</h1>
+        <p class="lead">You have caught 10 of 16 (62%). 3 have been seen but not caught, and 3 have never been seen.</p>
+        <div class="meter" role="img" aria-label="10 caught, 3 seen, 3 not seen, out of 16"><i style="width:62.5%"></i><i class="seen" style="width:18.75%"></i></div>
+        <p class="meter-key">Solid: caught (10). Striped: seen, not caught (3). Empty: not seen (3).</p>
+        <section class="tofind" aria-labelledby="find-h">
+          <h2 id="find-h">Still to find (6)</h2>
+          <ul>
+            <li><span class="thumb empty" aria-hidden="true"></span><div>#008<br><span class="none">Not seen yet</span></div></li>
+            <li><span class="thumb seen"><img src="../../art/mistheron.svg" alt="" width="48" height="48"></span><div><a href="#">#009 Mistheron</a><br><strong class="tag yellow">Seen, not caught</strong></div></li>
+            <li><span class="thumb seen"><img src="../../art/stormgull.svg" alt="" width="48" height="48"></span><div><a href="#">#012 Stormgull</a><br><strong class="tag yellow">Seen, not caught</strong></div></li>
+            <li><span class="thumb empty" aria-hidden="true"></span><div>#013<br><span class="none">Not seen yet</span></div></li>
+            <li><span class="thumb seen"><img src="../../art/duskmote.svg" alt="" width="48" height="48"></span><div><a href="#">#015 Duskmote</a><br><strong class="tag yellow">Seen, not caught</strong> <strong class="tag purple">Mythic</strong></div></li>
+            <li><span class="thumb empty" aria-hidden="true"></span><div>#016<br><span class="none">Not seen yet</span></div></li>
+          </ul>
+          <p class="img-note"><span class="thumb broken"><img src="../../art/emberkit.svg" alt="" width="48" height="48" onerror="this.parentNode.classList.add('broken')"><span class="ph">No image</span></span>The picture for #011 Emberkit did not load. It shows a placeholder until the image is fixed.</p>
+        </section>
+      </div>
+      <aside class="related" aria-labelledby="sel-h">
+        <h2 id="sel-h">Selected: #007 Lanternfin</h2>
+        <div class="glance">
+          <img src="../../art/lanternfin.svg" alt="Lanternfin">
+          <div>
+            <p>Tide / Ember. <strong>Rare.</strong> Caught 3.</p>
+            <p>Your team is full, so you cannot add it yet.</p>
+            <p><a href="#detail-h">See Lanternfin's stats and actions</a></p>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="results">
+      <form class="filter" onsubmit="return false" aria-labelledby="f-h">
+        <h2 id="f-h">Filter</h2>
+        <fieldset><legend>Status</legend>
+          <label class="choice"><input type="radio" name="st" checked> All</label>
+          <label class="choice"><input type="radio" name="st"> Caught</label>
+          <label class="choice"><input type="radio" name="st"> Seen</label>
+          <label class="choice"><input type="radio" name="st"> Unknown</label>
+        </fieldset>
+        <fieldset><legend>Type</legend>
+          <label class="choice"><input type="checkbox"> Tide</label>
+          <label class="choice"><input type="checkbox"> Moss</label>
+          <label class="choice"><input type="checkbox"> Ember</label>
+          <label class="choice"><input type="checkbox"> Gale</label>
+          <label class="choice"><input type="checkbox"> Stone</label>
+        </fieldset>
+        <fieldset><legend>Rarity</legend>
+          <label class="choice"><input type="checkbox"> Common</label>
+          <label class="choice"><input type="checkbox"> Uncommon</label>
+          <label class="choice"><input type="checkbox"> Rare</label>
+          <label class="choice"><input type="checkbox"> Mythic</label>
+        </fieldset>
+        <button class="button secondary apply" type="submit">Apply filters</button>
+      </form>
+
+      <section aria-labelledby="t-h">
+        <div class="table-top">
+          <h2 id="t-h">All 16 creatures</h2>
+          <div class="sort"><label for="sort">Sort by</label><select id="sort"><option selected>Number</option><option>Name</option><option>Rarity</option></select></div>
+        </div>
+        <table>
+          <thead><tr><th scope="col"><span class="vh">Picture</span></th><th scope="col" class="num">No.</th><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Rarity</th><th scope="col">Status</th><th scope="col" class="num">Caught</th></tr></thead>
+          <tbody>
+          <tr><td><span class="thumb"><img src="../../art/reedling.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">001</td><td class="name"><a href="#">Reedling</a></td><td>Moss</td><td>Common</td><td><strong class="tag green">Caught</strong></td><td class="num">14</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/bogwhistle.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">002</td><td class="name"><a href="#">Bogwhistle</a></td><td>Moss / Gale</td><td>Uncommon</td><td><strong class="tag green">Caught</strong></td><td class="num">3</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/cindermoth.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">003</td><td class="name"><a href="#">Cindermoth</a></td><td>Ember</td><td>Common</td><td><strong class="tag green">Caught</strong></td><td class="num">9</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/pebblepup.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">004</td><td class="name"><a href="#">Pebblepup</a></td><td>Stone</td><td>Common</td><td><strong class="tag green">Caught</strong></td><td class="num">22</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/saltcrab.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">005</td><td class="name"><a href="#">Saltcrab</a></td><td>Tide / Stone</td><td>Common</td><td><strong class="tag green">Caught</strong></td><td class="num">6</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/glimmerfry.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">006</td><td class="name"><a href="#">Glimmerfry</a></td><td>Tide</td><td>Uncommon</td><td><strong class="tag green">Caught</strong></td><td class="num">5</td></tr>
+          <tr class="selected"><td><span class="thumb"><img src="../../art/lanternfin.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">007</td><td class="name"><a href="#detail-h">Lanternfin</a><span class="vh"> (selected)</span></td><td>Tide / Ember</td><td><strong>Rare</strong></td><td><strong class="tag green">Caught</strong></td><td class="num">3</td></tr>
+          <tr class="unknown"><td><span class="thumb empty" aria-hidden="true"></span></td><td class="num">008</td><td colspan="3" class="hint-cell">Not seen yet</td><td><strong class="tag grey">Not seen</strong></td><td class="num none">&mdash;</td></tr>
+          <tr><td><span class="thumb seen"><img src="../../art/mistheron.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">009</td><td class="name"><a href="#">Mistheron</a></td><td>Gale</td><td>Uncommon</td><td><strong class="tag yellow">Seen, not caught</strong></td><td class="num">0</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/marsh-wobbler.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">010</td><td class="name"><a href="#">Greater Spotted Marsh Wobbler</a></td><td>Moss / Tide</td><td>Uncommon</td><td><strong class="tag green">Caught</strong></td><td class="num">1</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/emberkit.svg" alt="" width="48" height="48" onerror="this.parentNode.classList.add('broken')"><span class="ph">No image</span></span></td><td class="num">011</td><td class="name"><a href="#">Emberkit</a></td><td>Ember</td><td>Common</td><td><strong class="tag green">Caught</strong></td><td class="num">7</td></tr>
+          <tr><td><span class="thumb seen"><img src="../../art/stormgull.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">012</td><td class="name"><a href="#">Stormgull</a></td><td>Gale / Tide</td><td><strong>Rare</strong></td><td><strong class="tag yellow">Seen, not caught</strong></td><td class="num">0</td></tr>
+          <tr class="unknown"><td><span class="thumb empty" aria-hidden="true"></span></td><td class="num">013</td><td colspan="3" class="hint-cell">Not seen yet</td><td><strong class="tag grey">Not seen</strong></td><td class="num none">&mdash;</td></tr>
+          <tr><td><span class="thumb"><img src="../../art/cragback.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">014</td><td class="name"><a href="#">Cragback</a></td><td>Stone</td><td><strong>Rare</strong></td><td><strong class="tag green">Caught</strong></td><td class="num">2</td></tr>
+          <tr><td><span class="thumb seen"><img src="../../art/duskmote.svg" alt="" width="48" height="48"><span class="ph">No image</span></span></td><td class="num">015</td><td class="name"><a href="#">Duskmote</a></td><td>Gale / Ember</td><td><strong class="tag purple">Mythic</strong></td><td><strong class="tag yellow">Seen, not caught</strong></td><td class="num">0</td></tr>
+          <tr class="unknown"><td><span class="thumb empty" aria-hidden="true"></span></td><td class="num">016</td><td colspan="3" class="hint-cell">Not seen yet</td><td><strong class="tag grey">Not seen</strong></td><td class="num none">&mdash;</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="detail" aria-labelledby="detail-h">
+        <h2 id="detail-h">#007 Lanternfin</h2>
+        <p class="caption">Tide / Ember. Rare.</p>
+        <div class="top">
+          <figure><img src="../../art/lanternfin.svg" alt="Lanternfin, a spiny blue fish with a glowing lure"></figure>
+          <dl class="summary">
+            <div><dt>Number</dt><dd>007</dd></div>
+            <div><dt>Types</dt><dd>Tide / Ember</dd></div>
+            <div><dt>Rarity</dt><dd>Rare</dd></div>
+            <div><dt>Habitat</dt><dd>Tidal caves, night only</dd></div>
+            <div><dt>First caught</dt><dd>12 Aug</dd></div>
+            <div><dt>Caught</dt><dd>3</dd></div>
+          </dl>
+        </div>
+        <p class="desc">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</p>
+
+        <h3>Stats</h3>
+        <table class="stats">
+          <thead><tr><th scope="col">Stat</th><th scope="col" class="num">Value</th><th scope="col"><span class="vh">Bar</span></th></tr></thead>
+          <tbody>
+            <tr><td>HP</td><td class="num">62</td><td class="bar"><div class="track"><i style="width:62%"></i></div></td></tr>
+            <tr><td>Attack</td><td class="num">48</td><td class="bar"><div class="track"><i style="width:48%"></i></div></td></tr>
+            <tr><td>Defense</td><td class="num">55</td><td class="bar"><div class="track"><i style="width:55%"></i></div></td></tr>
+            <tr><td>Speed</td><td class="num">81</td><td class="bar"><div class="track"><i style="width:81%"></i></div></td></tr>
+          </tbody>
+        </table>
+        <p class="stats-note">Each stat is out of 100.</p>
+
+        <h3>Evolution line</h3>
+        <ol class="evo">
+          <li><div class="box"><img src="../../art/glimmerfry.svg" alt=""></div><a href="#">#006 Glimmerfry</a></li>
+          <li class="step" aria-hidden="true">then</li>
+          <li><div class="box"><img src="../../art/lanternfin.svg" alt=""></div><span class="current">#007 Lanternfin</span><span class="vh"> (this creature)</span></li>
+          <li class="step" aria-hidden="true">then</li>
+          <li><div class="box empty" aria-hidden="true"></div>#008<br><span class="hint">Not seen yet</span></li>
+        </ol>
+
+        <h3>Drops</h3>
+        <ul class="bullets"><li>Lantern scale (common)</li><li>Deep pearl (rare, 4% chance)</li></ul>
+
+        <div class="buttons">
+          <button class="button" type="button">Show on map</button>
+          <button class="button secondary" type="button">Mark as favourite</button>
+          <div class="dis">
+            <button class="button secondary" type="button" disabled aria-describedby="team-hint">Add to team</button>
+            <p class="hint" id="team-hint">Team is full (6 of 6). Remove one to add Lanternfin.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap");
+
+:root {
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+
+  /* width axis, used as a hierarchy tool */
+  --w-compressed: 62%;
+  --w-condensed: 75%;
+  --w-normal: 100%;
+  --w-expanded: 125%;
+
+  --white: #FFFFFF;
+  --black: #000000;
+  --ultramarine: #1F3FD1;
+  --ultramarine-deep: #16309F;
+  --ultramarine-wash: #3552DB;
+  --yellow: #FFD400;
+  --red: #E0201B;
+  --grey: #6B6B6B;
+  --on-blue-soft: #C9D2F6;
+
+  /* scale: 11 / 14 / 17 / 22 / 30 / 44 / 64 / 128 */
+  --t-label: 11px;
+  --t-small: 14px;
+  --t-body: 17px;
+  --t-sub: 22px;
+  --t-id: 30px;
+  --t-title: 44px;
+  --t-figure: 64px;
+  --t-poster: 128px;
+
+  --margin: 40px;
+  --gutter: 24px;
+  --u: 8px;
+  --rule: 3px;
+  --radius: 0;
+}

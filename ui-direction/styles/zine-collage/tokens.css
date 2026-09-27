@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Permanent+Marker&display=swap");
+
+:root {
+  --font-cut: "Anton", "Impact", "Haettenschweiler", sans-serif;
+  --font-typed: "Courier Prime", "Courier New", monospace;
+  --font-marker: "Permanent Marker", "Comic Sans MS", cursive;
+
+  /* the sheet the pieces are pasted on */
+  --paper: #F7F7F4;
+  /* stock the pieces are cut from */
+  --stock: #FFFFFF;
+  /* riso drums: print layers, fills, strokes */
+  --riso-pink: #FF48B0;
+  --riso-blue: #0078BF;
+  --riso-yellow: #FFE800;
+  /* typewriter ribbon: all text a person reads */
+  --ribbon: #1B2A4A;
+  --ribbon-faded: #56607A;
+  /* marker pen: hand annotations that must be read (pink family = trouble) */
+  --marker: #C8126F;
+
+  --edge: rgba(27, 42, 74, 0.22);
+  --lift: 1px 2px 0 rgba(27, 42, 74, 0.13);
+  --tape: rgba(255, 232, 0, 0.62);
+  --halftone: radial-gradient(circle, var(--riso-blue) 0.9px, transparent 1.25px);
+  --halftone-size: 5px 5px;
+
+  --t-foot: 11.5px;
+  --t-typed: 13px;
+  --t-card: 15px;
+  --t-sticker: 17px;
+  --t-slip: 30px;
+  --t-head: 54px;
+  --t-readout: 76px;
+
+  --u: 4px;
+  --row: 28px;
+  --tilt-s: -0.6deg;
+  --tilt-m: 1.1deg;
+}

@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap");
+
+:root {
+  --font-mincho: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --font-gothic: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+
+  --paper: #EEF1F0;
+  --paper-fold: #E4E8E7;
+  --dot: #A3ABAE;
+  --rule: #CBD1D1;
+  --pencil: #8A9099;
+  --pencil-text: #5E6570;
+  --ink: #2E3A59;
+  --ink-wash: rgba(46, 58, 89, 0.07);
+  --ink-band: rgba(46, 58, 89, 0.10);
+  --ribbon: #3F4E73;
+  --seal: #C23B22;
+  --thread: #56627E;
+  --tape: rgba(63, 78, 115, 0.16);
+
+  /* scale on a 20px line grid */
+  --t-small: 12px;
+  --t-body: 14px;
+  --t-lead: 17px;
+  --t-head: 22px;
+  --t-title: 30px;
+  --t-figure: 48px;
+
+  --line: 20px;
+  --dots: radial-gradient(circle at 1.5px 1.5px, var(--dot) 1.4px, transparent 1.9px) 0 0 / var(--line) var(--line);
+  --radius: 2px;
+}

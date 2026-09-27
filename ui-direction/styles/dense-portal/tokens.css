@@ -1,0 +1,53 @@
+@import url("https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;500;700;800&family=M+PLUS+1+Code:wght@400;500;700&display=swap");
+
+:root {
+  --font: "M PLUS 1p", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+  --font-code: "M PLUS 1 Code", ui-monospace, Consolas, monospace;
+
+  /* type ladder: hierarchy comes from weight and colour, not size */
+  --fs-10: 10px;
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-fig: 18px;   /* one figure per screen: the number the page is about */
+  --fs-logo: 26px;
+  --lh: 1.45;
+
+  /* page */
+  --paper: #FFFFFF;
+  --ink: #222222;
+  --ink-2: #545B66;
+  --ink-3: #7A818C;
+  --link: #0033CC;
+  --visited: #663399;
+  --rule: #D5D9E0;
+  --rule-2: #AEB5C0;
+  --wash: #F4F6F9;
+  --select: #FFF7D1;
+
+  /* module header bars: one colour family per module kind */
+  --blue-bar: #E8F0FB;
+  --blue: #2A5DB0;
+  --alert: #E60012;
+  --alert-wash: #FFF1F1;
+  --rank: #FF7A00;
+  --rank-bar: #FFF1E3;
+  --rank-ink: #A34A00;
+  --green-bar: #E7F4EB;
+  --green: #1D7A3E;
+  --grey-bar: #EEF0F3;
+  --grey: #4A515C;
+
+  /* status */
+  --ok: #1D7A3E;
+  --bad: #E60012;
+  --run: #2A5DB0;
+  --idle: #7A818C;
+
+  /* spacing: tight inside a module, one gutter between modules */
+  --u: 4px;
+  --gutter: 10px;
+  --bar-h: 24px;
+  --row-h: 22px;
+  --radius-tab: 3px;
+}

@@ -1,0 +1,21 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=VT323&display=swap");
+
+:root {
+  --font-mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+  --font-readout: "VT323", "JetBrains Mono", monospace;
+
+  --bg: #1A1206;
+  --bg-band: #2A1E0B;
+  --amber: #FFB000;
+  --dim: #8A6A2A;
+  --dim-text: #A8843A;
+  --red: #FF5C39;
+  --cyan: #6FD3E3;
+
+  /* the character grid: 13px mono, 20px rows. Place everything in ch and rows. */
+  --t: 13px;
+  --row: 20px;
+  --t-readout: 80px;
+  --glow: 0 0 1px rgba(255, 176, 0, 0.35);
+  --radius: 0;
+}

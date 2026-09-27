@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wildbook: index</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font); font-variant-numeric: tabular-nums;
+  color: var(--black); background: var(--white);
+  width: 1440px; height: 900px; overflow: hidden; position: relative;
+}
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+:focus-visible { outline: 3px solid var(--black); outline-offset: 3px; }
+.blue :focus-visible, .slot.sel a:focus-visible { outline-color: var(--yellow); }
+
+.blue { position: absolute; left: 1000px; top: 0; width: 440px; height: 900px; background: var(--ultramarine); color: var(--white); }
+.left { position: absolute; left: var(--margin); top: 0; width: 936px; height: 900px; }
+
+/* nav line */
+.nav { position: absolute; top: 22px; left: 0; right: 0; display: flex; align-items: baseline; }
+.brand { font-stretch: var(--w-compressed); font-weight: 900; font-size: 34px; line-height: 1; }
+.ws { font-size: var(--t-small); margin-left: 10px; width: 130px; }
+.sections { display: flex; gap: 20px; }
+.sections a { font-stretch: var(--w-condensed); font-size: 26px; font-weight: 300; line-height: 1; }
+.sections a[aria-current] { font-weight: 800; }
+.sections a:hover { font-weight: 600; }
+.search { margin-left: auto; display: flex; align-items: baseline; gap: 10px; border-bottom: var(--rule) solid var(--black); width: 300px; padding-bottom: 5px; }
+.search input { font: inherit; font-size: var(--t-small); border: 0; background: transparent; flex: 1; min-width: 0; }
+.search input::placeholder { color: var(--grey); }
+.search input:focus { outline: none; }
+.search:focus-within { background: var(--yellow); }
+
+/* poster headline, split at the column edge */
+.finding { position: absolute; left: var(--margin); top: 66px; width: 1400px; font-stretch: 90%; font-weight: 800; font-size: 150px; line-height: .86; letter-spacing: -0.02em; white-space: nowrap; }
+.finding.ink { clip-path: inset(0 440px 0 0); }
+.finding.paper { color: var(--white); clip-path: inset(0 0 0 960px); }
+
+.counts { position: absolute; left: 0; top: 214px; display: flex; align-items: baseline; gap: 22px; }
+.counts div { font-size: var(--t-small); font-weight: 500; }
+.counts b { font-stretch: var(--w-compressed); font-weight: 800; font-size: var(--t-title); line-height: 1; margin-right: 4px; }
+.counts .bar { width: 300px; height: 12px; background: #E3E3E3; position: relative; align-self: center; margin-left: 8px; }
+.counts .bar::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 62.5%; background: var(--black); }
+
+.filters { position: absolute; left: 0; top: 272px; width: 936px; display: flex; gap: 20px; align-items: baseline; border-top: var(--rule) solid var(--black); padding-top: 10px; }
+.filters div { display: flex; gap: 8px; align-items: baseline; }
+.filters .lab { font-stretch: var(--w-expanded); font-size: var(--t-label); font-weight: 700; }
+.filters a { font-stretch: var(--w-condensed); font-size: 15px; font-weight: 300; }
+.filters a[aria-pressed="true"] { font-weight: 800; }
+.filters a:hover { font-weight: 600; }
+
+/* the index: a typographic grid, images on flat blocks */
+.grid { position: absolute; left: 0; top: 326px; width: 936px; display: grid; grid-template-columns: repeat(8, 103px); column-gap: 16px; row-gap: 22px; }
+.slot a, .slot { display: grid; grid-template-columns: 1fr auto; align-content: start; }
+.slot a { grid-column: 1 / -1; }
+.blk { grid-column: 1 / -1; width: 103px; height: 103px; background: #EDEDED; position: relative; margin-bottom: 7px; }
+.blk img { position: absolute; inset: 6px; width: 91px; height: 91px; }
+.no { font-stretch: var(--w-compressed); font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: -0.01em; }
+.rar { grid-column: 1 / -1; order: 5; font-size: 11px; font-stretch: var(--w-expanded); justify-self: start; margin-top: 2px; }
+.st { order: 6; }
+.nm { grid-column: 1 / -1; font-size: 14px; font-weight: 700; line-height: 1.15; margin-top: 3px; overflow-wrap: anywhere; }
+.ty, .st { grid-column: 1 / -1; font-size: 12px; line-height: 1.3; }
+.st { color: var(--grey); }
+.slot a:hover .nm { text-decoration: underline; text-decoration-thickness: 2px; }
+
+/* rarity is a system: weight, a bar, and the one yellow block */
+.r-common .rar { font-weight: 300; color: var(--grey); }
+.r-uncommon .rar { font-weight: 600; }
+.r-rare .rar { font-weight: 800; }
+.r-rare .blk::before, .d-art .plate::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 7px; background: var(--black); z-index: 1; }
+.r-mythic .blk { background: var(--yellow); }
+.r-mythic .rar { font-weight: 900; background: var(--yellow); padding: 1px 4px 2px; font-size: 12px; }
+
+/* states */
+.seen img { filter: brightness(0); opacity: .82; }
+.seen .nm { font-weight: 500; }
+.unknown .blk { background: transparent; outline: 1px solid #BDBDBD; outline-offset: -1px; }
+.bigno { position: absolute; left: 8px; bottom: 4px; font-stretch: var(--w-compressed); font-weight: 200; font-size: 48px; line-height: 1; color: #9A9A9A; }
+.ph { position: absolute; inset: 14px; background: #D4D4D4; display: flex; flex-direction: column; justify-content: flex-end; padding: 7px; font-size: 11px; line-height: 1.2; color: #3A3A3A; }
+.ph b { font-size: 13px; font-weight: 700; color: var(--black); }
+.sel .blk { background: var(--ultramarine); }
+.sel .no { color: var(--ultramarine); }
+
+.legend { position: absolute; left: 0; top: 820px; width: 936px; display: flex; gap: 28px; border-top: var(--rule) solid var(--black); padding-top: 10px; font-size: 13px; line-height: 1.3; }
+.legend span { display: flex; gap: 8px; align-items: center; }
+.legend i { width: 18px; height: 18px; flex: none; background: #EDEDED; }
+.legend i.k { background: #EDEDED; position: relative; }
+.legend i.k::after { content: ""; position: absolute; inset: 4px; background: var(--black); border-radius: 50%; }
+.legend i.u { background: transparent; outline: 1px solid #BDBDBD; outline-offset: -1px; }
+.legend i.r { border-top: 4px solid var(--black); }
+.legend i.m { background: var(--yellow); }
+.legend i.x { background: #D4D4D4; }
+
+/* detail column */
+.actions { position: absolute; top: 22px; left: 32px; right: 36px; display: flex; gap: 8px; }
+.btn { font: inherit; font-stretch: var(--w-condensed); font-weight: 700; font-size: 15px; line-height: 1; padding: 10px 11px 11px; border: 3px solid var(--white); cursor: pointer; white-space: nowrap; }
+.btn.primary { background: var(--white); color: var(--ultramarine); }
+.btn.primary:hover { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+.btn.secondary { background: transparent; color: var(--white); }
+.btn.secondary:hover { background: var(--ultramarine-deep); }
+.btn:disabled { background: transparent; color: var(--on-blue-soft); border: 3px dotted rgba(201,210,246,.55); cursor: not-allowed; }
+.why { position: absolute; top: 66px; left: 32px; font-size: 12px; color: var(--on-blue-soft); }
+
+.d { position: absolute; left: 32px; right: 36px; }
+.d-no { top: 226px; font-size: 14px; display: flex; gap: 12px; align-items: baseline; }
+.d-no b { font-stretch: var(--w-compressed); font-weight: 700; font-size: 30px; line-height: 1; }
+.d-no span { font-weight: 800; font-stretch: var(--w-expanded); font-size: 12px; }
+.d-name { top: 256px; font-stretch: var(--w-compressed); font-weight: 800; font-size: 76px; line-height: .9; letter-spacing: -0.02em; }
+.d-art { top: 338px; display: grid; grid-template-columns: 180px 1fr; column-gap: 18px; }
+.d-art .plate { width: 180px; height: 180px; background: var(--white); position: relative; }
+.d-art .plate img { position: absolute; inset: 14px; width: 152px; height: 152px; }
+.d-art dl { display: grid; grid-template-columns: 1fr; align-content: start; }
+.d-art dt { font-stretch: var(--w-expanded); font-size: var(--t-label); font-weight: 700; color: var(--on-blue-soft); margin-top: 7px; }
+.d-art dt:first-child { margin-top: 0; }
+.d-art dd { font-size: 15px; line-height: 1.25; }
+.d-art dd b { font-weight: 800; }
+.d-desc { top: 532px; font-size: 14px; line-height: 1.35; }
+.stats { top: 618px; display: grid; grid-template-columns: 62px 32px 1fr; row-gap: 6px; align-items: center; font-size: 14px; }
+.stats dt { font-weight: 600; }
+.stats dd.v { text-align: right; padding-right: 10px; font-stretch: var(--w-condensed); font-weight: 700; font-size: 17px; }
+.stats dd.b { height: 12px; background: var(--ultramarine-deep); position: relative; }
+.stats dd.b i { position: absolute; inset: 0 auto 0 0; background: var(--white); }
+.evo { top: 722px; display: flex; gap: 12px; align-items: flex-start; }
+.evo li { width: 104px; font-size: 12px; line-height: 1.25; }
+.evo .t { width: 56px; height: 56px; background: var(--white); position: relative; margin-bottom: 5px; }
+.evo .t img { position: absolute; inset: 4px; width: 48px; height: 48px; }
+.evo .cur .t { outline: 3px solid var(--yellow); outline-offset: -3px; }
+.evo .cur { font-weight: 800; }
+.evo .empty .t { background: transparent; outline: 2px solid var(--on-blue-soft); outline-offset: -2px; }
+.evo .empty .t span { position: absolute; left: 6px; bottom: 3px; font-stretch: var(--w-compressed); font-weight: 300; font-size: 22px; color: var(--on-blue-soft); }
+.evo .arrow { width: auto; align-self: center; margin-top: -26px; font-weight: 300; font-size: 20px; }
+.drops { top: 818px; font-size: 14px; line-height: 1.35; }
+.drops b { font-stretch: var(--w-expanded); font-size: var(--t-label); font-weight: 700; color: var(--on-blue-soft); display: block; }
+</style>
+</head>
+<body>
+
+<div class="blue">
+  <div class="actions">
+    <button class="btn primary" type="button">Show on map</button>
+    <button class="btn secondary" type="button">Mark as favourite</button>
+    <button class="btn" type="button" disabled aria-describedby="why">Add to team</button>
+  </div>
+  <p class="why" id="why">Team is full (6 of 6). Remove one to add Lanternfin.</p>
+
+  <p class="d d-no"><b>#007</b><span>Rare</span></p>
+  <h2 class="d d-name">Lanternfin</h2>
+  <div class="d d-art">
+    <div class="plate"><img src="../../art/lanternfin.svg" alt="Lanternfin"></div>
+    <dl>
+      <dt>Type</dt><dd>Tide / Ember</dd>
+      <dt>Rarity</dt><dd><b>Rare</b></dd>
+      <dt>Habitat</dt><dd>Tidal caves, night only</dd>
+      <dt>First caught</dt><dd>12 Aug</dd>
+      <dt>Caught</dt><dd>3</dd>
+    </dl>
+  </div>
+  <p class="d d-desc">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it’s kept out of salt water for more than a day.</p>
+  <dl class="d stats" aria-label="Stats, out of 100">
+    <dt>HP</dt><dd class="v">62</dd><dd class="b"><i style="width:62%"></i></dd>
+    <dt>Attack</dt><dd class="v">48</dd><dd class="b"><i style="width:48%"></i></dd>
+    <dt>Defense</dt><dd class="v">55</dd><dd class="b"><i style="width:55%"></i></dd>
+    <dt>Speed</dt><dd class="v">81</dd><dd class="b"><i style="width:81%"></i></dd>
+  </dl>
+  <ol class="d evo" aria-label="Evolution line">
+    <li><div class="t"><img src="../../art/glimmerfry.svg" alt=""></div>006 Glimmerfry</li>
+    <li class="arrow" aria-hidden="true">&rarr;</li>
+    <li class="cur"><div class="t"><img src="../../art/lanternfin.svg" alt=""></div>007 Lanternfin</li>
+    <li class="arrow" aria-hidden="true">&rarr;</li>
+    <li class="empty" aria-label="008, not seen yet"><div class="t"><span>008</span></div></li>
+  </ol>
+  <p class="d drops"><b>Drops</b>Lantern scale, common. Deep pearl, rare, 4% chance.</p>
+</div>
+
+<div class="left">
+  <nav class="nav" aria-label="Sections">
+    <span class="brand">Wildbook</span>
+    <span class="ws">Saltmarsh Reach</span>
+    <ul class="sections">
+      <li><a href="#" aria-current="page">Index</a></li>
+      <li><a href="#">Team</a></li>
+      <li><a href="#">Map</a></li>
+      <li><a href="#">Items</a></li>
+    </ul>
+    <label class="search"><input type="search" placeholder="Search by name, number or type" aria-label="Search by name, number or type"></label>
+  </nav>
+
+  <div class="counts">
+    <div><b>10</b>caught</div>
+    <div><b>3</b>seen, not caught</div>
+    <div><b>3</b>never seen</div>
+    <div><b>62%</b>complete</div>
+    <span class="bar" aria-hidden="true"></span>
+  </div>
+
+  <div class="filters" role="group" aria-label="Filters and sort">
+    <div><span class="lab">Status</span><a href="#" aria-pressed="true">All</a><a href="#" aria-pressed="false">Caught</a><a href="#" aria-pressed="false">Seen</a><a href="#" aria-pressed="false">Unknown</a></div>
+    <div><span class="lab">Type</span><a href="#">Tide</a><a href="#">Moss</a><a href="#">Ember</a><a href="#">Gale</a><a href="#">Stone</a></div>
+    <div><span class="lab">Rarity</span><a href="#">Common</a><a href="#">Uncommon</a><a href="#">Rare</a><a href="#">Mythic</a></div>
+    <div><span class="lab">Sort</span><a href="#" aria-pressed="true">Number</a><a href="#" aria-pressed="false">Name</a><a href="#" aria-pressed="false">Rarity</a></div>
+  </div>
+
+  <ol class="grid" aria-label="Saltmarsh Reach index, 16 slots">
+    <li class="slot caught r-common"><a href="#"><div class="blk"><img src="../../art/reedling.svg" alt="Reedling" onerror="this.hidden=true"></div><span class="no">001</span><span class="rar">Common</span><span class="nm">Reedling</span><span class="ty">Moss</span><span class="st">Caught 14</span></a></li>
+    <li class="slot caught r-uncommon"><a href="#"><div class="blk"><img src="../../art/bogwhistle.svg" alt="Bogwhistle" onerror="this.hidden=true"></div><span class="no">002</span><span class="rar">Uncommon</span><span class="nm">Bogwhistle</span><span class="ty">Moss / Gale</span><span class="st">Caught 3</span></a></li>
+    <li class="slot caught r-common"><a href="#"><div class="blk"><img src="../../art/cindermoth.svg" alt="Cindermoth" onerror="this.hidden=true"></div><span class="no">003</span><span class="rar">Common</span><span class="nm">Cindermoth</span><span class="ty">Ember</span><span class="st">Caught 9</span></a></li>
+    <li class="slot caught r-common"><a href="#"><div class="blk"><img src="../../art/pebblepup.svg" alt="Pebblepup" onerror="this.hidden=true"></div><span class="no">004</span><span class="rar">Common</span><span class="nm">Pebblepup</span><span class="ty">Stone</span><span class="st">Caught 22</span></a></li>
+    <li class="slot caught r-common"><a href="#"><div class="blk"><img src="../../art/saltcrab.svg" alt="Saltcrab" onerror="this.hidden=true"></div><span class="no">005</span><span class="rar">Common</span><span class="nm">Saltcrab</span><span class="ty">Tide / Stone</span><span class="st">Caught 6</span></a></li>
+    <li class="slot caught r-uncommon"><a href="#"><div class="blk"><img src="../../art/glimmerfry.svg" alt="Glimmerfry" onerror="this.hidden=true"></div><span class="no">006</span><span class="rar">Uncommon</span><span class="nm">Glimmerfry</span><span class="ty">Tide</span><span class="st">Caught 5</span></a></li>
+    <li class="slot caught r-rare sel"><a href="#" aria-current="true"><div class="blk"><img src="../../art/lanternfin.svg" alt="Lanternfin" onerror="this.hidden=true"></div><span class="no">007</span><span class="rar">Rare</span><span class="nm">Lanternfin</span><span class="ty">Tide / Ember</span><span class="st">Caught 3</span></a></li>
+    <li class="slot unknown" aria-label="Number 008, not seen yet"><div class="blk"><span class="bigno">008</span></div></li>
+    <li class="slot seen r-uncommon"><a href="#"><div class="blk"><img src="../../art/mistheron.svg" alt="Mistheron" onerror="this.hidden=true"></div><span class="no">009</span><span class="rar">Uncommon</span><span class="nm">Mistheron</span><span class="ty">Gale</span><span class="st">Seen, not caught</span></a></li>
+    <li class="slot caught r-uncommon"><a href="#"><div class="blk"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler" onerror="this.hidden=true"></div><span class="no">010</span><span class="rar">Uncommon</span><span class="nm">Greater Spotted Marsh Wobbler</span><span class="ty">Moss / Tide</span><span class="st">Caught 1</span></a></li>
+    <li class="slot caught r-common"><a href="#"><div class="blk"><span class="ph" aria-hidden="true"><b>Emberkit</b>Image missing</span><img src="../../art/emberkit.svg" alt="Emberkit" onerror="this.hidden=true"></div><span class="no">011</span><span class="rar">Common</span><span class="nm">Emberkit</span><span class="ty">Ember</span><span class="st">Caught 7</span></a></li>
+    <li class="slot seen r-rare"><a href="#"><div class="blk"><img src="../../art/stormgull.svg" alt="Stormgull" onerror="this.hidden=true"></div><span class="no">012</span><span class="rar">Rare</span><span class="nm">Stormgull</span><span class="ty">Gale / Tide</span><span class="st">Seen, not caught</span></a></li>
+    <li class="slot unknown" aria-label="Number 013, not seen yet"><div class="blk"><span class="bigno">013</span></div></li>
+    <li class="slot caught r-rare"><a href="#"><div class="blk"><img src="../../art/cragback.svg" alt="Cragback" onerror="this.hidden=true"></div><span class="no">014</span><span class="rar">Rare</span><span class="nm">Cragback</span><span class="ty">Stone</span><span class="st">Caught 2</span></a></li>
+    <li class="slot seen r-mythic"><a href="#"><div class="blk"><img src="../../art/duskmote.svg" alt="Duskmote" onerror="this.hidden=true"></div><span class="no">015</span><span class="rar">Mythic</span><span class="nm">Duskmote</span><span class="ty">Gale / Ember</span><span class="st">Seen, not caught</span></a></li>
+    <li class="slot unknown" aria-label="Number 016, not seen yet"><div class="blk"><span class="bigno">016</span></div></li>
+  </ol>
+
+  <div class="legend">
+    <span><i></i>Grey block: caught</span>
+    <span><i class="k"></i>Black shape: seen, not caught</span>
+    <span><i class="u"></i>Empty square: never seen</span>
+    <span><i class="r"></i>Black bar: rare</span>
+    <span><i class="m"></i>Yellow: mythic</span>
+    <span><i class="x"></i>Image missing</span>
+  </div>
+</div>
+
+<h1 class="finding ink">10 of 16 caught.</h1>
+<div class="finding paper" aria-hidden="true">10 of 16 caught.</div>
+
+</body>
+</html>

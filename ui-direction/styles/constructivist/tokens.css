@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800;900&family=PT+Sans+Narrow:wght@400;700&family=PT+Mono&display=swap");
+
+:root {
+  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --font-body: "PT Sans Narrow", "Arial Narrow", sans-serif;
+  --font-mono: "PT Mono", "Courier New", monospace;
+
+  --paper: #E6E3DC;
+  --paper-deep: #D6D2C8;
+  --red: #D52B1E;
+  --red-ink: #A8201A;
+  --black: #111111;
+  --tone: #8C8A84;
+  --tone-soft: #B9B5AC;
+  --graphite: #4A4843;
+  --on-black: #E6E3DC;
+  --on-black-soft: #A9A59C;
+
+  /* the one axis and its perpendicular */
+  --axis: -18deg;
+  --cut: 72deg;
+  --slope: 0.3249;
+
+  /* halftone: printed grey, never a flat tint */
+  --halftone: radial-gradient(circle at 50% 50%, var(--tone) 0 1.6px, transparent 1.9px) 0 0 / 6px 6px;
+  --halftone-on-black: radial-gradient(circle at 50% 50%, #5E5B55 0 1.5px, transparent 1.8px) 0 0 / 6px 6px;
+
+  /* scale: 12 / 14 / 16 / 20 / 28 / 40 / 64 / 104 */
+  --t-note: 12px;
+  --t-small: 14px;
+  --t-body: 16px;
+  --t-sub: 20px;
+  --t-title: 28px;
+  --t-head: 40px;
+  --t-figure: 64px;
+  --t-poster: 104px;
+
+  --bar: 6px;
+  --bar-heavy: 14px;
+  --gap: 8px;
+}

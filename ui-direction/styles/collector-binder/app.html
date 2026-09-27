@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { min-height: 100vh; padding-bottom: 64px; overflow-x: hidden; }
+  body::before { inset: 4px; border-radius: 16px; }
+
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 10px; color: var(--vinyl-ink); }
+  .top .spine-label b { font-size: 22px; }
+  .date { font-family: var(--font-card); font-weight: 600; font-size: var(--t-15); color: var(--card); }
+
+  .page.album { margin: 0 10px; border-radius: 4px; padding: 16px 14px 20px 30px; }
+  .album .holes { left: 7px; right: auto; padding: 40px 0; justify-content: space-between; }
+  section + section { margin-top: 22px; }
+  h2 { font-family: var(--font-card); font-weight: 700; font-size: var(--t-18); line-height: 1.15; }
+  .sub { font-size: var(--t-12); color: var(--ink-2); }
+
+  /* currently reading: the pulled card and what is printed beside it */
+  .now { display: grid; grid-template-columns: 146px 1fr; gap: 16px; align-items: start; }
+  .book-card { height: 206px; padding: 6px; gap: 5px; margin-top: 4px; }
+  .cover { flex: 1; border-radius: 3px; background: #22324B; color: #EEF2F4; padding: 9px 9px 8px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+  .cover svg { position: absolute; right: -26px; bottom: -22px; width: 100px; height: 100px; }
+  .cover .t { font-family: var(--font-card); font-weight: 700; font-size: 16px; line-height: 1.08; position: relative; }
+  .cover .a { font-size: 10.5px; font-weight: 600; letter-spacing: .02em; margin-top: 6px; position: relative; }
+  .book-card .c-no { display: flex; justify-content: space-between; font-size: var(--t-10); color: var(--ink-2); padding: 0 2px; }
+  .book-card .c-no b { font-family: var(--font-card); color: var(--ink); font-weight: 700; }
+  .now-info .lbl { font-size: var(--t-12); color: var(--ink-2); }
+  .now-info h1 { font-family: var(--font-card); font-weight: 700; font-size: 20px; line-height: 1.12; margin-top: 2px; }
+  .now-info .by { font-size: var(--t-13); margin-top: 3px; }
+  .pages { font-family: var(--font-card); margin-top: 12px; line-height: 1; }
+  .pages b { font-size: 40px; font-weight: 700; }
+  .pages span { font-size: var(--t-15); font-weight: 500; color: var(--ink-2); }
+  .bar { position: relative; height: 10px; background: var(--pocket); border: 1px solid var(--seam); border-radius: 2px; margin-top: 8px; }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 61%; background: var(--vinyl); }
+  .now-info .meta { display: flex; justify-content: space-between; font-size: var(--t-12); margin-top: 5px; color: var(--ink-2); }
+  .now-info .meta b { color: var(--ink); }
+
+  /* today's goal: 20 tiny pockets, 8 filled */
+  .goal-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .goal-head .n { font-family: var(--font-card); font-size: var(--t-15); font-weight: 600; }
+  .pockets20 { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin-top: 8px; }
+  .pockets20 li { height: 30px; border: 1px solid var(--seam); background: var(--pocket); border-radius: 2px; padding: 2px; display: grid; place-items: center; font-family: var(--font-card); font-size: 10px; color: var(--print); }
+  .pockets20 li.in { background: var(--pocket); }
+  .pockets20 li.in::before { content: ""; width: 100%; height: 100%; background: var(--card); border: 1px solid var(--card-edge); border-top: 5px solid var(--vinyl); border-radius: 2px; grid-area: 1 / 1; }
+  .pockets20 li.in span { padding-top: 4px; }
+  .pockets20 li.in span { grid-area: 1 / 1; color: var(--ink); font-weight: 700; position: relative; }
+  .goal-note { font-size: var(--t-13); margin-top: 7px; }
+  .goal-note b { font-weight: 700; }
+  .log-btn { width: 100%; min-height: 50px; font-size: var(--t-15); margin-top: 12px; }
+
+  /* streak: stamps in a clear mount strip */
+  .stamps { display: grid; grid-template-columns: repeat(11, 1fr); gap: 3px; margin-top: 8px; background: var(--pocket); border: 1px solid var(--seam); border-radius: 2px; padding: 5px 4px; position: relative; }
+  .stamps li { aspect-ratio: 4 / 5; background: var(--card); display: grid; place-items: center; font-family: var(--font-card); font-weight: 700; font-size: 12px; color: var(--vinyl);
+    -webkit-mask: radial-gradient(circle at 50% 50%, #000 1.4px, transparent 1.8px) 0 0 / 5px 5px, linear-gradient(#000, #000) center / calc(100% - 5px) calc(100% - 5px) no-repeat;
+    mask: radial-gradient(circle at 50% 50%, #000 1.4px, transparent 1.8px) 0 0 / 5px 5px, linear-gradient(#000, #000) center / calc(100% - 5px) calc(100% - 5px) no-repeat; }
+  .stamps li span { background: var(--vinyl); color: var(--card); width: calc(100% - 7px); height: calc(100% - 7px); display: grid; place-items: center; }
+  .streak-head { display: flex; align-items: baseline; gap: 8px; }
+  .streak-head b { font-family: var(--font-card); font-size: 28px; line-height: 1; }
+
+  /* up next: a 3-pocket strip */
+  .strip3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .strip3 .pocket { height: 132px; }
+  .mini { height: 100%; padding: 4px; }
+  .mini .cover { padding: 6px; }
+  .mini .cover .t { font-size: 12px; }
+  .mini .cover .a { font-size: 9px; }
+  .strip3 .slot-no { position: absolute; }
+  .nexts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+  .nexts li { font-size: var(--t-12); line-height: 1.3; overflow-wrap: anywhere; }
+  .nexts .t { font-weight: 700; display: block; }
+  .nexts .pp { color: var(--ink-2); display: block; margin-top: 2px; }
+
+  /* highlight: a slip in a pocket */
+  .slip-pocket { margin-top: 8px; }
+  .slip { background: var(--card); border: 1px solid var(--card-edge); border-radius: 3px; padding: 14px 14px 12px; }
+  .slip blockquote { margin: 0; font-family: var(--font-card); font-style: italic; font-weight: 500; font-size: 18px; line-height: 1.3; }
+  .slip p { font-size: var(--t-12); color: var(--ink-2); margin-top: 8px; }
+
+  /* bottom: divider tabs standing up from the album edge */
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; height: 60px; background: var(--vinyl); display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 0 10px 8px; align-items: end; z-index: 5; border-top: 1px solid var(--vinyl-deep); }
+  .tabs a { text-decoration: none; text-align: center; font-family: var(--font-card); font-weight: 600; font-size: var(--t-15); background: var(--sleeve-edge); color: var(--ink); border-radius: 7px 7px 3px 3px; padding: 11px 4px 10px; }
+  .tabs a[aria-current="page"] { background: var(--page); font-weight: 700; padding-top: 16px; box-shadow: inset 0 3px 0 var(--gold); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="spine-label"><b>Shelf</b></div>
+  <p class="date">Thu 24 Sep</p>
+</header>
+
+<main class="page album">
+  <section class="now" aria-labelledby="now-title">
+    <article class="card book-card pulled" aria-hidden="true">
+      <div class="cover">
+        <span class="t">The Left Hand of Darkness</span>
+        <span class="a">Ursula K. Le Guin</span>
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#EEF2F4"/><path d="M50 4a46 46 0 0 1 0 92z" fill="#9FB6C8"/><circle cx="50" cy="50" r="46" fill="none" stroke="#EEF2F4" stroke-width="2"/></svg>
+      </div>
+      <p class="c-no"><span>p. <b>184</b> / 304</span><span>61%</span></p>
+    </article>
+    <div class="now-info">
+      <p class="lbl">Currently reading</p>
+      <h1 id="now-title">The Left Hand of Darkness</h1>
+      <p class="by">Ursula K. Le Guin</p>
+      <p class="pages"><b class="num">184</b> <span>of 304</span></p>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="304" aria-valuenow="184" aria-label="Page 184 of 304"><i></i></div>
+      <p class="meta"><span><b>61%</b> read</span><span>120 left</span></p>
+      <p class="meta"><span>Last read yesterday</span></p>
+    </div>
+  </section>
+
+  <section aria-labelledby="goal-title">
+    <div class="goal-head">
+      <h2 id="goal-title">Today's goal</h2>
+      <span class="n">8 of 20 pages</span>
+    </div>
+    <ol class="pockets20" aria-hidden="true">
+      <li class="in"><span>1</span></li><li class="in"><span>2</span></li><li class="in"><span>3</span></li><li class="in"><span>4</span></li><li class="in"><span>5</span></li><li class="in"><span>6</span></li><li class="in"><span>7</span></li><li class="in"><span>8</span></li><li>9</li><li>10</li>
+      <li>11</li><li>12</li><li>13</li><li>14</li><li>15</li><li>16</li><li>17</li><li>18</li><li>19</li><li>20</li>
+    </ol>
+    <p class="goal-note">Not done yet. <b>12 pages to go</b> to fill today's 20.</p>
+    <button class="btn primary log-btn" type="button">Log pages</button>
+  </section>
+
+  <section aria-labelledby="streak-title">
+    <div class="streak-head"><b class="num">11</b><h2 id="streak-title">day streak</h2></div>
+    <ol class="stamps" aria-label="11 days in a row">
+      <li><span>1</span></li><li><span>2</span></li><li><span>3</span></li><li><span>4</span></li><li><span>5</span></li><li><span>6</span></li><li><span>7</span></li><li><span>8</span></li><li><span>9</span></li><li><span>10</span></li><li><span>11</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="next-title">
+    <h2 id="next-title">Up next</h2>
+    <ol class="strip3" aria-hidden="true">
+      <li class="pocket"><div class="card mini"><div class="cover" style="background:#5E6F7E"><span class="t">Piranesi</span><span class="a">Susanna Clarke</span></div></div></li>
+      <li class="pocket"><div class="card mini"><div class="cover" style="background:#5C6B4C"><span class="t">The Remains of the Day</span><span class="a">Kazuo Ishiguro</span></div></div></li>
+      <li class="pocket"><div class="card mini"><div class="cover" style="background:#6E5872"><span class="t">A Very Long Book Title</span><span class="a">J. Placeholder-Smythe</span></div></div></li>
+    </ol>
+    <ol class="nexts">
+      <li><span class="t">Piranesi</span>Susanna Clarke<span class="pp">272 pp</span></li>
+      <li><span class="t">The Remains of the Day</span>Kazuo Ishiguro<span class="pp">245 pp</span></li>
+      <li><span class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</span>J. Placeholder-Smythe<span class="pp">1,104 pp</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="hl-title">
+    <h2 id="hl-title">Saved highlight</h2>
+    <div class="pocket slip-pocket">
+      <figure class="slip">
+        <blockquote>“Light is the left hand of darkness and darkness the right hand of light.”</blockquote>
+        <p>The Left Hand of Darkness, p. 222</p>
+      </figure>
+    </div>
+  </section>
+  <div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>
+</main>
+
+<nav class="tabs" aria-label="Sections">
+  <a href="#" aria-current="page">Today</a>
+  <a href="#">Library</a>
+  <a href="#">Highlights</a>
+  <a href="#">Stats</a>
+</nav>
+</body>
+</html>

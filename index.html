@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400..700;1,400..700&display=swap">
+<link rel="stylesheet" href="gallery/gallery.css">
+</head>
+<body>
+<header class="masthead">
+  <h1>UI Directions</h1>
+  <p class="lede"><span id="count">Twelve</span> directions for interfaces that don't look like every other AI-built app. Each one is shown on the same three screens: an eval-run dashboard, a mobile reading tracker and a creature-collection index. The content is identical, so what you're comparing is the design. Pick one, and the <code>ui-direction</code> skill carries it into your project.</p>
+  <div class="search">
+    <label for="q">Find a direction or an aesthetic</label>
+    <input type="search" id="q" placeholder="e.g. vaporwave, Art Deco, Teletext, terminal" autocomplete="off">
+  </div>
+  <nav class="filters" aria-label="Filter by use">
+    <span id="filter-label">Good for</span>
+    <div role="group" aria-labelledby="filter-label" id="filters"></div>
+  </nav>
+</header>
+
+<main>
+  <ul class="matches" id="matches" hidden></ul>
+  <ul class="grid" id="grid" aria-live="polite"></ul>
+  <p class="empty" id="empty" hidden>Nothing matches. Try another word or choose All.</p>
+</main>
+
+<footer class="colophon">
+  <p><a href="ui-direction/ANTI-SLOP.md">Anti-slop guide</a>, <a href="ui-direction/PATTERNS.md">layout patterns</a>, <a href="ui-direction/SKILL.md">the skill</a>, and <a href="content/FIXTURE.md">the shared content</a> each specimen shows.</p>
+</footer>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-name">
+  <div class="detail-bar">
+    <button type="button" class="back" id="close">All directions</button>
+    <h2 id="detail-name"></h2>
+    <p class="feels" id="detail-feels"></p>
+    <div class="actions">
+      <button type="button" class="primary" id="copy">Copy brief</button>
+      <a id="open-dashboard" target="_blank" rel="noopener">Open dashboard</a>
+      <a id="open-app" target="_blank" rel="noopener">Open app</a>
+      <a id="open-collection" target="_blank" rel="noopener">Open collection</a>
+    </div>
+    <p class="status" id="copy-status" role="status"></p>
+  </div>
+  <div class="stage" id="stage">
+    <div class="screen desk"><iframe id="frame-dashboard" title="Dashboard specimen" tabindex="-1"></iframe></div>
+    <div class="screen phone"><iframe id="frame-app" title="Mobile app specimen" tabindex="-1"></iframe></div>
+    <div class="screen desk collection"><iframe id="frame-collection" title="Collection specimen" tabindex="-1"></iframe></div>
+  </div>
+  <div class="spec">
+    <aside class="swatches" aria-label="Fonts and palette">
+      <h3>Fonts</h3>
+      <ul id="detail-fonts"></ul>
+      <h3>Palette</h3>
+      <ul id="detail-colors" class="chips"></ul>
+      <h3>Good for</h3>
+      <p id="detail-use"></p>
+    </aside>
+    <article class="brief" id="detail-brief"></article>
+  </div>
+  <textarea id="copy-fallback" class="visually-hidden" aria-hidden="true" tabindex="-1"></textarea>
+</dialog>
+
+<script src="gallery/data.js"></script>
+<script src="gallery/gallery.js"></script>
+</body>
+</html>

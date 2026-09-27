@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--alu); color: var(--graphite);
+    font-family: var(--font-label); font-size: var(--t-body); line-height: 1.3;
+    font-variant-numeric: tabular-nums; padding: 0 16px 104px; overflow-x: hidden;
+  }
+  h1, h2, p, ol { margin: 0; padding: 0; }
+  ol { list-style: none; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--graphite); outline-offset: 2px; }
+  .ss { font-size: var(--t-label); text-transform: lowercase; }
+  .ss.m { font-size: var(--t-micro); color: var(--print); }
+  .lcd { background: var(--lcd); color: var(--lcd-on); border-radius: var(--r-lcd); box-shadow: inset 0 2px 0 rgba(0,0,0,.45), 0 1px 0 var(--alu-hi); font-family: var(--font-lcd); font-weight: 700; }
+  .dots { background-image: radial-gradient(circle, var(--lcd-ghost) 0.9px, transparent 1.3px); background-size: 4px 4px; }
+  .led { width: 9px; height: 9px; border-radius: 50%; background: var(--led-off); display: inline-block; box-shadow: inset 0 -1px 0 rgba(0,0,0,.25); flex: none; }
+  .led.on { background: var(--led-ok); }
+  .seam { height: 2px; background: var(--seam); box-shadow: 0 1px 0 var(--alu-hi); margin: 14px -16px; }
+
+  /* cartridge slot */
+  .slot { position: relative; height: 112px; margin: 0 -16px; background: var(--seam); display: flex; justify-content: center; align-items: flex-end; overflow: hidden; }
+  .slot::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: var(--alu); box-shadow: 0 -2px 0 var(--graphite); }
+  .cart { width: 250px; height: 118px; background: #5E605D; border-radius: 6px 6px 0 0; position: relative; top: 0; padding: 10px 12px 0; }
+  .cart svg { display: block; width: 226px; height: 84px; }
+  .slot .ss { position: absolute; left: 16px; top: 10px; color: var(--graphite); }
+
+  .head { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+  .head b { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .head .ss.m { margin-left: auto; }
+
+  .screen { margin-top: 10px; padding: 12px 14px 12px; }
+  .status { display: flex; justify-content: space-between; font-size: 13px; color: var(--lcd-dim); }
+  .title { font-size: 25px; line-height: 1.05; margin-top: 10px; font-weight: 800; overflow-wrap: anywhere; }
+  .author { font-size: 14px; margin-top: 6px; }
+  .pg { display: flex; align-items: baseline; justify-content: space-between; margin-top: 12px; }
+  .pg b { font-size: 46px; line-height: .9; font-weight: 800; }
+  .pg b small { font-size: 22px; color: var(--lcd-dim); }
+  .pg span { font-size: 22px; }
+  .bar { display: grid; grid-template-columns: repeat(38, 1fr); gap: 2px; margin-top: 10px; }
+  .bar i { height: 8px; background: var(--lcd-ghost); }
+  .bar i.on { background: var(--lcd-on); }
+  .last { font-size: 13px; color: var(--lcd-dim); margin-top: 8px; }
+  .dp { display: inline-block; width: .13em; height: .13em; background: currentColor; margin: 0 .07em; }
+
+  .modrow { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px; }
+  .lab { display: flex; justify-content: space-between; align-items: baseline; }
+  .lab .num { font-family: var(--font-lcd); font-weight: 800; font-size: 20px; }
+  .leds { display: flex; gap: 8px; margin-top: 8px; }
+  .leds .led { width: 16px; height: 16px; }
+  .ladder { display: grid; grid-template-columns: repeat(20, 1fr); gap: 3px; margin-top: 8px; padding: 5px; }
+  .ladder i { height: 16px; background: var(--lcd-ghost); border-radius: 1px; }
+  .ladder i.on { background: var(--lcd-on); }
+  .togo { margin-top: 6px; font-size: 13px; }
+  .togo b { font-weight: 700; }
+
+  .keyrow { display: flex; align-items: flex-end; gap: 14px; margin-top: 18px; }
+  .key { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; }
+  .key .cap {
+    width: 190px; height: 64px; border-radius: var(--r-key); background: var(--orange); color: #2A1406;
+    box-shadow: inset 0 -6px 0 #C24F0F, 0 0 0 1px #B8490E, 0 2px 0 #9E9F9A;
+    display: flex; align-items: center; padding: 0 16px 6px; font-size: 16px; font-weight: 700; text-transform: lowercase; transition: transform .05s;
+  }
+  .key:active .cap { transform: translateY(3px); box-shadow: inset 0 -2px 0 #C24F0F, 0 0 0 1px #B8490E; }
+  .key:focus-visible { outline: none; }
+  .key:focus-visible .cap { outline: 2px solid var(--graphite); outline-offset: 3px; }
+  .keyrow { justify-content: space-between; }
+  .grille { width: 120px; height: 64px; background-image: radial-gradient(circle, var(--graphite) 2px, transparent 2.5px); background-size: 12px 12px; opacity: .8; }
+
+  .memo { margin-top: 8px; padding: 10px 12px; font-size: 15px; line-height: 1.35; }
+  .memo span { display: block; font-size: 12px; color: var(--lcd-dim); margin-top: 6px; }
+
+  .queue { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .queue li { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; }
+  .qk { width: 40px; height: 36px; border-radius: 6px; background: var(--alu-hi); box-shadow: inset 0 -4px 0 var(--seam), 0 0 0 1px var(--seam); display: grid; place-items: center; font-weight: 700; font-size: 14px; padding-bottom: 3px; }
+  .queue a { font-size: 14px; font-weight: 700; display: block; overflow-wrap: anywhere; line-height: 1.25; }
+  .queue a:hover { text-decoration: underline; }
+  .queue p { font-size: 12px; color: var(--print); margin-top: 2px; overflow-wrap: anywhere; }
+
+  /* 4-position selector */
+  .selector { position: fixed; left: 0; right: 0; bottom: 0; background: var(--alu); border-top: 2px solid var(--seam); box-shadow: inset 0 1px 0 var(--alu-hi); padding: 12px 22px 14px; }
+  .selector .track { position: relative; height: 24px; margin: 0 26px; border-radius: 12px; background: var(--graphite); box-shadow: inset 0 2px 3px rgba(0,0,0,.5); }
+  .selector .thumb { position: absolute; left: -9px; top: -4px; width: 52px; height: 32px; border-radius: 8px; background: var(--alu-hi); box-shadow: inset 0 -4px 0 var(--seam), 0 0 0 1px var(--seam); }
+  .selector .thumb::after { content: ""; position: absolute; left: 25px; top: 7px; width: 2px; height: 14px; background: var(--graphite); }
+  .selector nav { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 8px; }
+  .selector a { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; text-transform: lowercase; padding: 2px 0; }
+  .selector a::before { content: ""; width: 2px; height: 5px; background: var(--print); }
+  .selector a[aria-current] { font-weight: 700; }
+  .selector a[aria-current]::before { background: var(--graphite); height: 7px; }
+</style>
+</head>
+<body>
+  <div class="slot">
+    <span class="ss">book slot</span>
+    <div class="cart">
+      <svg viewBox="0 0 226 84" role="img" aria-label="Cover of The Left Hand of Darkness by Ursula K. Le Guin">
+        <rect width="226" height="84" rx="3" fill="#3B4A57"/>
+        <path d="M0 64 L36 50 L60 58 L98 42 L132 56 L168 46 L226 58 V84 H0 Z" fill="#E9ECEE"/>
+        <circle cx="196" cy="24" r="12" fill="#E9ECEE"/>
+        <path d="M196 12 a12 12 0 0 0 0 24 Z" fill="#3B4A57"/>
+        <text x="12" y="21" font-family="Hanken Grotesk, sans-serif" font-weight="700" font-size="14" fill="#E9ECEE">The Left Hand</text>
+        <text x="12" y="38" font-family="Hanken Grotesk, sans-serif" font-weight="700" font-size="14" fill="#E9ECEE">of Darkness</text>
+        <text x="12" y="77" font-family="Hanken Grotesk, sans-serif" font-weight="600" font-size="10" fill="#3B4A57">Ursula K. Le Guin</text>
+      </svg>
+    </div>
+  </div>
+
+  <header class="head">
+    <span class="led on" aria-hidden="true"></span>
+    <b>shelf</b>
+    <span class="ss m">reading tracker</span>
+  </header>
+
+  <section class="lcd screen dots" aria-label="Currently reading">
+    <p class="status"><span>thu 24 sep</span><span>now reading</span></p>
+    <h1 class="title">The Left Hand of Darkness</h1>
+    <p class="author">Ursula K. Le Guin</p>
+    <p class="pg"><b>184<small>/304</small></b><span>61%</span></p>
+    <div class="bar" role="progressbar" aria-valuenow="184" aria-valuemin="0" aria-valuemax="304" aria-label="Book progress"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="last">last read yesterday</p>
+  </section>
+
+  <div class="modrow">
+    <section aria-label="Reading streak">
+      <div class="lab"><span class="ss">streak, days in a row</span><span class="num">11</span></div>
+      <div class="leds" aria-hidden="true"><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span></div>
+    </section>
+    <section aria-label="Today's goal">
+      <div class="lab"><span class="ss">today's goal, 20 pages</span><span class="num">8/20</span></div>
+      <div class="lcd ladder" role="progressbar" aria-valuenow="8" aria-valuemin="0" aria-valuemax="20" aria-label="Pages read today"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="togo"><b>Not met yet.</b> 12 pages to go today.</p>
+    </section>
+  </div>
+
+  <div class="keyrow">
+    <button class="key" type="button"><span class="cap">log pages</span></button>
+    <span class="grille" aria-hidden="true"></span>
+  </div>
+
+  <div class="seam"></div>
+
+  <section aria-label="Saved highlight">
+    <div class="lab"><span class="ss">memo, saved highlight</span><span class="ss m">p<i class="dp"></i> 222</span></div>
+    <p class="lcd memo">“Light is the left hand of darkness and darkness the right hand of light.”<span>from the current book, page 222</span></p>
+  </section>
+
+  <div class="seam"></div>
+
+  <section aria-label="Up next">
+    <div class="lab"><span class="ss">up next, in order</span><span class="ss m">3 queued</span></div>
+    <ol class="queue">
+      <li><span class="qk">1</span><div><a href="#">Piranesi</a><p>Susanna Clarke, 272 pp</p></div></li>
+      <li><span class="qk">2</span><div><a href="#">The Remains of the Day</a><p>Kazuo Ishiguro, 245 pp</p></div></li>
+      <li><span class="qk">3</span><div><a href="#">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</a><p>J. Placeholder-Smythe, 1,104 pp</p></div></li>
+    </ol>
+  </section>
+
+  <div class="selector">
+    <div class="track" aria-hidden="true"><span class="thumb"></span></div>
+    <nav aria-label="Primary">
+      <a href="#" aria-current="page">today</a>
+      <a href="#">library</a>
+      <a href="#">highlights</a>
+      <a href="#">stats</a>
+    </nav>
+  </div>
+</body>
+</html>

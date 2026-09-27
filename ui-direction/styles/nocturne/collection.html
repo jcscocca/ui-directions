@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Wildbook: Saltmarsh Reach</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ink); color: var(--ivory);
+    font-family: var(--font-ui); font-size: var(--t-ui); line-height: 1.4;
+    font-variant-numeric: tabular-nums lining-nums; min-width: 1360px; min-height: 860px;
+  }
+  h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 1px solid var(--gold); outline-offset: 4px; box-shadow: 0 0 0 4px var(--ink), 0 0 0 5px var(--gold); }
+  .caps { font-family: var(--font-ui); font-size: var(--t-caps); font-weight: 500; letter-spacing: var(--track-caps); text-transform: uppercase; }
+
+  .frame { position: fixed; inset: var(--frame-outer); border: 1px solid var(--gold); pointer-events: none; z-index: 5; }
+  .frame::after { content: ""; position: absolute; inset: var(--frame-gap); border: 1px solid var(--gold); }
+  .orn { position: absolute; width: 46px; height: 46px; }
+  .orn.tl { left: -1px; top: -1px; } .orn.tr { right: -1px; top: -1px; transform: scaleX(-1); }
+  .orn.bl { left: -1px; bottom: -1px; transform: scaleY(-1); } .orn.br { right: -1px; bottom: -1px; transform: scale(-1, -1); }
+
+  .page { height: 100%; padding: 30px 50px 34px; display: flex; flex-direction: column; }
+
+  /* masthead */
+  .mast { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; }
+  .tally { display: flex; align-items: center; gap: 14px; padding-top: 4px; }
+  .tally .ring { position: relative; width: 64px; height: 64px; }
+  .tally .ring span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-style: italic; font-size: 22px; }
+  .tally p { font-size: 12.5px; color: var(--ivory-dim); line-height: 1.45; }
+  .tally p b { display: block; font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 19px; color: var(--ivory); }
+  .title { text-align: center; }
+  .title h1 { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 50px; line-height: 1; }
+  .title p { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--ivory-dim); margin-top: 2px; }
+  .search { justify-self: end; width: 320px; padding-top: 6px; }
+  .search label { display: block; color: var(--gold); margin-bottom: 4px; }
+  .search .field { border-bottom: 1px solid var(--gold-dim); padding-bottom: 4px; }
+  .search input { width: 100%; font: inherit; font-size: 14px; color: var(--ivory); background: transparent; border: 0; padding: 2px 0; }
+  .search input::placeholder { color: var(--ivory-dim); }
+  .search input:focus-visible { outline: none; box-shadow: none; }
+  .search .field:focus-within { border-bottom-color: var(--gold); box-shadow: 0 1px 0 var(--gold); }
+
+  nav.sections { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 10px; }
+  nav.sections a { color: var(--ivory-dim); padding: 3px 2px; border-bottom: 1px solid transparent; }
+  nav.sections a:hover { color: var(--ivory); border-bottom-color: var(--gold-dim); }
+  nav.sections a[aria-current] { color: var(--gold); border-bottom-color: var(--gold); }
+  i.dia { width: 5px; height: 5px; background: var(--gold-dim); transform: rotate(45deg); display: inline-block; }
+
+  .rule { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .rule::before, .rule::after { content: ""; flex: 1; height: 3px; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold-dim); }
+  .rule i { width: 7px; height: 7px; border: 1px solid var(--gold); transform: rotate(45deg); }
+
+  .filters { display: flex; justify-content: center; gap: 30px; margin-top: 10px; }
+  .filters .grp { display: flex; align-items: baseline; gap: 10px; }
+  .filters .lbl { color: var(--gold); }
+  .filters button { border: 0; background: transparent; padding: 2px 1px; cursor: pointer; font-family: var(--font-display); font-style: italic; font-size: 16px; color: var(--ivory-dim); border-bottom: 1px solid transparent; }
+  .filters button:hover { color: var(--ivory); }
+  .filters button[aria-pressed="true"] { color: var(--ivory); border-bottom-color: var(--gold); }
+
+  /* three columns: wing, stage, wing */
+  .hall { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 480px 1fr; column-gap: 28px; margin-top: 16px; }
+  .col-h { display: flex; align-items: center; gap: 12px; color: var(--gold); margin-bottom: 10px; }
+  .col-h::before, .col-h::after { content: ""; flex: 1; border-top: 1px solid var(--gold-dim); }
+  .col-h .id { text-transform: none; letter-spacing: 0.12em; }
+
+  .wing ol { list-style: none; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 150px; gap: 8px 10px; }
+  .plate { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; padding: 6px; align-self: start; border-left: 1px solid transparent; }
+  .plate.sel { background: var(--midnight); border-left-color: var(--gold); }
+  .plate:hover { background: rgba(23, 38, 64, .7); }
+
+  /* the frame: rarity is how much gilding it gets */
+  .fr { position: relative; width: 76px; height: 76px; background: var(--ivory); padding: 4px; border: 1px solid var(--gold-dim); }
+  .fr img { display: block; width: 66px; height: 66px; }
+  .uncommon .fr { border-color: var(--gold); }
+  .rare .fr, .mythic .fr { border-color: var(--gold); outline: 1px solid var(--gold); outline-offset: 3px; }
+  .mythic .fr::before, .mythic .fr::after { content: ""; position: absolute; width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); }
+  .mythic .fr::before { left: -9px; top: -9px; }
+  .mythic .fr::after { right: -9px; bottom: -9px; }
+  .seen .fr img { filter: brightness(0); opacity: .72; }
+  .unknown .fr { background: transparent; border: 1px dashed var(--gold-dim); }
+  .ph { display: none; position: absolute; inset: 4px; border: 1px solid var(--gold-dim); background: #DDD5C3; color: var(--ink); flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 3px; }
+  .ph i { font-family: var(--font-display); font-size: 14px; }
+  .ph b { font-family: var(--font-ui); font-weight: 500; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .broken img { display: none; }
+  .broken .ph { display: flex; }
+
+  .lab { display: flex; flex-direction: column; font-size: 12px; line-height: 1.35; }
+  .lab .no { font-family: var(--font-display); font-style: italic; font-size: 15px; color: var(--gold); line-height: 1.1; }
+  .lab .nm { font-family: var(--font-display); font-weight: 600; font-size: 16.5px; line-height: 1.1; margin-top: 1px; overflow-wrap: break-word; }
+  .lab .nm:hover { text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
+  .lab .ty { color: var(--ivory-dim); margin-top: 2px; }
+  .lab .rar { font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--ivory-dim); }
+  .uncommon .lab .rar { color: var(--ivory); }
+  .rare .lab .rar { font-family: var(--font-ui); font-style: normal; font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
+  .mythic .lab .rar { font-family: var(--font-ui); font-style: normal; font-size: 10.5px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink); background: var(--gold); align-self: flex-start; padding: 1px 6px; margin-top: 3px; }
+  .lab .ct { color: var(--ivory-dim); }
+  .lab .seen-t { font-family: var(--font-display); font-style: italic; font-size: 14px; }
+  .unknown .lab .un { font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--ivory-dim); margin-top: 2px; }
+
+  /* the stage */
+  .stage { background: var(--midnight); border: 1px solid var(--gold-dim); padding: 14px 26px 16px; display: flex; flex-direction: column; }
+  .stage .col-h { margin-bottom: 4px; }
+  .stage h2 { text-align: center; font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 52px; line-height: 1; }
+  .stage .sub { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 6px; color: var(--ivory-dim); }
+  .stage .sub .rare-mark { color: var(--gold); }
+  .feature { display: grid; grid-template-columns: 196px 1fr; gap: 22px; margin-top: 14px; align-items: start; }
+  .big { width: 196px; height: 196px; background: var(--ivory); padding: 8px; border: 1px solid var(--gold); outline: 1px solid var(--gold); outline-offset: 4px; }
+  .big img { width: 178px; height: 178px; display: block; }
+  .stats { display: grid; grid-template-columns: 62px 28px 1fr; gap: 7px 10px; align-items: center; }
+  .stats dt { color: var(--gold); }
+  .stats dd.v { text-align: right; font-family: var(--font-display); font-style: italic; font-size: 19px; line-height: 1; }
+  .stats .t { height: 1px; background: var(--gold-dim); position: relative; }
+  .stats .t i { position: absolute; left: 0; top: -1px; height: 3px; background: var(--gold); }
+  .stats .t::after { content: ""; position: absolute; right: 0; top: -3px; width: 1px; height: 7px; background: var(--gold-dim); }
+  .scale { font-size: 11px; color: var(--ivory-dim); margin-top: 6px; }
+  .facts { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin-top: 12px; font-size: 13px; }
+  .facts dt { color: var(--gold); }
+  .desc { font-family: var(--font-display); font-style: italic; font-size: 18px; line-height: 1.3; margin-top: 16px; }
+  .lower { display: grid; grid-template-columns: 1fr 150px; gap: 20px; margin-top: 14px; }
+  .lower h3 { color: var(--gold); font-weight: 500; margin-bottom: 8px; }
+  .evo { list-style: none; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .evo .m { width: 50px; height: 50px; background: var(--ivory); border: 1px solid var(--gold-dim); padding: 2px; flex: none; }
+  .evo .m img { width: 44px; height: 44px; display: block; }
+  .evo .m.here { border-color: var(--gold); outline: 1px solid var(--gold); outline-offset: 2px; }
+  .evo .m.empty { background: transparent; border: 1px dashed var(--gold-dim); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-style: italic; color: var(--ivory-dim); font-size: 14px; }
+  .evo li { display: flex; align-items: center; gap: 6px; }
+  .evo .nx { color: var(--gold-dim); }
+  .evo b { font-weight: 500; color: var(--ivory); }
+  .drops { list-style: none; font-size: 12.5px; }
+  .drops li + li { margin-top: 3px; }
+  .drops small { display: block; color: var(--ivory-dim); font-size: 11.5px; }
+
+  .actions { margin-top: auto; padding-top: 12px; display: flex; justify-content: center; gap: 12px; }
+  .btn { white-space: nowrap; font-family: var(--font-ui); font-size: 11.5px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; height: 36px; padding: 0 16px; border-radius: 0; cursor: pointer; transition: background-color .2s, color .2s; }
+  .btn.primary { background: var(--gold); color: var(--ink); border: 1px solid var(--gold); }
+  .btn.primary:hover { background: var(--ivory); border-color: var(--ivory); }
+  .btn.second { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn.second:hover { background: var(--midnight-2); color: var(--ivory); }
+  .btn:disabled { background: transparent; color: var(--gold-dim); border: 1px dashed var(--gold-dim); cursor: not-allowed; }
+  .cancel-line { display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 10px; }
+  .why { font-size: 12px; color: var(--ivory-dim); max-width: 220px; line-height: 1.35; }
+</style>
+</head>
+<body>
+<div class="frame" aria-hidden="true">
+  <svg class="orn tl" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+  <svg class="orn tr" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+  <svg class="orn bl" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+  <svg class="orn br" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+</div>
+
+<div class="page">
+  <header>
+    <div class="mast">
+      <div class="tally">
+        <div class="ring" role="img" aria-label="10 of 16 caught, 62 percent">
+          <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="29" fill="none" stroke="#8A7447" stroke-width="1" stroke-dasharray="1 3"/>
+            <circle cx="32" cy="32" r="29" fill="none" stroke="#C9A45C" stroke-width="2" stroke-dasharray="113 182.2" transform="rotate(-90 32 32)"/>
+          </svg>
+          <span>10</span>
+        </div>
+        <p><b>10 of 16 caught, 62%</b>3 seen but not caught, 3 never seen</p>
+      </div>
+      <div class="title">
+        <h1>Wildbook</h1>
+        <p>The index of Saltmarsh Reach</p>
+      </div>
+      <form class="search" role="search" onsubmit="return false">
+        <label class="caps" for="q">Search</label>
+        <div class="field"><input id="q" type="search" placeholder="Search by name, number or type"></div>
+      </form>
+    </div>
+    <nav class="sections caps" aria-label="Sections">
+      <a href="#" aria-current="page">Index</a><i class="dia" aria-hidden="true"></i>
+      <a href="#">Team</a><i class="dia" aria-hidden="true"></i>
+      <a href="#">Map</a><i class="dia" aria-hidden="true"></i>
+      <a href="#">Items</a>
+    </nav>
+    <div class="rule" aria-hidden="true"><i></i></div>
+    <div class="filters" aria-label="Filters">
+      <div class="grp" role="group" aria-label="Status"><span class="lbl caps">Status</span><button aria-pressed="true">All</button><button aria-pressed="false">Caught</button><button aria-pressed="false">Seen</button><button aria-pressed="false">Unknown</button></div>
+      <div class="grp" role="group" aria-label="Type"><span class="lbl caps">Type</span><button aria-pressed="false">Tide</button><button aria-pressed="false">Moss</button><button aria-pressed="false">Ember</button><button aria-pressed="false">Gale</button><button aria-pressed="false">Stone</button></div>
+      <div class="grp" role="group" aria-label="Rarity"><span class="lbl caps">Rarity</span><button aria-pressed="false">Common</button><button aria-pressed="false">Uncommon</button><button aria-pressed="false">Rare</button><button aria-pressed="false">Mythic</button></div>
+      <div class="grp" role="group" aria-label="Sort"><span class="lbl caps">Sort</span><button aria-pressed="true">Number</button><button aria-pressed="false">Name</button><button aria-pressed="false">Rarity</button></div>
+    </div>
+  </header>
+
+  <main class="hall">
+    <section class="wing" aria-labelledby="w1">
+      <h2 class="col-h caps" id="w1">Nos. 001 to 008</h2>
+      <ol>
+<li class="plate common caught"><div class="fr"><img src="../../art/reedling.svg" alt=""><span class="ph"><i>Reedling</i><b>no image</b></span></div><div class="lab"><span class="no">No. 001</span><a href="#" class="nm">Reedling</a><span class="ty">Moss</span><span class="rar">Common</span><span class="ct">Caught 14</span></div></li>
+<li class="plate uncommon caught"><div class="fr"><img src="../../art/bogwhistle.svg" alt=""><span class="ph"><i>Bogwhistle</i><b>no image</b></span></div><div class="lab"><span class="no">No. 002</span><a href="#" class="nm">Bogwhistle</a><span class="ty">Moss / Gale</span><span class="rar">Uncommon</span><span class="ct">Caught 3</span></div></li>
+<li class="plate common caught"><div class="fr"><img src="../../art/cindermoth.svg" alt=""><span class="ph"><i>Cindermoth</i><b>no image</b></span></div><div class="lab"><span class="no">No. 003</span><a href="#" class="nm">Cindermoth</a><span class="ty">Ember</span><span class="rar">Common</span><span class="ct">Caught 9</span></div></li>
+<li class="plate common caught"><div class="fr"><img src="../../art/pebblepup.svg" alt=""><span class="ph"><i>Pebblepup</i><b>no image</b></span></div><div class="lab"><span class="no">No. 004</span><a href="#" class="nm">Pebblepup</a><span class="ty">Stone</span><span class="rar">Common</span><span class="ct">Caught 22</span></div></li>
+<li class="plate common caught"><div class="fr"><img src="../../art/saltcrab.svg" alt=""><span class="ph"><i>Saltcrab</i><b>no image</b></span></div><div class="lab"><span class="no">No. 005</span><a href="#" class="nm">Saltcrab</a><span class="ty">Tide / Stone</span><span class="rar">Common</span><span class="ct">Caught 6</span></div></li>
+<li class="plate uncommon caught"><div class="fr"><img src="../../art/glimmerfry.svg" alt=""><span class="ph"><i>Glimmerfry</i><b>no image</b></span></div><div class="lab"><span class="no">No. 006</span><a href="#" class="nm">Glimmerfry</a><span class="ty">Tide</span><span class="rar">Uncommon</span><span class="ct">Caught 5</span></div></li>
+<li class="plate rare caught sel" aria-current="true"><div class="fr"><img src="../../art/lanternfin.svg" alt=""><span class="ph"><i>Lanternfin</i><b>no image</b></span></div><div class="lab"><span class="no">No. 007</span><a href="#" class="nm">Lanternfin</a><span class="ty">Tide / Ember</span><span class="rar">Rare</span><span class="ct">Caught 3</span></div></li>
+<li class="plate unknown"><div class="fr" aria-hidden="true"></div><div class="lab"><span class="no">No. 008</span><span class="un">Not yet seen</span></div></li>
+      </ol>
+    </section>
+
+    <section class="stage" aria-labelledby="st-h">
+      <p class="col-h caps">Selected <span class="id">No. 007</span></p>
+      <h2 id="st-h">Lanternfin</h2>
+      <p class="sub caps"><span>Tide / Ember</span><i class="dia" aria-hidden="true"></i><span class="rare-mark">Rare</span></p>
+      <div class="feature">
+        <figure class="big"><img src="../../art/lanternfin.svg" alt="Lanternfin"></figure>
+        <div>
+          <dl class="stats" aria-label="Stats out of 100">
+            <dt class="caps">HP</dt><dd class="v">62</dd><dd class="t"><i style="width:62%"></i></dd>
+            <dt class="caps">Attack</dt><dd class="v">48</dd><dd class="t"><i style="width:48%"></i></dd>
+            <dt class="caps">Defense</dt><dd class="v">55</dd><dd class="t"><i style="width:55%"></i></dd>
+            <dt class="caps">Speed</dt><dd class="v">81</dd><dd class="t"><i style="width:81%"></i></dd>
+          </dl>
+          <p class="scale">Each stat out of 100; the tick marks 100.</p>
+          <dl class="facts">
+            <dt>Habitat</dt><dd>Tidal caves, night only</dd>
+            <dt>First caught</dt><dd>12 Aug</dd>
+            <dt>Caught</dt><dd>3</dd>
+          </dl>
+        </div>
+      </div>
+      <p class="desc">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</p>
+      <div class="lower">
+        <div>
+          <h3 class="caps">Evolution</h3>
+          <ol class="evo">
+            <li><span class="m"><img src="../../art/glimmerfry.svg" alt=""></span><span>No. 006<br>Glimmerfry</span></li>
+            <li class="nx" aria-hidden="true">&rsaquo;</li>
+            <li><span class="m here"><img src="../../art/lanternfin.svg" alt=""></span><b>No. 007<br>Lanternfin</b></li>
+            <li class="nx" aria-hidden="true">&rsaquo;</li>
+            <li><span class="m empty" aria-label="No. 008, not yet seen">008</span></li>
+          </ol>
+        </div>
+        <div>
+          <h3 class="caps">Drops</h3>
+          <ul class="drops"><li>Lantern scale<small>common</small></li><li>Deep pearl<small>rare, 4% chance</small></li></ul>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" type="button">Show on map</button>
+        <button class="btn second" type="button">Mark as favourite</button>
+      </div>
+      <div class="cancel-line">
+        <button class="btn" type="button" disabled aria-describedby="why">Add to team</button>
+        <p class="why" id="why">Team is full (6 of 6). Remove one to add Lanternfin.</p>
+      </div>
+    </section>
+
+    <section class="wing" aria-labelledby="w2">
+      <h2 class="col-h caps" id="w2">Nos. 009 to 016</h2>
+      <ol>
+<li class="plate uncommon seen"><div class="fr"><img src="../../art/mistheron.svg" alt=""><span class="ph"><i>Mistheron</i><b>no image</b></span></div><div class="lab"><span class="no">No. 009</span><a href="#" class="nm">Mistheron</a><span class="ty">Gale</span><span class="rar">Uncommon</span><span class="ct seen-t">Seen, not caught</span></div></li>
+<li class="plate uncommon caught"><div class="fr"><img src="../../art/marsh-wobbler.svg" alt=""><span class="ph"><i>Greater Spotted Marsh Wobbler</i><b>no image</b></span></div><div class="lab"><span class="no">No. 010</span><a href="#" class="nm">Greater Spotted Marsh Wobbler</a><span class="ty">Moss / Tide</span><span class="rar">Uncommon</span><span class="ct">Caught 1</span></div></li>
+<li class="plate common caught"><div class="fr"><img src="../../art/emberkit.svg" alt="" onerror="this.parentNode.classList.add('broken')"><span class="ph"><i>Emberkit</i><b>no image</b></span></div><div class="lab"><span class="no">No. 011</span><a href="#" class="nm">Emberkit</a><span class="ty">Ember</span><span class="rar">Common</span><span class="ct">Caught 7</span></div></li>
+<li class="plate rare seen"><div class="fr"><img src="../../art/stormgull.svg" alt=""><span class="ph"><i>Stormgull</i><b>no image</b></span></div><div class="lab"><span class="no">No. 012</span><a href="#" class="nm">Stormgull</a><span class="ty">Gale / Tide</span><span class="rar">Rare</span><span class="ct seen-t">Seen, not caught</span></div></li>
+<li class="plate unknown"><div class="fr" aria-hidden="true"></div><div class="lab"><span class="no">No. 013</span><span class="un">Not yet seen</span></div></li>
+<li class="plate rare caught"><div class="fr"><img src="../../art/cragback.svg" alt=""><span class="ph"><i>Cragback</i><b>no image</b></span></div><div class="lab"><span class="no">No. 014</span><a href="#" class="nm">Cragback</a><span class="ty">Stone</span><span class="rar">Rare</span><span class="ct">Caught 2</span></div></li>
+<li class="plate mythic seen"><div class="fr"><img src="../../art/duskmote.svg" alt=""><span class="ph"><i>Duskmote</i><b>no image</b></span></div><div class="lab"><span class="no">No. 015</span><a href="#" class="nm">Duskmote</a><span class="ty">Gale / Ember</span><span class="rar">Mythic</span><span class="ct seen-t">Seen, not caught</span></div></li>
+<li class="plate unknown"><div class="fr" aria-hidden="true"></div><div class="lab"><span class="no">No. 016</span><span class="un">Not yet seen</span></div></li>
+      </ol>
+    </section>
+  </main>
+</div>
+</body>
+</html>

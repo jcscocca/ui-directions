@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals: runs</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-mono);
+  font-size: var(--t);
+  line-height: var(--row);
+  font-variant-numeric: tabular-nums;
+  font-variant-ligatures: none;
+  color: var(--amber);
+  background: var(--bg);
+  text-shadow: var(--glow);
+  width: 1440px; height: 900px; overflow: hidden; position: relative;
+}
+a, button, input { font: inherit; color: inherit; background: none; border: 0; text-shadow: inherit; }
+a { text-decoration: none; }
+:focus-visible { outline: none; background: var(--amber) !important; color: var(--bg) !important; text-shadow: none; }
+.dim { color: var(--dim-text); }
+.b { font-weight: 700; }
+.red { color: var(--red); }
+.cy { color: var(--cyan); }
+pre { font: inherit; }
+
+/* panes sit on the character grid: --c0/--c1 in columns, --r0/--r1 in rows; borders run through cell centres */
+.pane {
+  position: absolute;
+  left: calc((var(--c0) + 0.5) * 1ch); width: calc((var(--c1) - var(--c0)) * 1ch);
+  top: calc((var(--r0) + 0.5) * var(--row)); height: calc((var(--r1) - var(--r0)) * var(--row));
+  border: 1px solid var(--dim);
+}
+.pane.focus { border-color: var(--amber); }
+.pane > h2 {
+  position: absolute; top: calc(var(--row) / -2 - 1px); left: calc(1.5ch - 1px);
+  font-size: var(--t); font-weight: 400; background: var(--bg); padding: 0 1ch; white-space: pre;
+}
+.pane.focus > h2 { font-weight: 700; }
+.pane > .foot {
+  position: absolute; bottom: calc(var(--row) / -2 - 1px); right: calc(1.5ch - 1px);
+  background: var(--bg); padding: 0 1ch; white-space: pre;
+}
+.in { position: absolute; left: calc(1.5ch - 1px); right: calc(1.5ch - 1px); top: calc(var(--row) / 2 - 1px); }
+
+/* top line and status line */
+.line { position: absolute; left: 0; width: 184ch; height: var(--row); display: flex; white-space: pre; }
+.top { top: 0; }
+.status { top: calc(44 * var(--row)); }
+.rev { background: var(--amber); color: var(--bg); text-shadow: none; }
+.tabs { display: flex; list-style: none; }
+.tabs a { padding: 0 1ch; }
+.tabs a[aria-current] { background: var(--amber); color: var(--bg); text-shadow: none; font-weight: 700; }
+.tabs a:hover { color: var(--cyan); }
+.search { margin-left: auto; display: flex; width: 44ch; }
+.search input { width: 38ch; outline: none; }
+.search input::placeholder { color: var(--dim-text); }
+.search:focus-within { background: var(--bg-band); }
+.cursor { background: var(--amber); width: 1ch; display: inline-block; height: 16px; margin-top: 2px; animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.keys { margin-left: auto; display: flex; gap: 2ch; }
+.keys kbd { font: inherit; background: var(--dim); color: var(--bg); text-shadow: none; padding: 0 0.5ch; margin-right: 0.5ch; }
+
+/* runs */
+.runs .r { display: grid; grid-template-columns: 1ch 6ch 12ch 29ch 5ch 6ch 20ch 13ch 9ch 5ch; column-gap: 1ch; white-space: pre; }
+.runs p { white-space: pre; }
+.runs .r > span { overflow: hidden; }
+.runs .r .ds { white-space: normal; overflow-wrap: anywhere; }
+.runs .r .n { text-align: right; }
+.runs .hd { color: var(--dim-text); }
+.runs a.r:hover { background: var(--bg-band); }
+.runs a.r.sel { background: var(--cyan); color: var(--bg); text-shadow: none; margin: 0 -1ch; padding: 0 1ch; }
+.runs .sub { grid-column: 2 / -1; white-space: pre; }
+.bar { color: var(--amber); }
+.bar i { font-style: normal; color: var(--dim-text); }
+
+/* chart */
+.chart pre { white-space: pre; }
+.chart .y { color: var(--dim-text); }
+.chart .band { background: var(--bg-band); }
+.chart .pt { color: var(--amber); }
+.chart .hit, .chart .hitl { color: var(--red); font-weight: 700; }
+.chart .base { color: var(--dim); text-shadow: none; }
+
+/* log */
+.log .l { display: grid; grid-template-columns: 10ch 6ch 1fr; white-space: pre; }
+.log p { white-space: pre; }
+.log .warn { color: var(--amber); font-weight: 700; }
+
+/* detail */
+.detail p { white-space: pre-wrap; }
+.detail p:empty::before { content: " "; }
+.readout { display: flex; gap: 4ch; height: calc(4 * var(--row)); align-items: center; }
+.readout span { font-family: var(--font-readout); font-size: var(--t-readout); line-height: calc(4 * var(--row)); letter-spacing: 0.02em; }
+.readout small { font-family: var(--font-mono); font-size: var(--t); line-height: var(--row); display: block; color: var(--dim-text); }
+.readout .d { display: flex; flex-direction: column; }
+.readout .d span { line-height: calc(3 * var(--row)); font-size: 64px; }
+.mt { display: grid; grid-template-columns: 16ch 8ch 10ch 9ch; white-space: pre; }
+.mt .n { text-align: right; }
+.spark { letter-spacing: 0; }
+.acts { display: flex; gap: 2ch; white-space: pre; }
+.acts button { cursor: pointer; padding: 0 1ch; margin: 0 -1ch; }
+.acts button:not(:disabled):hover { color: var(--cyan); }
+.acts .k { background: var(--amber); color: var(--bg); text-shadow: none; padding: 0 0.5ch; }
+.acts button:disabled { color: var(--dim); cursor: not-allowed; text-decoration: line-through; }
+.acts button:disabled .k { background: var(--dim); }
+</style>
+</head>
+<body>
+
+<header class="line top">
+  <span class="rev b"> evals </span><span class="dim"> atlas-research </span><span class="dim">│</span>
+  <nav aria-label="Sections"><ul class="tabs">
+    <li><a href="#" aria-current="page">1 runs</a></li>
+    <li><a href="#">2 datasets</a></li>
+    <li><a href="#">3 models</a></li>
+    <li><a href="#">4 baselines</a></li>
+    <li><a href="#">5 settings</a></li>
+  </ul></nav>
+  <label class="search"><span>/ </span><input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets"><span class="cursor" aria-hidden="true"></span></label>
+</header>
+
+<section class="pane focus runs" style="--c0:0; --c1:118; --r0:1; --r1:21" aria-label="Runs">
+  <h2>[1] runs</h2>
+  <span class="foot">8 runs  5 passed  <span class="red">1 failed</span>  1 running  1 queued</span>
+  <div class="in">
+    <div class="r hd" aria-hidden="true"><span></span><span>ID</span><span>MODEL</span><span>DATASET</span><span class="n">SCORE</span><span class="n">Δ BASE</span><span>STATUS</span><span>DURATION</span><span>BY</span><span>START</span></div>
+    <a href="#" class="r sel" aria-current="true"><span>&gt;</span><span>r-2291</span><span>summarize-v3</span><span class="ds">news-digest-2k</span><span class="n">0.812</span><span class="n b">-0.041</span><span>passed ▼ regressed</span><span>14m 02s</span><span>schedule</span><span>02:00</span></a>
+    <a href="#" class="r"><span></span><span>r-2290</span><span>summarize-v3</span><span class="ds">multilingual-legal-contracts-longform-eval-2026-q3</span><span class="n">0.774</span><span class="n">+0.006</span><span>passed</span><span>41m 55s</span><span>M. Okafor</span><span>01:12</span></a>
+    <a href="#" class="r"><span></span><span>r-2289</span><span>router-small</span><span class="ds">intent-routing-v7</span><span class="n">0.931</span><span class="n">+0.012</span><span>passed</span><span>3m 48s</span><span>schedule</span><span>01:00</span></a>
+    <a href="#" class="r"><span></span><span>r-2288</span><span>router-small</span><span class="ds">adversarial-prompts</span><span class="n dim">—</span><span class="n dim">—</span><span>running <span class="bar">█████<i>░░░</i></span> 62%</span><span>9m 10s so far</span><span>CI #4812</span><span>00:51</span></a>
+    <a href="#" class="r"><span></span><span>r-2287</span><span>extract-json</span><span class="ds">invoices-ocr</span><span class="n">0.000</span><span class="n">-0.884</span><span class="red b">FAILED</span><span>0m 41s</span><span>CI #4809</span><span>00:40</span>
+      <span class="sub red">└ KeyError: 'line_items' — 212 of 212 samples failed schema validation</span>
+      <span class="sub dim">  fix the extractor's output schema, then rerun. failed, not a regression.</span></a>
+    <a href="#" class="r"><span></span><span>r-2286</span><span>extract-json</span><span class="ds">receipts-small</span><span class="n">0.902</span><span class="n">+0.000</span><span>passed</span><span>2m 15s</span><span>L. Brandt</span><span>23:58</span></a>
+    <a href="#" class="r"><span></span><span>r-2285</span><span>chat-core-8b</span><span class="ds">helpfulness-pairwise</span><span class="n">0.668</span><span class="n">+0.021</span><span>passed</span><span>1h 06m</span><span>schedule</span><span>23:00</span></a>
+    <a href="#" class="r"><span></span><span>r-2284</span><span>chat-core-8b</span><span class="ds">safety-refusals</span><span class="n dim">—</span><span class="n dim">—</span><span class="dim">queued</span><span class="dim">—</span><span>schedule</span><span class="dim">—</span></a>
+    <p class="dim" style="margin-top: var(--row)">  —  not computed yet (running or queued)      0.000  computed, and zero      ▼  below the ±0.020 noise band</p>
+    <p class="dim">  j/k move   enter open   r rerun   c compare   x cancel   p pin</p>
+  </div>
+</section>
+
+<section class="pane chart" style="--c0:0; --c1:118; --r0:22; --r1:43" aria-label="Score over the last 12 runs">
+  <h2>[2] score: summarize-v3 on news-digest-2k, last 12 runs</h2>
+  <div class="in">
+<pre role="img" aria-label="Eleven runs between 0.846 and 0.857 inside the 0.833 to 0.873 noise band, near the 0.853 baseline, then r-2291 at 0.812, below the band"><span class="y">       ●</span> score   <span class="band"> ░ </span><span class="y"> noise band 0.833–0.873   ┄ baseline 0.853</span>
+
+<span class="y">      │</span>                                                                                    <span class="y"></span>
+<span class="y">0.870 ┤</span><span class="band">                                                                                    </span><span class="y"> ◂ band top 0.873</span>
+<span class="y">      │</span><span class="band">                                                                                    </span><span class="y"></span>
+<span class="y">0.860 ┤</span><span class="band">                                                                                    </span><span class="y"></span>
+<span class="y">      │</span><span class="band"><span class="base">┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ <span class="pt">●</span> ┄ ┄ ┄<span class="pt">●</span>┄ ┄ ┄ ┄ ┄ ┄ ┄<span class="pt">●</span>┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄<span class="pt">●</span>┄ ┄ ┄ ┄ ┄ </span></span><span class="y"> ◂ baseline 0.853</span>
+<span class="y">0.850 ┤</span><span class="band">          <span class="pt">●</span>      <span class="pt">●</span>                    <span class="pt">●</span>             <span class="pt">●</span>      <span class="pt">●</span>      <span class="pt">●</span>                 </span><span class="y"></span>
+<span class="y">      │</span><span class="band">   <span class="pt">●</span>                                                                                </span><span class="y"></span>
+<span class="y">0.840 ┤</span><span class="band">                                                                                    </span><span class="y"></span>
+<span class="y">      │</span><span class="band">                                                                                    </span><span class="y"> ◂ band bottom 0.833</span>
+<span class="y">0.830 ┤</span>                                                                                    <span class="y"></span>
+<span class="y">      │</span>                                                                                    <span class="y"></span>
+<span class="y">0.820 ┤</span>                                                                                    <span class="y"></span>
+<span class="y">      │</span>                                                                                    <span class="y"></span>
+<span class="y">0.810 ┤</span>                                                                                <span class="hit">●</span><span class="hitl"> 0.812  r-2291 regressed</span><span class="y"></span>
+<span class="y">      └────────────────────────────────────────────────────────────────────────────────────</span>
+<span class="y">          oldest                                                                     </span><span class="hitl">r-2291</span></pre>
+  </div>
+</section>
+
+<section class="pane log" style="--c0:118; --c1:183; --r0:32; --r1:43" aria-label="Log tail for r-2291">
+  <h2>[3] log: r-2291, tail</h2>
+  <div class="in">
+    <div class="l"><span class="dim">02:13:48</span><span>eval</span><span>1996/2000 samples scored</span></div>
+    <div class="l"><span class="dim">02:13:55</span><span>eval</span><span>2000/2000 samples scored</span></div>
+    <div class="l"><span class="dim">02:13:55</span><span class="warn">warn</span><span class="warn">length_ratio above 1.15 on 38% of samples</span></div>
+    <div class="l"><span class="dim">02:14:01</span><span>agg</span><span>faithfulness=0.861 (baseline 0.902)</span></div>
+    <div class="l"><span class="dim">02:14:02</span><span>done</span><span>run r-2291 finished in 14m 02s</span></div>
+    <p class="dim">-- end of log: run finished, not following --</p>
+  </div>
+</section>
+
+<section class="pane detail" style="--c0:118; --c1:183; --r0:1; --r1:31" aria-label="Selected run r-2291">
+  <h2>[4] r-2291</h2>
+  <div class="in">
+    <p class="b">summarize-v3 on news-digest-2k</p>
+    <p class="dim">baseline  summarize-v2 @ r-2203 (0.853)</p>
+    <p>passed    14m 02s    schedule    started 02:00</p>
+    <p></p>
+    <div class="readout">
+      <span>0.812</span>
+      <div class="d"><small>Δ vs baseline</small><span>-0.041</span></div>
+    </div>
+    <p>▼ 0.041 below baseline: twice the ±0.020 noise band.</p>
+    <p class="b">  this is a regression, not noise.</p>
+    <p></p>
+    <div class="mt dim"><span>METRIC</span><span class="n">SCORE</span><span class="n">BASELINE</span><span class="n">Δ</span></div>
+    <div class="mt"><span>rouge-l</span><span class="n">0.412</span><span class="n">0.447</span><span class="n">-0.035</span></div>
+    <div class="mt"><span>faithfulness</span><span class="n b">0.861</span><span class="n">0.902</span><span class="n b">-0.041 ▼</span></div>
+    <div class="mt"><span>coverage</span><span class="n">0.790</span><span class="n">0.801</span><span class="n">-0.011</span></div>
+    <div class="mt"><span>length ratio</span><span class="n">1.18</span><span class="n">1.02</span><span class="n">+0.16</span></div>
+    <p></p>
+    <p class="dim">actions</p>
+    <div class="acts">
+      <button type="button"><span class="k">r</span> rerun</button>
+      <button type="button"><span class="k">c</span> compare with baseline</button>
+      <button type="button" disabled aria-describedby="nocancel"><span class="k">x</span> cancel</button>
+    </div>
+    <p class="dim" id="nocancel">cancel unavailable: r-2291 finished at 02:14:02</p>
+    <p></p>
+    <p class="dim">pinned comparisons</p>
+    <p class="dim">  (none yet)  press c to compare, then p to pin it here</p>
+  </div>
+</section>
+
+<footer class="line status">
+  <span class="rev b"> NORMAL </span><span> atlas-research </span><span class="dim">│</span><span> runs </span><span class="dim">│</span><span class="cy"> r-2291 selected </span>
+  <span class="keys"><span><kbd>F1</kbd>help</span><span><kbd>/</kbd>search</span><span><kbd>r</kbd>rerun</span><span><kbd>c</kbd>compare</span><span><kbd>q</kbd>quit</span><span class="dim">updated 02:14:02 </span></span>
+</footer>
+
+</body>
+</html>

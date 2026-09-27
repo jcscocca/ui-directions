@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Doto:wght@400..900&family=Hanken+Grotesk:wght@400..700&display=swap");
+
+:root {
+  --font-label: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-lcd: "Doto", "Courier New", monospace;
+
+  --alu: #D4D5D1;          /* panel face */
+  --alu-hi: #E3E4E0;       /* seam highlight, key tops */
+  --seam: #A9AAA5;         /* module seams */
+  --graphite: #2A2B2A;     /* silkscreen, dark keys */
+  --print: #4B4C4A;        /* secondary silkscreen */
+  --lcd: #1E2A22;          /* LCD glass */
+  --lcd-ghost: #2C3A30;    /* unlit pixels */
+  --lcd-dim: #6E8468;      /* half-lit pixels */
+  --lcd-on: #B9D4B0;       /* lit pixels */
+  --orange: #F26B1D;       /* the one primary control */
+  --led-ok: #8EDB7E;       /* lit status LED */
+  --led-fault: #E3372A;    /* fault LED only */
+  --led-off: #7D7E7A;      /* unlit LED */
+
+  --t-micro: 10px;
+  --t-label: 11px;
+  --t-body: 13px;
+  --t-lcd-s: 15px;
+  --t-lcd-m: 26px;
+  --t-lcd-l: 76px;
+
+  --seam-w: 2px;
+  --r-body: 22px;
+  --r-module: 6px;
+  --r-key: 7px;
+  --r-lcd: 4px;
+}

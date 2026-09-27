@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wildbook · Saltmarsh Reach · constructivist</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--black); }
+  body { font: 400 var(--t-body)/1.3 var(--font-body); font-variant-numeric: tabular-nums lining-nums; }
+  .stage { position: relative; width: 1440px; height: 900px; overflow: hidden; margin: 0 auto; }
+  .ground { position: absolute; inset: 0; width: 1440px; height: 900px; }
+  .abs { position: absolute; }
+  .axis { transform-origin: 0 50%; transform: rotate(var(--axis)); white-space: nowrap; display: flex; align-items: center; }
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+  .on-black { color: var(--on-black); }
+  .on-black :focus-visible { outline-color: var(--on-black); }
+
+  .mast { left: 32px; top: 20px; display: flex; align-items: baseline; gap: 18px; }
+  .brand { font: 900 44px/1 var(--font-display); text-transform: uppercase; margin: 0; }
+  .ws { font-size: var(--t-small); }
+  .nav { display: flex; gap: 16px; margin-left: 10px; }
+  .nav a { font: 700 22px/1 var(--font-display); text-transform: uppercase; color: var(--black); text-decoration: none; padding: 2px 0 4px; }
+  .nav a[aria-current] { border-bottom: var(--bar) solid var(--black); }
+  .nav a:hover { color: var(--red-ink); }
+  .search { left: 32px; top: 80px; display: flex; width: 330px; border-bottom: 3px solid var(--black); padding-bottom: 4px; }
+  .search input { flex: 1; border: 0; background: transparent; font: 400 var(--t-body)/1.2 var(--font-body); color: var(--black); padding: 2px 0; }
+  .search input::placeholder { color: var(--graphite); }
+  .search input:focus-visible { outline: none; }
+  .search:focus-within { border-bottom-color: var(--red); }
+
+  .filters { left: 32px; top: 128px; display: grid; gap: 5px; }
+  .filters div { display: flex; align-items: baseline; gap: 2px; }
+  .filters span { font: 800 13px/1 var(--font-display); text-transform: uppercase; letter-spacing: .06em; width: 58px; }
+  .filters button { font: 400 15px/1 var(--font-body); background: none; border: 0; padding: 3px 6px; color: var(--black); cursor: pointer; }
+  .filters button:hover { background: var(--paper-deep); }
+  .filters button[aria-pressed="true"] { background: var(--black); color: var(--paper); font-weight: 700; }
+
+  .headline { left: 34px; top: 310px; height: 130px; margin: 0; font: 900 88px/1 var(--font-display); text-transform: uppercase; color: var(--paper); padding-top: 6px; }
+  .tail { left: 640px; top: 158px; height: 40px; gap: 22px; color: var(--paper); font: 800 20px/1 var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
+  .tail b { font: 900 30px/1 var(--font-display); margin-right: 4px; }
+
+  /* specimens on the sheared grid: every column steps up the axis */
+  .sp { position: absolute; left: calc(32px + var(--c) * 205px); top: calc(462px - var(--c) * 66.6px + var(--r) * 106px); width: 200px; height: 100px; display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: start; padding: 4px; }
+  .sp .hit { position: absolute; inset: 0; z-index: 2; }
+  .sp .hit:focus-visible { outline-offset: 0; }
+  .sp:hover:not(.unknown):not(.sel) { background: var(--paper-deep); }
+  .disc { width: 72px; height: 72px; border-radius: 50%; position: relative; display: grid; place-items: center; overflow: hidden; }
+  .disc img { width: 64px; height: 64px; object-fit: contain; position: relative; }
+  .caught .disc { background: var(--halftone), var(--paper-deep); }
+  .seen .disc { background: var(--paper-deep); }
+  .seen .disc img { filter: brightness(0); opacity: .82; }
+  .unknown .disc { box-shadow: inset 0 0 0 2px var(--black); background: transparent; }
+  .unknown .disc span { font: 800 20px/1 var(--font-display); color: var(--graphite); }
+  .disc .ph { display: none; }
+  .disc.missing { background: var(--tone-soft); }
+  .disc.missing .ph { display: block; font: 700 12px/1.1 var(--font-body); text-align: center; color: var(--black); }
+  .tx { min-width: 0; }
+  .tx .no { font: 800 20px/1 var(--font-display); display: block; }
+  .tx h3 { margin: 1px 0 0; font: 700 16px/1.1 var(--font-body); }
+  .tx p { margin: 1px 0 0; font-size: 13px; line-height: 1.2; }
+  .seen .tx p:first-of-type { color: var(--graphite); }
+  .ra { display: flex; align-items: center; gap: 6px; }
+  .ra i { display: block; width: 30px; background: var(--black); }
+  .common .ra i { height: 2px; }
+  .uncommon .ra i { height: 5px; }
+  .rare .ra i { height: 10px; }
+  .sp.mythic { z-index: 0; grid-template-columns: 90px 1fr; }
+  .sp.mythic::before { content: ""; position: absolute; z-index: -1; left: -16px; top: -16px; width: 112px; height: 112px; border-radius: 50%; background: var(--red); }
+  .sp.mythic .disc { background: var(--red); }
+  .sp.mythic .disc img { opacity: 1; }
+  .mythic .ra { position: absolute; left: 6px; top: 124px; transform-origin: 0 50%; transform: rotate(var(--axis)); gap: 8px; font: 900 30px/1 var(--font-display); color: var(--red); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+  .mythic .ra i { height: 16px; width: 44px; background: var(--red); }
+  .common .ra { color: var(--graphite); }
+  .sp.sel { background: var(--black); color: var(--on-black); }
+  .sp.sel .ra i { background: var(--on-black); }
+  .sp.sel .disc { background: var(--halftone-on-black), #2A2927; }
+
+  .key { left: 668px; top: 712px; width: 300px; font-size: 13px; line-height: 1.2; }
+  .key h2 { font: 800 14px/1 var(--font-display); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; border-top: var(--bar) solid var(--black); padding-top: 6px; }
+  .key ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  .key li { display: flex; align-items: center; gap: 8px; }
+  .key .d { width: 20px; height: 20px; border-radius: 50%; flex: none; }
+  .key .d.c { background: var(--halftone), var(--paper-deep); }
+  .key .d.s { background: var(--black); opacity: .82; }
+  .key .d.u { box-shadow: inset 0 0 0 2px var(--black); }
+  .key .d.m { background: var(--tone-soft); }
+  .key .b { width: 26px; background: var(--black); flex: none; }
+
+  /* detail on the black slab */
+  .dtitle { left: 846px; top: 184px; height: 56px; font: 900 44px/1 var(--font-display); text-transform: uppercase; color: var(--on-black); }
+  .dtitle small { font: 700 26px/1 var(--font-display); color: var(--on-black-soft); margin-right: 12px; }
+  .art { left: 884px; top: 236px; width: 196px; height: 196px; border-radius: 50%; background: radial-gradient(circle, #9E9A91 0 1.7px, transparent 2px) 0 0 / 6px 6px, var(--paper); display: grid; place-items: center; }
+  .art img { width: 172px; height: 172px; object-fit: contain; }
+  .facts { left: 1110px; top: 200px; width: 300px; margin: 0; display: grid; grid-template-columns: 96px 1fr; gap: 7px 12px; font-size: 16px; }
+  .facts dt { font: 800 13px/1.5 var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: var(--on-black-soft); }
+  .facts dd { margin: 0; font-weight: 700; }
+  .facts .rb { display: inline-block; width: 30px; height: 10px; background: var(--on-black); margin-right: 8px; vertical-align: 1px; }
+  .desc { left: 936px; top: 450px; width: 474px; margin: 0; font-size: 17px; line-height: 1.3; }
+  .stats { left: 982px; top: 536px; width: 220px; }
+  .stats h2, .drops h2, .evo h2 { font: 800 14px/1 var(--font-display); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 8px; color: var(--on-black-soft); }
+  .stats div { display: grid; grid-template-columns: 62px 26px 1fr; align-items: center; gap: 8px; height: 22px; font-size: 15px; }
+  .stats b { text-align: right; }
+  .stats i { display: block; height: 10px; background: linear-gradient(90deg, var(--on-black) calc(var(--v) * 1%), #3A3936 0); }
+  .drops { left: 1228px; top: 536px; width: 182px; font-size: 15px; line-height: 1.3; }
+  .drops ul { margin: 0; padding: 0; list-style: none; }
+  .drops li { padding: 3px 0; border-bottom: 1px solid #3A3936; }
+  .evo { left: 1016px; top: 664px; width: 396px; }
+  .evo ol { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 6px; }
+  .evo li { display: grid; justify-items: center; gap: 4px; font-size: 13px; text-align: center; width: 100px; }
+  .evo .c { width: 58px; height: 58px; border-radius: 50%; background: var(--paper); display: grid; place-items: center; }
+  .evo .c img { width: 48px; height: 48px; }
+  .evo .now .c { box-shadow: 0 0 0 4px var(--black), 0 0 0 7px var(--on-black); }
+  .evo .now { font-weight: 700; }
+  .evo .unk .c { background: transparent; box-shadow: inset 0 0 0 2px var(--on-black-soft); font: 800 16px/1 var(--font-display); color: var(--on-black-soft); }
+  .evo svg { flex: none; }
+  .actions { left: 1052px; top: 790px; width: 360px; display: grid; grid-template-columns: auto auto; justify-content: start; gap: 8px; }
+  button.a { justify-self: start; font: 800 15px/1 var(--font-display); text-transform: uppercase; letter-spacing: .05em; border: 0; padding: 10px 12px; cursor: pointer; }
+  .a-primary { background: var(--red); color: var(--paper); }
+  .a-primary:hover { background: var(--red-ink); }
+  .a-secondary { background: transparent; color: var(--on-black); box-shadow: inset 0 0 0 2px var(--on-black); }
+  .a-secondary:hover { background: #2A2927; }
+  button.a:disabled { background: transparent; color: #6E6B65; box-shadow: inset 0 0 0 2px #45433F; cursor: not-allowed; text-decoration: line-through; }
+  .actions .why { margin: 0; font-size: 13px; line-height: 1.2; color: var(--on-black-soft); align-self: center; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <svg class="ground" viewBox="0 0 1440 900" aria-hidden="true">
+    <defs><pattern id="ht" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.7" fill="#8C8A84"/></pattern></defs>
+    <polygon points="820,189.6 1460,-18.4 1460,900 1050.8,900" fill="#111111"/>
+    <polygon points="-20,325.5 1460,-155.4 1460,-18.4 -20,462.5" fill="#D52B1E"/>
+  </svg>
+
+  <header class="abs mast">
+    <h1 class="brand">Wildbook</h1>
+    <span class="ws">Saltmarsh Reach</span>
+    <nav class="nav" aria-label="Sections">
+      <a href="#" aria-current="page">Index</a>
+      <a href="#">Team</a>
+      <a href="#">Map</a>
+      <a href="#">Items</a>
+    </nav>
+  </header>
+  <label class="abs search"><input type="search" placeholder="Search by name, number or type" aria-label="Search by name, number or type"></label>
+
+  <div class="abs filters">
+    <div role="group" aria-label="Rarity"><span>Rarity</span><button aria-pressed="false">Common</button><button aria-pressed="false">Uncommon</button><button aria-pressed="false">Rare</button><button aria-pressed="false">Mythic</button></div>
+    <div role="group" aria-label="Status"><span>Status</span><button aria-pressed="true">All</button><button aria-pressed="false">Caught</button><button aria-pressed="false">Seen</button><button aria-pressed="false">Unknown</button></div>
+    <div role="group" aria-label="Type"><span>Type</span><button aria-pressed="false">Tide</button><button aria-pressed="false">Moss</button><button aria-pressed="false">Ember</button><button aria-pressed="false">Gale</button><button aria-pressed="false">Stone</button></div>
+    <div role="group" aria-label="Sort"><span>Sort</span><button aria-pressed="true">Number</button><button aria-pressed="false">Name</button><button aria-pressed="false">Rarity</button></div>
+  </div>
+
+  <p class="abs axis headline" role="heading" aria-level="2">10 of 16 caught</p>
+  <div class="abs axis tail"><span><b>62%</b></span><span><b>3</b>seen, not caught</span><span><b>3</b>never seen</span></div>
+
+  <section aria-label="Saltmarsh Reach index">
+  <article class="sp caught common" style="--c:0;--r:0"><a href="#" class="hit" aria-label="#001 Reedling"></a><div class="disc"><img src="../../art/reedling.svg" alt="Reedling"></div><div class="tx"><b class="no">001</b><h3>Reedling</h3><p>Moss, caught 14</p><p class="ra"><i></i>Common</p></div></article>
+  <article class="sp caught uncommon" style="--c:1;--r:0"><a href="#" class="hit" aria-label="#002 Bogwhistle"></a><div class="disc"><img src="../../art/bogwhistle.svg" alt="Bogwhistle"></div><div class="tx"><b class="no">002</b><h3>Bogwhistle</h3><p>Moss / Gale, caught 3</p><p class="ra"><i></i>Uncommon</p></div></article>
+  <article class="sp caught common" style="--c:2;--r:0"><a href="#" class="hit" aria-label="#003 Cindermoth"></a><div class="disc"><img src="../../art/cindermoth.svg" alt="Cindermoth"></div><div class="tx"><b class="no">003</b><h3>Cindermoth</h3><p>Ember, caught 9</p><p class="ra"><i></i>Common</p></div></article>
+  <article class="sp caught common" style="--c:3;--r:0"><a href="#" class="hit" aria-label="#004 Pebblepup"></a><div class="disc"><img src="../../art/pebblepup.svg" alt="Pebblepup"></div><div class="tx"><b class="no">004</b><h3>Pebblepup</h3><p>Stone, caught 22</p><p class="ra"><i></i>Common</p></div></article>
+  <article class="sp caught common" style="--c:0;--r:1"><a href="#" class="hit" aria-label="#005 Saltcrab"></a><div class="disc"><img src="../../art/saltcrab.svg" alt="Saltcrab"></div><div class="tx"><b class="no">005</b><h3>Saltcrab</h3><p>Tide / Stone, caught 6</p><p class="ra"><i></i>Common</p></div></article>
+  <article class="sp caught uncommon" style="--c:1;--r:1"><a href="#" class="hit" aria-label="#006 Glimmerfry"></a><div class="disc"><img src="../../art/glimmerfry.svg" alt="Glimmerfry"></div><div class="tx"><b class="no">006</b><h3>Glimmerfry</h3><p>Tide, caught 5</p><p class="ra"><i></i>Uncommon</p></div></article>
+  <article class="sp caught rare sel" style="--c:2;--r:1" aria-current="true"><a href="#" class="hit" aria-label="#007 Lanternfin"></a><div class="disc"><img src="../../art/lanternfin.svg" alt="Lanternfin"></div><div class="tx"><b class="no">007</b><h3>Lanternfin</h3><p>Tide / Ember, caught 3</p><p class="ra"><i></i>Rare</p></div></article>
+  <article class="sp unknown" style="--c:3;--r:1" aria-label="Number 008, never seen"><div class="disc"><span>008</span></div></article>
+  <article class="sp seen uncommon" style="--c:0;--r:2"><a href="#" class="hit" aria-label="#009 Mistheron"></a><div class="disc"><img src="../../art/mistheron.svg" alt="Mistheron silhouette"></div><div class="tx"><b class="no">009</b><h3>Mistheron</h3><p>Gale, seen, not caught</p><p class="ra"><i></i>Uncommon</p></div></article>
+  <article class="sp caught uncommon" style="--c:1;--r:2"><a href="#" class="hit" aria-label="#010 Greater Spotted Marsh Wobbler"></a><div class="disc"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler"></div><div class="tx"><b class="no">010</b><h3>Greater Spotted Marsh Wobbler</h3><p>Moss / Tide, caught 1</p><p class="ra"><i></i>Uncommon</p></div></article>
+  <article class="sp caught common" style="--c:2;--r:2"><a href="#" class="hit" aria-label="#011 Emberkit"></a><div class="disc"><img src="../../art/emberkit.svg" alt="Emberkit" onerror="this.parentNode.classList.add('missing');this.remove()"><span class="ph">Emberkit<br>image missing</span></div><div class="tx"><b class="no">011</b><h3>Emberkit</h3><p>Ember, caught 7</p><p class="ra"><i></i>Common</p></div></article>
+  <article class="sp seen rare" style="--c:3;--r:2"><a href="#" class="hit" aria-label="#012 Stormgull"></a><div class="disc"><img src="../../art/stormgull.svg" alt="Stormgull silhouette"></div><div class="tx"><b class="no">012</b><h3>Stormgull</h3><p>Gale / Tide, seen, not caught</p><p class="ra"><i></i>Rare</p></div></article>
+  <article class="sp unknown" style="--c:0;--r:3" aria-label="Number 013, never seen"><div class="disc"><span>013</span></div></article>
+  <article class="sp caught rare" style="--c:1;--r:3"><a href="#" class="hit" aria-label="#014 Cragback"></a><div class="disc"><img src="../../art/cragback.svg" alt="Cragback"></div><div class="tx"><b class="no">014</b><h3>Cragback</h3><p>Stone, caught 2</p><p class="ra"><i></i>Rare</p></div></article>
+  <article class="sp seen mythic" style="--c:2;--r:3"><a href="#" class="hit" aria-label="#015 Duskmote"></a><div class="disc"><img src="../../art/duskmote.svg" alt="Duskmote silhouette"></div><div class="tx"><b class="no">015</b><h3>Duskmote</h3><p>Gale / Ember, seen, not caught</p><p class="ra"><i></i>Mythic</p></div></article>
+  <article class="sp unknown" style="--c:3;--r:3" aria-label="Number 016, never seen"><div class="disc"><span>016</span></div></article>
+  </section>
+
+  <aside class="abs key" aria-label="Key">
+    <h2>Key</h2>
+    <ul>
+      <li><span class="d c"></span>Caught: art on a printed disc</li>
+      <li><span class="b" style="height:2px"></span>Common</li>
+      <li><span class="d s"></span>Seen, not caught: silhouette</li>
+      <li><span class="b" style="height:5px"></span>Uncommon</li>
+      <li><span class="d u"></span>Never seen: number only</li>
+      <li><span class="b" style="height:10px"></span>Rare</li>
+      <li><span class="d m"></span>Image missing: grey disc</li>
+      <li><span class="d" style="background:var(--red)"></span><b style="color:var(--red-ink)">MYTHIC: red disc, word on the axis</b></li>
+    </ul>
+  </aside>
+
+  <div class="abs axis dtitle"><small>#007</small>Lanternfin</div>
+  <div class="abs art"><img src="../../art/lanternfin.svg" alt="Lanternfin"></div>
+  <dl class="abs facts on-black">
+    <dt>Types</dt><dd>Tide / Ember</dd>
+    <dt>Rarity</dt><dd><span class="rb" aria-hidden="true"></span>Rare</dd>
+    <dt>Habitat</dt><dd>Tidal caves, night only</dd>
+    <dt>First caught</dt><dd>12 Aug</dd>
+    <dt>Caught</dt><dd>3</dd>
+  </dl>
+  <p class="abs desc on-black">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</p>
+  <section class="abs stats on-black" aria-label="Stats, out of 100">
+    <h2>Stats, out of 100</h2>
+    <div><span>HP</span><b>62</b><i style="--v:62"></i></div>
+    <div><span>Attack</span><b>48</b><i style="--v:48"></i></div>
+    <div><span>Defense</span><b>55</b><i style="--v:55"></i></div>
+    <div><span>Speed</span><b>81</b><i style="--v:81"></i></div>
+  </section>
+  <section class="abs drops on-black" aria-label="Drops">
+    <h2>Drops</h2>
+    <ul><li>Lantern scale, common</li><li>Deep pearl, rare (4% chance)</li></ul>
+  </section>
+  <section class="abs evo on-black" aria-label="Evolution line">
+    <h2>Evolution line</h2>
+    <ol>
+      <li><span class="c"><img src="../../art/glimmerfry.svg" alt=""></span>#006 Glimmerfry</li>
+      <li aria-hidden="true" style="width:auto"><svg width="28" height="20" viewBox="0 0 28 20"><polygon points="0,7 16,7 16,1 28,10 16,19 16,13 0,13" fill="#E6E3DC"/></svg></li>
+      <li class="now"><span class="c"><img src="../../art/lanternfin.svg" alt=""></span>#007 Lanternfin</li>
+      <li aria-hidden="true" style="width:auto"><svg width="28" height="20" viewBox="0 0 28 20"><polygon points="0,7 16,7 16,1 28,10 16,19 16,13 0,13" fill="#E6E3DC"/></svg></li>
+      <li class="unk"><span class="c">008</span>Not seen yet</li>
+    </ol>
+  </section>
+  <div class="abs actions on-black">
+    <button class="a a-primary">Show on map</button>
+    <button class="a a-secondary">Mark as favourite</button>
+    <button class="a" disabled aria-describedby="team">Add to team</button>
+    <p class="why" id="team">Team is full (6 of 6). Remove one to add Lanternfin.</p>
+  </div>
+</div>
+</body>
+</html>

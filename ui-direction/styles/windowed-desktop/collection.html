@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wildbook: Saltmarsh Reach (windowed desktop)</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { width: 1440px; height: 900px; overflow: hidden; position: relative; }
+  :root { --r-unc: #C4E3B9; --r-rare: #9FDCE8; --r-myth: #9B2F94; }
+
+  #index  { left: 8px;   top: 32px;  width: 740px; height: 628px; z-index: 2; }
+  #team   { left: 748px; top: 676px; width: 420px; z-index: 2; }
+  #info   { left: 720px; top: 54px;  width: 626px; height: 604px; z-index: 5; }
+  #filter { left: 22px;  top: 648px; width: 680px; height: 164px; z-index: 8; }
+
+  /* index window: Finder icon view */
+  .strip { display: flex; align-items: center; gap: 14px; height: 58px; padding: 0 14px; border-bottom: 1px solid var(--frame); }
+  .done { display: grid; gap: 4px; width: 250px; }
+  .done .t { font-size: 12px; }
+  .done .t b { font-size: 15px; font-weight: 800; }
+  .done .progress { height: 10px; }
+  .strip .rest { font-size: 12px; line-height: 1.35; }
+  .strip .field { margin-left: auto; margin-right: 34px; width: 236px; }
+  .view { position: absolute; top: 59px; left: 0; right: 0; bottom: 0; background: var(--paper); }
+  .grid { display: grid; grid-template-columns: repeat(5, 138px); grid-auto-rows: 141px; padding: 8px 0 0 12px; }
+  .ic { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--ink); padding-top: 4px; }
+  .ic .art { position: relative; width: 72px; height: 72px; display: grid; place-items: center; }
+  .ic .art img { width: 72px; height: 72px; display: block; position: relative; z-index: 1; }
+  .ic .nm { margin-top: 3px; padding: 0 4px; font-size: 12px; font-weight: 700; line-height: 16px; max-width: 132px; text-align: center; }
+  .ic .nm .no { font-weight: 400; color: var(--muted); margin-right: 3px; }
+  .ic .meta { font-size: 11px; line-height: 14px; color: var(--ink); text-align: center; }
+  .ic:focus-visible { outline: none; }
+  .ic:focus-visible .nm, .ic:hover .nm { outline: 2px solid var(--select); outline-offset: 1px; }
+
+  .unc .nm { background: var(--r-unc); }
+  .rare .nm { background: var(--r-rare); }
+  .myth .nm { background: var(--r-myth); color: #fff; }
+  .myth .nm .no { color: #F3D3F0; }
+  .myth .art::before { content: ""; position: absolute; inset: -4px; border: 2px solid var(--r-myth); background: repeating-conic-gradient(#E9C6E6 0 25%, #fff 0 50%) 0 0 / 2px 2px; }
+
+  .seen .art img { filter: brightness(0); opacity: .5; }
+  .seen .nm { font-style: italic; font-weight: 600; }
+  .seen .meta { font-style: italic; }
+  .alias { position: absolute; left: -2px; bottom: 0; z-index: 2; }
+
+  .unk .nm { font-weight: 400; color: var(--muted); background: none; }
+
+  .ph { position: absolute; inset: 6px; border: 1px solid var(--bevel-lo); background: var(--platinum); display: grid; place-items: center; font-size: 10px; color: var(--muted); text-align: center; line-height: 1.2; }
+
+  .sel .art { background: var(--select-soft); outline: 1px solid var(--select); }
+  .sel .nm { background: var(--select); color: #fff; }
+  .sel .nm .no { color: #D6DAF3; }
+
+  /* filter palette: a floating utility window, always above documents */
+  #filter .tb { height: 14px; }
+  #filter .tb h2 { font-size: 14px; }
+  #filter .tb { background: repeating-linear-gradient(180deg, var(--bevel-hi) 0 1px, var(--bevel-lo) 1px 2px) 3px 2px / calc(100% - 6px) 10px no-repeat, var(--platinum); }
+  #filter .tb h2 { color: var(--ink); }
+  #filter .wb { display: grid; grid-template-columns: 120px 150px 190px 1fr; gap: 16px; padding: 16px 14px 8px; }
+  #filter .group { padding: 12px 10px 8px; }
+  .opt { display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 20px; }
+  .opt input { margin: 0; accent-color: var(--frame); width: 13px; height: 13px; }
+  .opt input:focus-visible { outline: 2px solid var(--select); outline-offset: 1px; }
+  .chip { display: inline-block; width: 14px; height: 10px; border: 1px solid var(--frame); background: #fff; }
+
+  /* info window */
+  #info .wb { padding: 14px 18px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 14px 22px; align-content: start; }
+  .ihead { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--bevel-lo); box-shadow: 0 1px 0 var(--bevel-hi); }
+  .ihead img { width: 36px; height: 36px; }
+  .ihead h1 { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.1; }
+  .ihead h1 .no { font-weight: 600; color: var(--muted); }
+  .ihead .sub { font-size: 12px; margin-top: 2px; }
+  .ihead .rlabel { margin-left: auto; font-size: 12px; font-weight: 800; padding: 2px 8px; background: var(--r-rare); border: 1px solid var(--frame); }
+  .plate { width: 250px; height: 250px; display: grid; place-items: center; background: #F2F6F7; }
+  .plate img { width: 232px; height: 232px; }
+  .props { display: grid; grid-template-columns: 96px 1fr; gap: 5px 10px; font-size: 12.5px; align-content: start; }
+  .props dt { text-align: right; font-weight: 700; }
+  .props dd { margin: 0; }
+  .comments { margin-top: 14px; }
+  .comments .lbl { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+  .comments .well { padding: 7px 9px; font-size: 13px; line-height: 1.45; }
+  .stats { grid-column: 1; }
+  .stat { display: grid; grid-template-columns: 52px 1fr 26px; align-items: center; gap: 8px; font-size: 12px; margin-top: 7px; }
+  .stat:first-of-type { margin-top: 2px; }
+  .stat b { text-align: right; font-weight: 800; }
+  .stat .progress { height: 11px; }
+  .scale { display: grid; grid-template-columns: 52px 1fr 26px; gap: 8px; font-size: 10px; margin-top: 3px; color: var(--muted); }
+  .scale span:nth-child(2) { display: flex; justify-content: space-between; }
+  .evo { grid-column: 2; }
+  .evoline { display: flex; align-items: flex-start; gap: 4px; }
+  .evoline .ic { width: 86px; }
+  .evoline { justify-content: space-between; }
+  .evoline .ic .art { width: 56px; height: 56px; }
+  .evoline .ic .art img { width: 56px; height: 56px; }
+  .evoline .arrow { padding-top: 22px; }
+  .actions-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; padding-top: 12px; margin-top: 2px; border-top: 1px solid var(--bevel-lo); box-shadow: inset 0 1px 0 var(--bevel-hi); }
+  .actions-row .why { font-size: 11.5px; line-height: 1.3; max-width: 200px; }
+
+  .desk { position: absolute; left: 1360px; width: 78px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 1; }
+  #nav { top: 40px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="3" height="3" patternUnits="userSpaceOnUse"><rect width="3" height="3" fill="#C9CCE6"/><rect width="1" height="1" fill="#555"/></pattern>
+    <symbol id="folder" viewBox="0 0 32 32"><path d="M2 8h10l2 3h16v17H2z" fill="#A9B0E8" stroke="#222"/><path d="M3 12h26" stroke="#fff"/><path d="M2 11h28" stroke="#222"/></symbol>
+    <symbol id="folder-open" viewBox="0 0 32 32"><path d="M2 8h10l2 3h16v17H2z" fill="url(#hatch)" stroke="#222"/><path d="M2 11h28" stroke="#222"/></symbol>
+    <symbol id="blank" viewBox="0 0 72 72"><path d="M18.5 8.5h26l10 10v45h-36z" fill="#fff" stroke="#888" stroke-dasharray="3 2"/><path d="M44.5 8.5v10h10" fill="none" stroke="#888" stroke-dasharray="3 2"/></symbol>
+    <symbol id="alias" viewBox="0 0 16 16"><rect x="0.5" y="0.5" width="15" height="15" fill="#fff" stroke="#222"/><path d="M4 12L11 5M6.5 5H11V9.5" fill="none" stroke="#222" stroke-width="1.6"/></symbol>
+    <symbol id="map" viewBox="0 0 32 32"><path d="M3.5 7.5l8-3 9 3 8-3v20l-8 3-9-3-8 3z" fill="#E6E2C8" stroke="#222"/><path d="M11.5 4.5v20M20.5 7.5v20" stroke="#888"/><path d="M6 17c4-3 7 2 11-1s6-4 9-2" fill="none" stroke="#3A4FC7" stroke-width="1.5"/></symbol>
+    <symbol id="bag" viewBox="0 0 32 32"><path d="M5.5 11.5h21l-2 16h-17z" fill="#C8A77A" stroke="#222"/><path d="M11 11.5V9a5 5 0 0 1 10 0v2.5" fill="none" stroke="#222"/><path d="M7 14.5h18" stroke="#fff"/></symbol>
+    <symbol id="team" viewBox="0 0 32 32"><rect x="3.5" y="6.5" width="25" height="19" fill="#DDD" stroke="#222"/><g fill="#A9B0E8" stroke="#222"><rect x="6.5" y="9.5" width="5" height="6"/><rect x="13.5" y="9.5" width="5" height="6"/><rect x="20.5" y="9.5" width="5" height="6"/><rect x="6.5" y="17.5" width="5" height="6"/><rect x="13.5" y="17.5" width="5" height="6"/><rect x="20.5" y="17.5" width="5" height="6"/></g></symbol>
+    <symbol id="logo" viewBox="0 0 16 16"><path d="M2.5 2.5h11v11h-11z" fill="#fff" stroke="#222"/><path d="M8 2.5v11" stroke="#222"/><circle cx="5.2" cy="7" r="1.6" fill="#2D8290"/><path d="M10 6h2M10 8h2M10 10h2" stroke="#888"/></symbol>
+  </defs>
+</svg>
+
+<nav class="menubar" aria-label="Menu bar">
+  <span class="logo"><svg width="16" height="16"><use href="#logo"/></svg></span>
+  <button class="m app">Wildbook</button>
+  <button class="m">File</button>
+  <button class="m">Edit</button>
+  <button class="m">View</button>
+  <button class="m">Label</button>
+  <button class="m">Window</button>
+</nav>
+
+<nav class="desk" id="nav" aria-label="Sections">
+  <a class="icon current" href="#" aria-current="page"><svg width="32" height="32"><use href="#folder-open"/></svg><span class="label">Index</span></a>
+  <a class="icon" href="#"><svg width="32" height="32"><use href="#team"/></svg><span class="label">Team</span></a>
+  <a class="icon" href="#"><svg width="32" height="32"><use href="#map"/></svg><span class="label">Map</span></a>
+  <a class="icon" href="#"><svg width="32" height="32"><use href="#bag"/></svg><span class="label">Items</span></a>
+</nav>
+
+<!-- INDEX: Finder icon view of the region -->
+<section class="win" id="index" aria-label="Saltmarsh Reach index">
+  <header class="tb"><span class="box close"></span><h2>Saltmarsh Reach</h2><span class="box zoom"></span><span class="box shade"></span></header>
+  <div class="wb">
+    <div class="strip">
+      <div class="done">
+        <span class="t"><b>10 of 16 caught</b> (62%)</span>
+        <div class="progress" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="16" aria-label="Caught"><i style="width:62.5%"></i></div>
+      </div>
+      <span class="rest">3 seen but not caught<br>3 never seen</span>
+      <label class="field"><span class="sr">Search</span><input type="search" placeholder="Search by name, number or type"></label>
+    </div>
+    <div class="view">
+      <div class="grid">
+        <a class="ic" href="#"><span class="art"><img src="../../art/reedling.svg" alt="Reedling"></span><span class="nm"><span class="no">001</span>Reedling</span><span class="meta">Moss<br>Common, caught 14</span></a>
+        <a class="ic unc" href="#"><span class="art"><img src="../../art/bogwhistle.svg" alt="Bogwhistle"></span><span class="nm"><span class="no">002</span>Bogwhistle</span><span class="meta">Moss / Gale<br>Uncommon, caught 3</span></a>
+        <a class="ic" href="#"><span class="art"><img src="../../art/cindermoth.svg" alt="Cindermoth"></span><span class="nm"><span class="no">003</span>Cindermoth</span><span class="meta">Ember<br>Common, caught 9</span></a>
+        <a class="ic" href="#"><span class="art"><img src="../../art/pebblepup.svg" alt="Pebblepup"></span><span class="nm"><span class="no">004</span>Pebblepup</span><span class="meta">Stone<br>Common, caught 22</span></a>
+        <a class="ic" href="#"><span class="art"><img src="../../art/saltcrab.svg" alt="Saltcrab"></span><span class="nm"><span class="no">005</span>Saltcrab</span><span class="meta">Tide / Stone<br>Common, caught 6</span></a>
+        <a class="ic unc" href="#"><span class="art"><img src="../../art/glimmerfry.svg" alt="Glimmerfry"></span><span class="nm"><span class="no">006</span>Glimmerfry</span><span class="meta">Tide<br>Uncommon, caught 5</span></a>
+        <a class="ic rare sel" href="#" aria-current="true"><span class="art"><img src="../../art/lanternfin.svg" alt="Lanternfin"></span><span class="nm"><span class="no">007</span>Lanternfin</span><span class="meta">Tide / Ember<br>Rare, caught 3</span></a>
+        <a class="ic unk" href="#" aria-label="Number 008, unknown"><span class="art"><svg width="72" height="72"><use href="#blank"/></svg></span><span class="nm">008</span></a>
+        <a class="ic seen unc" href="#"><span class="art"><img src="../../art/mistheron.svg" alt="Mistheron silhouette"><svg class="alias" width="16" height="16"><use href="#alias"/></svg></span><span class="nm"><span class="no">009</span>Mistheron</span><span class="meta">Seen, not caught<br>Uncommon</span></a>
+        <a class="ic unc" href="#"><span class="art"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler"></span><span class="nm"><span class="no">010</span>Greater Spotted Marsh Wobbler</span><span class="meta">Moss / Tide<br>Uncommon, caught 1</span></a>
+        <a class="ic" href="#"><span class="art"><span class="ph">no image</span><img src="../../art/emberkit.svg" alt="Emberkit" onerror="this.remove()"></span><span class="nm"><span class="no">011</span>Emberkit</span><span class="meta">Ember<br>Common, caught 7</span></a>
+        <a class="ic seen rare" href="#"><span class="art"><img src="../../art/stormgull.svg" alt="Stormgull silhouette"><svg class="alias" width="16" height="16"><use href="#alias"/></svg></span><span class="nm"><span class="no">012</span>Stormgull</span><span class="meta">Seen, not caught<br>Rare</span></a>
+        <a class="ic unk" href="#" aria-label="Number 013, unknown"><span class="art"><svg width="72" height="72"><use href="#blank"/></svg></span><span class="nm">013</span></a>
+        <a class="ic rare" href="#"><span class="art"><img src="../../art/cragback.svg" alt="Cragback"></span><span class="nm"><span class="no">014</span>Cragback</span><span class="meta">Stone<br>Rare, caught 2</span></a>
+        <a class="ic seen myth" href="#"><span class="art"><img src="../../art/duskmote.svg" alt="Duskmote silhouette"><svg class="alias" width="16" height="16"><use href="#alias"/></svg></span><span class="nm"><span class="no">015</span>Duskmote</span><span class="meta">Seen, not caught<br><b>Mythic</b></span></a>
+        <a class="ic unk" href="#" aria-label="Number 016, unknown"><span class="art"><svg width="72" height="72"><use href="#blank"/></svg></span><span class="nm">016</span></a>
+      </div>
+      <div class="vscroll"><i class="arr up"></i><i class="thumb"></i><i class="arr dn"></i></div>
+    </div>
+  </div>
+</section>
+
+<section class="win shaded" id="team" aria-label="Team">
+  <header class="tb"><h2>Team: 6 of 6, full</h2></header>
+</section>
+
+<!-- FILTER: floating palette -->
+<section class="win front" id="filter" aria-label="Filter and sort">
+  <header class="tb"><h2>Filter</h2></header>
+  <div class="wb">
+    <fieldset class="group" style="margin:0"><span class="legend">Status</span>
+      <label class="opt"><input type="radio" name="st" checked> <span>All</span></label>
+      <label class="opt"><input type="radio" name="st"> <span>Caught</span></label>
+      <label class="opt"><input type="radio" name="st"> <span>Seen</span></label>
+      <label class="opt"><input type="radio" name="st"> <span>Unknown</span></label>
+    </fieldset>
+    <fieldset class="group" style="margin:0"><span class="legend">Type</span>
+      <label class="opt"><input type="checkbox" checked> <span>Tide</span></label>
+      <label class="opt"><input type="checkbox" checked> <span>Moss</span></label>
+      <label class="opt"><input type="checkbox" checked> <span>Ember</span></label>
+      <label class="opt"><input type="checkbox" checked> <span>Gale</span></label>
+      <label class="opt"><input type="checkbox" checked> <span>Stone</span></label>
+    </fieldset>
+    <fieldset class="group" style="margin:0"><span class="legend">Rarity (label colour)</span>
+      <label class="opt"><input type="checkbox" checked> <i class="chip"></i> <span>Common, no label</span></label>
+      <label class="opt"><input type="checkbox" checked> <i class="chip" style="background:var(--r-unc)"></i> <span>Uncommon</span></label>
+      <label class="opt"><input type="checkbox" checked> <i class="chip" style="background:var(--r-rare)"></i> <span>Rare</span></label>
+      <label class="opt"><input type="checkbox" checked> <i class="chip" style="background:var(--r-myth)"></i> <span><b>Mythic</b>, framed</span></label>
+    </fieldset>
+    <fieldset class="group" style="margin:0"><span class="legend">Sort by</span>
+      <label class="opt"><input type="radio" name="so" checked> <span>Number</span></label>
+      <label class="opt"><input type="radio" name="so"> <span>Name</span></label>
+      <label class="opt"><input type="radio" name="so"> <span>Rarity</span></label>
+    </fieldset>
+  </div>
+</section>
+
+<!-- INFO: the selection, front and active -->
+<section class="win front" id="info" aria-label="Lanternfin Info">
+  <header class="tb"><span class="box close"></span><h2>Lanternfin Info</h2><span class="box zoom"></span><span class="box shade"></span></header>
+  <div class="wb">
+    <div class="ihead">
+      <img src="../../art/lanternfin.svg" alt="">
+      <div>
+        <h1><span class="no">#007</span> Lanternfin</h1>
+        <div class="sub">Tide / Ember</div>
+      </div>
+      <span class="rlabel">Rare</span>
+    </div>
+    <div class="well plate"><img src="../../art/lanternfin.svg" alt="Lanternfin artwork"></div>
+    <div>
+    <dl class="props">
+      <dt>Rarity</dt><dd>Rare</dd>
+      <dt>Habitat</dt><dd>Tidal caves, night only</dd>
+      <dt>First caught</dt><dd>12 Aug</dd>
+      <dt>Caught</dt><dd>3</dd>
+      <dt>Drops</dt><dd>Lantern scale (common)<br>Deep pearl (rare, 4% chance)</dd>
+    </dl>
+    <div class="comments">
+      <div class="lbl">Comments:</div>
+      <div class="well">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</div>
+    </div>
+    </div>
+    <div class="group stats"><span class="legend">Stats</span>
+      <div class="stat"><span>HP</span><div class="progress"><i style="width:62%"></i></div><b>62</b></div>
+      <div class="stat"><span>Attack</span><div class="progress"><i style="width:48%"></i></div><b>48</b></div>
+      <div class="stat"><span>Defense</span><div class="progress"><i style="width:55%"></i></div><b>55</b></div>
+      <div class="stat"><span>Speed</span><div class="progress"><i style="width:81%"></i></div><b>81</b></div>
+      <div class="scale"><span></span><span><span>0</span><span>50</span><span>100</span></span><span></span></div>
+    </div>
+    <div class="group evo"><span class="legend">Evolution line</span>
+      <div class="evoline">
+        <a class="ic unc" href="#"><span class="art"><img src="../../art/glimmerfry.svg" alt="Glimmerfry"></span><span class="nm"><span class="no">006</span>Glimmerfry</span></a>
+        <svg class="arrow" width="22" height="12"><path d="M1 6h17M13 1.5l5 4.5-5 4.5" fill="none" stroke="#222" stroke-width="1.5"/></svg>
+        <span class="ic rare"><span class="art"><img src="../../art/lanternfin.svg" alt="Lanternfin"></span><span class="nm"><span class="no">007</span>Lanternfin</span></span>
+        <svg class="arrow" width="22" height="12"><path d="M1 6h17M13 1.5l5 4.5-5 4.5" fill="none" stroke="#222" stroke-width="1.5"/></svg>
+        <span class="ic unk" aria-label="Number 008, unknown"><span class="art"><svg width="56" height="56" viewBox="0 0 72 72"><use href="#blank"/></svg></span><span class="nm">008</span></span>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button class="btn default">Show on map</button>
+      <button class="btn">Mark as favourite</button>
+      <button class="btn" disabled aria-describedby="teamwhy">Add to team</button>
+      <span class="why" id="teamwhy">Team is full (6 of 6). Remove one to add Lanternfin.</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

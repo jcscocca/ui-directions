@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wildbook: saltmarsh reach</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: #BDBEBA; color: var(--graphite); font-family: var(--font-label); font-size: var(--t-body); line-height: 1.3; font-variant-numeric: tabular-nums; padding: 10px; }
+  h1, h2, h3, p, ol, ul, dl, dd { margin: 0; padding: 0; }
+  ol, ul { list-style: none; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; }
+  img { display: block; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 2px solid var(--graphite); outline-offset: 2px; }
+
+  .ss { font-size: var(--t-label); text-transform: lowercase; color: var(--graphite); }
+  .ss.m { font-size: var(--t-micro); color: var(--print); }
+  .lcd { background: var(--lcd); color: var(--lcd-on); border-radius: var(--r-lcd); box-shadow: inset 0 2px 0 rgba(0,0,0,.45), 0 1px 0 var(--alu-hi); font-family: var(--font-lcd); font-weight: 700; }
+  .dots { background-image: radial-gradient(circle, var(--lcd-ghost) 0.9px, transparent 1.3px); background-size: 4px 4px; }
+  .led { width: 8px; height: 8px; border-radius: 50%; background: var(--led-off); display: inline-block; box-shadow: inset 0 -1px 0 rgba(0,0,0,.25); flex: none; }
+  .led.on { background: var(--led-ok); }
+  .led.dim { background: transparent; box-shadow: inset 0 0 0 2px #5FA052; }
+
+  .device { height: 880px; background: var(--seam); border-radius: var(--r-body); padding: 2px; position: relative; display: grid; grid-template-rows: 74px 1fr; gap: 2px; }
+  .screw { position: absolute; width: 11px; height: 11px; border-radius: 50%; background: var(--alu-hi); border: 1px solid var(--seam); z-index: 2; }
+  .screw::after { content: ""; position: absolute; left: 2px; right: 2px; top: 4px; height: 1.5px; background: var(--print); transform: rotate(-30deg); }
+  .screw.tl { left: 9px; top: 9px; } .screw.tr { right: 9px; top: 9px; } .screw.bl { left: 9px; bottom: 9px; } .screw.br { right: 9px; bottom: 9px; }
+  .mod { background: var(--alu); box-shadow: inset 1px 1px 0 var(--alu-hi); position: relative; min-width: 0; min-height: 0; }
+  .row { display: grid; gap: 2px; min-height: 0; }
+  .top { grid-template-columns: 290px 1fr 440px; }
+  .top .mod:first-child { border-top-left-radius: 20px; }
+  .top .mod:last-child { border-top-right-radius: 20px; }
+  .main { grid-template-columns: 832px 1fr; }
+  .col { display: grid; gap: 2px; min-height: 0; }
+  .col.left { grid-template-rows: 132px 1fr; }
+  .col.right { grid-template-rows: 262px 150px 124px 116px 1fr; }
+  .ctrls { display: grid; grid-template-columns: 250px 150px 1fr 170px; gap: 2px; }
+  .ctrls .mod, .bank-mod, .rmod { padding: 12px 16px; }
+  .col.left .bank-mod { border-bottom-left-radius: 20px; }
+  .col.right .mod:last-child { border-bottom-right-radius: 20px; }
+  h2, h3 { font-size: 11px; font-weight: 700; text-transform: lowercase; }
+
+  .brand { display: flex; align-items: center; gap: 12px; padding: 0 28px; }
+  .brand b { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .brand .ws { display: flex; flex-direction: column; }
+  .nav { display: flex; align-items: center; gap: 18px; padding: 0 22px; }
+  .navkey { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .navkey .led { width: 6px; height: 6px; }
+  .cap { width: 42px; height: 22px; border-radius: 5px; background: var(--alu-hi); box-shadow: inset 0 -3px 0 var(--seam), 0 0 0 1px var(--seam); display: block; }
+  .navkey:hover .cap, .fkey:hover .cap { background: #EDEEEA; }
+  .navkey[aria-current] .cap { background: var(--graphite); box-shadow: inset 0 -3px 0 #111, 0 0 0 1px #111; }
+  .navkey[aria-current] .ss { font-weight: 700; }
+  .search { display: flex; align-items: center; gap: 10px; padding: 0 28px 0 18px; }
+  .search .lcd { flex: 1; height: 38px; display: flex; align-items: center; padding: 0 10px; }
+  .search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--lcd-on); font-family: var(--font-lcd); font-weight: 700; font-size: 15px; }
+  .search input::placeholder { color: var(--lcd-dim); }
+  .search .lcd:focus-within { box-shadow: inset 0 2px 0 rgba(0,0,0,.45), 0 0 0 2px var(--graphite); }
+
+  /* controls */
+  .comp .lcd { display: flex; align-items: baseline; gap: 8px; padding: 4px 10px; margin-top: 6px; }
+  .comp .lcd b { font-size: 30px; font-weight: 800; line-height: 1; }
+  .comp .lcd span { font-size: 14px; color: var(--lcd-dim); }
+  .ledrow { display: flex; gap: 5px; margin-top: 9px; }
+  .ledrow .led { width: 10px; height: 10px; }
+  .comp .ss.m { margin-top: 5px; display: block; }
+  .knob { display: block; width: 118px; height: 96px; margin: 0 auto; }
+  .fkeys { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: end; margin-top: 6px; }
+  .fkeys .rowlab { padding-bottom: 14px; }
+  .fk { display: flex; gap: 8px; }
+  .fkey { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .fkey .cap { width: 34px; height: 18px; }
+  .fkey .led { width: 5px; height: 5px; }
+  .fkey .ss { font-size: 10px; }
+  .slide { position: relative; height: 18px; border-radius: 9px; background: var(--graphite); box-shadow: inset 0 2px 3px rgba(0,0,0,.5); margin: 16px 12px 0; }
+  .slide i { position: absolute; left: -8px; top: -4px; width: 34px; height: 26px; border-radius: 6px; background: var(--alu-hi); box-shadow: inset 0 -3px 0 var(--seam), 0 0 0 1px var(--seam); }
+  .slide-l { display: flex; justify-content: space-between; margin-top: 8px; }
+  .slide-l a:first-child { font-weight: 700; }
+
+  /* the pad bank */
+  .bank-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+  .bank-head .legend { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+  .bank-head .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .bank-mod { display: flex; flex-direction: column; }
+  .bank { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 10px; padding-bottom: 4px; }
+  .pad > a, .pad.unknown { display: flex; flex-direction: column; height: 100%; border-radius: 8px; padding: 7px 9px 7px; background: var(--alu-hi); box-shadow: inset 0 -5px 0 var(--seam), 0 0 0 1px var(--seam), 0 2px 0 #9E9F9A; position: relative; }
+  .pad > a:hover { background: #EDEEEA; }
+  .pad > a:active { transform: translateY(2px); box-shadow: inset 0 -2px 0 var(--seam), 0 0 0 1px var(--seam); }
+  .ptop { display: flex; align-items: center; gap: 6px; }
+  .pad .ptop { justify-content: space-between; }
+  .pad .no { font-size: 11px; font-weight: 700; }
+  .pad .art { flex: 1; min-height: 0; display: grid; place-items: center; }
+  .pad .art img { width: 70px; height: 70px; }
+  .pad .nm { font-size: 13px; font-weight: 700; line-height: 1.1; overflow-wrap: anywhere; }
+  .pad .bot { display: flex; align-items: center; gap: 6px; margin-top: 4px; padding-bottom: 3px; min-height: 18px; }
+  .pad .ty { flex: 1; min-width: 0; }
+  .pips { display: flex; gap: 3px; }
+  .pips i { width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--print); }
+  .pips i.on { background: var(--graphite); border-color: var(--graphite); }
+  .cnt { font-size: 13px; padding: 1px 5px; font-weight: 800; }
+  .st { white-space: nowrap; }
+  .seen .art img { filter: brightness(0); opacity: .55; }
+  .seen .nm { color: var(--print); }
+  .unknown { background: #C9CAC6 !important; box-shadow: inset 0 2px 3px rgba(0,0,0,.18), 0 0 0 1px var(--seam) !important; }
+  .unknown .no { color: var(--print); }
+  .mythic > a { background: var(--graphite); color: var(--alu-hi); box-shadow: inset 0 -5px 0 #111, 0 0 0 1px #111, 0 2px 0 #9E9F9A; }
+  .mythic > a:hover { background: #353635; }
+  .mythic .ss, .mythic .ss.m, .mythic .nm { color: var(--alu-hi); }
+  .mythic .art img { filter: brightness(0) invert(1); opacity: .6; }
+  .mythic .pips i { border-color: var(--alu-hi); }
+  .mythic .pips i.on { background: var(--alu-hi); }
+  .myth { font-weight: 700; letter-spacing: .02em; border: 1px solid var(--alu-hi); border-radius: 3px; padding: 0 4px; }
+  .sel > a { background: var(--lcd-on); box-shadow: inset 0 2px 0 rgba(0,0,0,.18), 0 0 0 1px #7E9A76; transform: translateY(2px); }
+  .sel > a:hover { background: var(--lcd-on); }
+  .ph { width: 76px; height: 68px; display: grid; place-items: center; font-size: 10px; text-transform: lowercase; color: var(--print); border: 1px solid var(--seam); background: repeating-linear-gradient(45deg, transparent 0 6px, rgba(0,0,0,.05) 6px 7px), #CFD0CC; }
+
+  /* right column */
+  .viewer { display: grid; grid-template-columns: 220px 1fr; gap: 16px; padding: 12px 30px 12px 18px; }
+  .window { width: 220px; height: 220px; margin-top: 6px; border-radius: 6px; background: #EEEFEB; box-shadow: inset 0 2px 4px rgba(0,0,0,.25), 0 0 0 1px var(--seam), 0 1px 0 var(--alu-hi); display: grid; place-items: center; }
+  .window img { width: 196px; height: 196px; }
+  .readout { padding: 8px 12px; margin-top: 6px; }
+  .readout .id { font-size: 16px; color: var(--lcd-dim); }
+  .readout .name { font-size: 32px; line-height: 1; font-weight: 800; margin-top: 2px; }
+  .readout .types { font-size: 15px; margin-top: 6px; }
+  .segs { display: flex; gap: 4px; margin-top: 8px; font-size: 11px; }
+  .seg { padding: 0 4px; border-radius: 2px; line-height: 15px; }
+  .seg.lit { background: var(--lcd-on); color: var(--lcd); }
+  .seg.off { color: var(--lcd-ghost); box-shadow: inset 0 0 0 1px var(--lcd-ghost); }
+  .desc { font-size: 12.5px; line-height: 1.4; margin-top: 10px; }
+
+  .stats { display: grid; grid-template-columns: 58px 1fr 34px; gap: 7px 10px; align-items: center; margin-top: 8px; }
+  .lad { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; padding: 4px; }
+  .lad i { height: 10px; background: var(--lcd-ghost); border-radius: 1px; }
+  .lad i.on { background: var(--lcd-on); }
+  .stats b { font-family: var(--font-lcd); font-weight: 800; font-size: 16px; text-align: right; }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+  .pair .lcd { padding: 6px 9px; font-size: 13px; line-height: 1.45; }
+  .pair .lcd span { color: var(--lcd-dim); }
+
+  .evo { display: flex; align-items: center; margin-top: 8px; }
+  .mini { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .mini .p { width: 64px; height: 54px; border-radius: 6px; background: var(--alu-hi); box-shadow: inset 0 -4px 0 var(--seam), 0 0 0 1px var(--seam); display: grid; place-items: center; }
+  .mini .p img { width: 46px; height: 46px; }
+  .mini.cur .p { background: var(--lcd-on); box-shadow: inset 0 2px 0 rgba(0,0,0,.18), 0 0 0 1px #7E9A76; }
+  .mini.none .p { background: #C9CAC6; box-shadow: inset 0 2px 3px rgba(0,0,0,.18), 0 0 0 1px var(--seam); font-size: 11px; font-weight: 700; color: var(--print); }
+  .wire { flex: 1; height: 2px; background: var(--graphite); margin: 0 8px 16px; position: relative; }
+  .wire::after { content: ""; position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left: 7px solid var(--graphite); border-right: 0; }
+  .wire.off { background: none; border-top: 2px dashed var(--print); height: 0; }
+  .wire.off::after { border-left-color: var(--print); top: -6px; }
+
+  .keys { display: flex; align-items: flex-start; gap: 22px; padding-top: 16px; }
+  .key { display: flex; flex-direction: column; align-items: center; gap: 7px; background: none; border: 0; padding: 0; cursor: pointer; }
+  .key .kc { width: 92px; height: 58px; border-radius: var(--r-key); background: var(--alu-hi); box-shadow: inset 0 -5px 0 var(--seam), 0 0 0 1px var(--seam), 0 2px 0 #9E9F9A; display: grid; place-items: center; font-size: 12px; font-weight: 600; text-transform: lowercase; transition: transform .05s; }
+  .key.primary .kc { background: var(--orange); color: #2A1406; box-shadow: inset 0 -5px 0 #C24F0F, 0 0 0 1px #B8490E, 0 2px 0 #9E9F9A; }
+  .key:active .kc { transform: translateY(2px); box-shadow: inset 0 -2px 0 var(--seam), 0 0 0 1px var(--seam); }
+  .key:disabled { cursor: not-allowed; }
+  .key:disabled .kc { background: #C9CAC6; color: #8C8D89; box-shadow: 0 0 0 1px var(--seam); transform: translateY(2px); }
+  .key .ss { text-align: center; max-width: 130px; }
+  .key:focus-visible { outline: none; }
+  .key:focus-visible .kc { outline: 2px solid var(--graphite); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="device">
+  <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+
+  <div class="row top">
+    <div class="mod brand">
+      <span class="led on" aria-hidden="true"></span>
+      <b>wildbook</b>
+      <span class="ws"><span class="ss m">region</span><span class="ss">saltmarsh reach</span></span>
+    </div>
+    <nav class="mod nav" aria-label="Sections">
+      <span class="ss m">mode</span>
+      <a href="#" class="navkey" aria-current="page"><span class="led on"></span><span class="cap"></span><span class="ss">index</span></a>
+      <a href="#" class="navkey"><span class="led"></span><span class="cap"></span><span class="ss">team</span></a>
+      <a href="#" class="navkey"><span class="led"></span><span class="cap"></span><span class="ss">map</span></a>
+      <a href="#" class="navkey"><span class="led"></span><span class="cap"></span><span class="ss">items</span></a>
+    </nav>
+    <label class="mod search">
+      <span class="ss m">find</span>
+      <span class="lcd"><input type="search" placeholder="search by name, number or type" aria-label="Search by name, number or type"></span>
+    </label>
+  </div>
+
+  <div class="row main">
+    <div class="col left">
+      <div class="ctrls">
+        <section class="mod comp" aria-label="Completion">
+          <h3>caught</h3>
+          <div class="lcd dots"><b>10/16</b><span>62%</span></div>
+          <div class="ledrow" aria-hidden="true"><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led on"></span><span class="led dim"></span><span class="led dim"></span><span class="led dim"></span><span class="led"></span><span class="led"></span><span class="led"></span></div>
+          <span class="ss m">lit 10 caught, half-lit 3 seen, dark 3 unknown</span>
+        </section>
+        <section class="mod" aria-label="Status filter">
+          <h3>status</h3>
+          <svg class="knob" viewBox="0 0 118 96" role="img" aria-label="Status filter set to all">
+            <g font-family="Hanken Grotesk" font-size="9" fill="#4B4C4A">
+              <text x="8" y="24" font-weight="700" fill="#2A2B2A">all</text>
+              <text x="86" y="24">caught</text>
+              <text x="4" y="90">seen</text>
+              <text x="78" y="90">unknown</text>
+            </g>
+            <g stroke="#2A2B2A" stroke-width="1.5"><line x1="26" y1="30" x2="32" y2="35"/><line x1="92" y1="30" x2="86" y2="35"/><line x1="26" y1="78" x2="32" y2="73"/><line x1="92" y1="78" x2="86" y2="73"/></g>
+            <circle cx="59" cy="54" r="27" fill="#BFC0BC" stroke="#A9AAA5"/>
+            <circle cx="59" cy="54" r="22" fill="#2A2B2A"/>
+            <circle cx="59" cy="54" r="17" fill="#3A3B3A"/>
+            <line x1="59" y1="54" x2="44" y2="39" stroke="#E3E4E0" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </section>
+        <section class="mod" aria-label="Type and rarity filters">
+          <h3>filter keys <span class="ss m" style="font-weight:400">(none held = show all)</span></h3>
+          <div class="fkeys">
+            <span class="ss m rowlab">type</span>
+            <div class="fk">
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">tide</span></a>
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">moss</span></a>
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">ember</span></a>
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">gale</span></a>
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">stone</span></a>
+            </div>
+            <span class="ss m rowlab">rarity</span>
+            <div class="fk">
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">common</span></a>
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">uncommon</span></a>
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">rare</span></a>
+              <a href="#" class="fkey"><span class="led"></span><span class="cap"></span><span class="ss">mythic</span></a>
+            </div>
+          </div>
+        </section>
+        <section class="mod" aria-label="Sort">
+          <h3>sort</h3>
+          <div class="slide" aria-hidden="true"><i></i></div>
+          <nav class="slide-l ss" aria-label="Sort by"><a href="#" aria-current="true">no.</a><a href="#">name</a><a href="#">rarity</a></nav>
+        </section>
+      </div>
+
+      <section class="mod bank-mod" aria-label="Index">
+        <div class="bank-head">
+          <h2>index, 16 pads</h2>
+          <p class="legend ss m"><span><span class="led on"></span>caught</span><span><span class="led dim"></span>seen</span><span><span class="led"></span>unknown</span><span class="pips"><i></i><i></i><i></i></span><span>rarity pips: 0 common, 1 uncommon, 2 rare, 3 mythic (dark pad)</span></p>
+        </div>
+        <ol class="bank">
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">001</span><span class="led on"></span></span><span class="art"><img src="../../art/reedling.svg" alt="Reedling"></span><span class="nm">Reedling</span><span class="bot"><span class="ty ss m">Moss</span><span class="pips" title="Common" aria-label="Common"><i></i><i></i><i></i></span><span class="cnt lcd">14</span></span></a></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">002</span><span class="led on"></span></span><span class="art"><img src="../../art/bogwhistle.svg" alt="Bogwhistle"></span><span class="nm">Bogwhistle</span><span class="bot"><span class="ty ss m">Moss / Gale</span><span class="pips" title="Uncommon" aria-label="Uncommon"><i class="on"></i><i></i><i></i></span><span class="cnt lcd">03</span></span></a></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">003</span><span class="led on"></span></span><span class="art"><img src="../../art/cindermoth.svg" alt="Cindermoth"></span><span class="nm">Cindermoth</span><span class="bot"><span class="ty ss m">Ember</span><span class="pips" title="Common" aria-label="Common"><i></i><i></i><i></i></span><span class="cnt lcd">09</span></span></a></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">004</span><span class="led on"></span></span><span class="art"><img src="../../art/pebblepup.svg" alt="Pebblepup"></span><span class="nm">Pebblepup</span><span class="bot"><span class="ty ss m">Stone</span><span class="pips" title="Common" aria-label="Common"><i></i><i></i><i></i></span><span class="cnt lcd">22</span></span></a></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">005</span><span class="led on"></span></span><span class="art"><img src="../../art/saltcrab.svg" alt="Saltcrab"></span><span class="nm">Saltcrab</span><span class="bot"><span class="ty ss m">Tide / Stone</span><span class="pips" title="Common" aria-label="Common"><i></i><i></i><i></i></span><span class="cnt lcd">06</span></span></a></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">006</span><span class="led on"></span></span><span class="art"><img src="../../art/glimmerfry.svg" alt="Glimmerfry"></span><span class="nm">Glimmerfry</span><span class="bot"><span class="ty ss m">Tide</span><span class="pips" title="Uncommon" aria-label="Uncommon"><i class="on"></i><i></i><i></i></span><span class="cnt lcd">05</span></span></a></li>
+          <li class="pad sel"><a href="#" aria-pressed="true"><span class="ptop"><span class="no">007</span><span class="led on"></span></span><span class="art"><img src="../../art/lanternfin.svg" alt="Lanternfin"></span><span class="nm">Lanternfin</span><span class="bot"><span class="ty ss m">Tide / Ember</span><span class="pips" title="Rare" aria-label="Rare"><i class="on"></i><i class="on"></i><i></i></span><span class="cnt lcd">03</span></span></a></li>
+          <li class="pad unknown" aria-label="Number 008, never seen"><span class="ptop"><span class="no">008</span><span class="led"></span></span></li>
+          <li class="pad seen"><a href="#"><span class="ptop"><span class="no">009</span><span class="led dim"></span></span><span class="art"><img src="../../art/mistheron.svg" alt="Silhouette of Mistheron"></span><span class="nm">Mistheron</span><span class="bot"><span class="ty ss m">Gale</span><span class="pips" title="Uncommon" aria-label="Uncommon"><i class="on"></i><i></i><i></i></span><span class="ss m st">seen, not caught</span></span></a></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">010</span><span class="led on"></span></span><span class="art"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler"></span><span class="nm">Greater Spotted Marsh Wobbler</span><span class="bot"><span class="ty ss m">Moss / Tide</span><span class="pips" title="Uncommon" aria-label="Uncommon"><i class="on"></i><i></i><i></i></span><span class="cnt lcd">01</span></span></a></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">011</span><span class="led on"></span></span><span class="art"><img src="../../art/emberkit.svg" alt="Emberkit" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="ph" hidden>no image</span></span><span class="nm">Emberkit</span><span class="bot"><span class="ty ss m">Ember</span><span class="pips" title="Common" aria-label="Common"><i></i><i></i><i></i></span><span class="cnt lcd">07</span></span></a></li>
+          <li class="pad seen"><a href="#"><span class="ptop"><span class="no">012</span><span class="led dim"></span></span><span class="art"><img src="../../art/stormgull.svg" alt="Silhouette of Stormgull"></span><span class="nm">Stormgull</span><span class="bot"><span class="ty ss m">Gale / Tide</span><span class="pips" title="Rare" aria-label="Rare"><i class="on"></i><i class="on"></i><i></i></span><span class="ss m st">seen, not caught</span></span></a></li>
+          <li class="pad unknown" aria-label="Number 013, never seen"><span class="ptop"><span class="no">013</span><span class="led"></span></span></li>
+          <li class="pad"><a href="#"><span class="ptop"><span class="no">014</span><span class="led on"></span></span><span class="art"><img src="../../art/cragback.svg" alt="Cragback"></span><span class="nm">Cragback</span><span class="bot"><span class="ty ss m">Stone</span><span class="pips" title="Rare" aria-label="Rare"><i class="on"></i><i class="on"></i><i></i></span><span class="cnt lcd">02</span></span></a></li>
+          <li class="pad seen mythic"><a href="#"><span class="ptop"><span class="no">015</span><span class="ss myth">mythic</span><span class="led dim"></span></span><span class="art"><img src="../../art/duskmote.svg" alt="Silhouette of Duskmote"></span><span class="nm">Duskmote</span><span class="bot"><span class="ty ss m">Gale / Ember</span><span class="pips" title="Mythic" aria-label="Mythic"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="ss m st">seen, not caught</span></span></a></li>
+          <li class="pad unknown" aria-label="Number 016, never seen"><span class="ptop"><span class="no">016</span><span class="led"></span></span></li>
+        </ol>
+      </section>
+    </div>
+
+    <div class="col right">
+      <section class="mod viewer" aria-label="Selected: Lanternfin">
+        <div>
+          <span class="ss m">viewer</span>
+          <div class="window"><img src="../../art/lanternfin.svg" alt="Lanternfin, a deep-blue fish with a glowing lure"></div>
+        </div>
+        <div>
+          <span class="ss m">selected pad</span>
+          <div class="lcd readout dots">
+            <p class="id">#007</p>
+            <p class="name">Lanternfin</p>
+            <p class="types">tide / ember</p>
+            <p class="segs"><span class="seg off">common</span><span class="seg off">uncommon</span><span class="seg lit">rare</span><span class="seg off">mythic</span></p>
+          </div>
+          <p class="desc">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</p>
+        </div>
+      </section>
+
+      <section class="mod rmod" aria-label="Stats">
+        <h3>stats, 0 to 100</h3>
+        <div class="stats">
+          <span class="ss">hp</span><div class="lcd lad"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>62</b>
+          <span class="ss">attack</span><div class="lcd lad"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>48</b>
+          <span class="ss">defense</span><div class="lcd lad"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>55</b>
+          <span class="ss">speed</span><div class="lcd lad"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div><b>81</b>
+        </div>
+      </section>
+
+      <section class="mod rmod" aria-label="Habitat and drops">
+        <div class="pair">
+          <div><h3>field data</h3><p class="lcd" style="margin-top:5px">tidal caves, night only<br><span>first</span> 12 aug<br><span>caught</span> 3</p></div>
+          <div><h3>drops</h3><p class="lcd" style="margin-top:5px">lantern scale <span>common</span><br>deep pearl <span>rare, 4%</span></p></div>
+        </div>
+      </section>
+
+      <section class="mod rmod" aria-label="Evolution line">
+        <h3>evolution</h3>
+        <div class="evo">
+          <span class="mini"><span class="p"><img src="../../art/glimmerfry.svg" alt=""></span><span class="ss m">006 glimmerfry</span></span>
+          <span class="wire" aria-hidden="true"></span>
+          <span class="mini cur"><span class="p"><img src="../../art/lanternfin.svg" alt=""></span><span class="ss m" style="font-weight:700">007 lanternfin</span></span>
+          <span class="wire off" aria-hidden="true"></span>
+          <span class="mini none" aria-label="Number 008, unknown"><span class="p">008</span><span class="ss m">&nbsp;</span></span>
+        </div>
+      </section>
+
+      <section class="mod rmod keys" aria-label="Actions">
+        <button class="key primary" type="button"><span class="kc">map</span><span class="ss">show on map</span></button>
+        <button class="key" type="button"><span class="kc">fav</span><span class="ss">mark as favourite</span></button>
+        <button class="key" type="button" disabled aria-describedby="tw"><span class="kc">team</span><span class="ss m" id="tw">add to team: off. team is full (6 of 6). remove one to add lanternfin</span></button>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals: runs</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-gothic);
+  font-size: var(--t-body);
+  line-height: var(--line);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--paper);
+  width: 1440px; height: 900px; overflow: hidden; position: relative;
+}
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+
+.page { position: absolute; top: 0; height: 900px; width: 720px; background: var(--dots); }
+.page.l { left: 0; }
+.page.r { left: 720px; background-position: 0 0; }
+.fold { position: absolute; left: 704px; top: 0; width: 32px; height: 900px; background: var(--paper-fold); border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); }
+.fold::after { content: ""; position: absolute; left: 14px; top: 30px; bottom: 30px; width: 3px; border-radius: 2px; background: repeating-linear-gradient(to bottom, var(--thread) 0 34px, transparent 34px 52px); }
+
+.vlabel {
+  position: absolute; writing-mode: vertical-rl;
+  font-family: var(--font-mincho); font-size: 18px; font-weight: 500; line-height: 20px; letter-spacing: 0.08em; color: var(--ink);
+}
+.vlabel::before { content: ""; display: block; height: 20px; width: 1px; margin: 0 auto 8px; background: var(--pencil); }
+
+/* ---- left page ---- */
+.head { position: absolute; z-index: 1; left: 120px; top: 60px; width: 540px; display: flex; align-items: baseline; gap: 14px; }
+.head .search { margin-left: auto; align-self: center; }
+.head h1 { font-family: var(--font-mincho); font-weight: 500; font-size: var(--t-title); line-height: 40px; position: relative; padding: 0 22px; margin-left: -22px; }
+.head h1::before { content: ""; position: absolute; inset: 2px 0 0; z-index: -1; transform: rotate(-1.5deg);
+  background: var(--tape) repeating-linear-gradient(45deg, rgba(63,78,115,.10) 0 4px, transparent 4px 10px);
+  clip-path: polygon(0 6%, 3% 0, 6% 8%, 9% 0, 100% 2%, 97% 50%, 100% 98%, 3% 100%, 0 94%, 3% 50%); }
+.head span { color: var(--pencil-text); font-size: 13px; }
+
+.nav { position: absolute; left: 120px; top: 120px; width: 540px; display: flex; align-items: center; }
+.nav ul { list-style: none; display: flex; gap: 22px; }
+.nav a { padding-bottom: 3px; border-bottom: 1px solid transparent; }
+.nav a:hover { border-bottom-color: var(--pencil); }
+.nav a[aria-current] { border-bottom: 2px solid var(--ink); font-weight: 700; }
+.search { background: var(--paper); padding: 0 4px; width: 230px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--pencil); height: 20px; }
+.search input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 13px; color: var(--ink); }
+.search input::placeholder { color: var(--pencil-text); }
+.search input:focus { outline: none; }
+.search:focus-within { border-bottom: 2px solid var(--ink); }
+.key { font-size: 11px; line-height: 14px; border: 1px solid var(--pencil); border-radius: 2px; padding: 0 5px; color: var(--pencil-text); }
+
+.tally { position: absolute; left: 120px; top: 180px; width: 540px; font-family: var(--font-mincho); font-size: var(--t-lead); line-height: 20px; }
+
+.group { position: absolute; left: 100px; width: 580px; list-style: none; }
+.run { display: grid; grid-template-columns: 20px 76px 1fr 60px 70px; column-gap: 0; padding: 0 20px 0 0; }
+.run + .run { margin-top: 20px; }
+.run > a { display: contents; }
+.run .mk { font-size: 15px; color: var(--ink); text-align: left; }
+.run .id { font-weight: 500; }
+.run .what { overflow-wrap: anywhere; padding-right: 12px; }
+.run .what b { font-weight: 700; }
+.run .what i { font-style: normal; color: var(--pencil-text); }
+.run .sc, .run .dl { text-align: right; }
+.n, .run .sc, .run .dl, .metrics td + td { font-family: var(--font-mincho); font-size: 15px; }
+.run .note { grid-column: 3 / -1; color: var(--pencil-text); font-size: 13px; }
+.run.sel { background: var(--ink-wash); box-shadow: inset 2px 0 0 var(--ink); margin-left: -20px; padding-left: 20px; }
+.run:not(.sel):hover { background: var(--ink-wash); margin-left: -20px; padding-left: 20px; }
+.run .err { grid-column: 3 / -1; font-size: 13px; }
+.run .err code { font-family: inherit; font-weight: 700; }
+.run .dash { color: var(--pencil-text); }
+.prog { display: inline-block; width: 80px; height: 1px; background: var(--pencil); vertical-align: 4px; margin-left: 8px; position: relative; }
+.prog::before { content: ""; position: absolute; left: 0; top: -1px; height: 3px; width: 62%; background: var(--ink); }
+
+.foot { position: absolute; left: 120px; top: 820px; width: 560px; font-size: 12px; color: var(--pencil-text); }
+.foot b { color: var(--ink); font-weight: 500; }
+
+/* ---- right page ---- */
+.ribbon { position: absolute; left: 1356px; top: 0; width: 18px; height: 168px; background: var(--ribbon); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 92%, 0 100%); }
+.rp { position: absolute; left: 820px; width: 520px; }
+.kicker { top: 60px; color: var(--pencil-text); font-size: 13px; }
+h2.rp { font-family: var(--font-mincho); font-weight: 500; font-size: var(--t-title); line-height: 40px; }
+.meta { top: 120px; font-size: 13px; }
+.meta p:first-child { color: var(--pencil-text); }
+
+.score { top: 180px; display: flex; align-items: flex-end; gap: 22px; height: 60px; }
+.score .fig { font-family: var(--font-mincho); font-size: var(--t-figure); line-height: 60px; font-weight: 500; }
+.score .d { font-family: var(--font-mincho); font-size: var(--t-head); line-height: 40px; font-weight: 600; }
+.score .d small { display: block; font-family: var(--font-gothic); font-size: 12px; line-height: 20px; color: var(--pencil-text); font-weight: 400; }
+.hanko { margin-left: 16px; align-self: stretch; display: flex; align-items: center; gap: 12px; }
+.hanko svg { transform: rotate(-4deg); mix-blend-mode: multiply; }
+.hanko p { align-self: flex-end; font-size: 12px; line-height: 20px; color: var(--pencil-text); width: 150px; }
+.why { top: 260px; font-size: var(--t-body); }
+
+table.metrics { top: 320px; border-collapse: collapse; }
+.metrics th { font-weight: 400; font-size: 12px; color: var(--pencil-text); text-align: right; height: 19px; line-height: 19px; padding: 0; border-bottom: 1px solid var(--pencil); }
+.metrics td { text-align: right; height: 19px; line-height: 19px; padding: 0; border-bottom: 1px solid var(--rule); }
+.metrics th:first-child, .metrics td:first-child { text-align: left; width: 220px; }
+.metrics td.big { font-weight: 700; }
+
+.chart { top: 440px; }
+.chart svg { display: block; overflow: visible; }
+.chart p { font-size: 12px; color: var(--pencil-text); margin-top: 0; }
+
+.log { top: 640px; list-style: none; font-size: 13px; }
+.log li { display: grid; grid-template-columns: 76px 48px 1fr; }
+.log li span:nth-child(1), .log li span:nth-child(2) { color: var(--pencil-text); }
+.log li.warn span:nth-child(2) { color: var(--ink); font-weight: 700; }
+
+.actions { top: 760px; display: flex; gap: 12px; align-items: center; }
+.btn { font: inherit; font-size: 14px; height: 40px; padding: 0 18px; border-radius: 2px; cursor: pointer; }
+.btn.primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); }
+.btn.primary:hover { background: #1F2940; }
+.btn.secondary { background: var(--paper); color: var(--ink); border: 1px solid var(--ink); }
+.btn.secondary:hover { background: var(--ink-wash); }
+.btn:disabled { background: var(--paper); color: var(--pencil); border: 1px dashed var(--pencil); cursor: not-allowed; }
+.why-off { top: 800px; font-size: 12px; color: var(--pencil-text); }
+.pinned { top: 840px; font-size: 12px; color: var(--pencil-text); }
+</style>
+</head>
+<body>
+
+<div class="page l"></div>
+<div class="page r"></div>
+<div class="fold" aria-hidden="true"></div>
+
+<!-- left page: the runs -->
+<header class="head"><h1>Evals</h1><span>atlas-research</span>
+  <label class="search"><input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets"><span class="key" title="Press / to search">/</span></label>
+</header>
+<nav class="nav" aria-label="Sections">
+  <ul>
+    <li><a href="#" aria-current="page">Runs</a></li>
+    <li><a href="#">Datasets</a></li>
+    <li><a href="#">Models</a></li>
+    <li><a href="#">Baselines</a></li>
+    <li><a href="#">Settings</a></li>
+  </ul>
+</nav>
+
+<p class="tally">Last night, 8 runs: 5 passed, 1 failed, 1 running, 1 queued.</p>
+
+<span class="vlabel" style="left:62px; top:240px">Needs attention</span>
+<ol class="group" style="top:240px" aria-label="Needs attention">
+  <li class="run sel"><a href="#" aria-current="true">
+    <span class="mk" aria-label="passed with a regression">&#9651;</span>
+    <span class="id">r-2291</span>
+    <span class="what"><b>summarize-v3</b> <i>on</i> news-digest-2k</span>
+    <span class="sc">0.812</span><span class="dl">&#8210;0.041</span>
+    <span class="note">Passed, but below the noise band. 14m 02s, started 02:00 by schedule.</span>
+  </a></li>
+  <li class="run"><a href="#">
+    <span class="mk" aria-label="failed">&#215;</span>
+    <span class="id">r-2287</span>
+    <span class="what"><b>extract-json</b> <i>on</i> invoices-ocr</span>
+    <span class="sc">0.000</span><span class="dl">&#8210;0.884</span>
+    <span class="note">Failed after 0m 41s, started 00:40 by CI #4809.</span>
+    <span class="err"><code>KeyError: 'line_items'</code> &mdash; 212 of 212 samples failed schema validation.</span>
+    <span class="note">Fix the extractor's output schema, then rerun. Not a regression.</span>
+  </a></li>
+</ol>
+
+<span class="vlabel" style="left:62px; top:460px">In progress</span>
+<ol class="group" style="top:460px" aria-label="In progress">
+  <li class="run"><a href="#">
+    <span class="mk" aria-label="running">&#9684;</span>
+    <span class="id">r-2288</span>
+    <span class="what"><b>router-small</b> <i>on</i> adversarial-prompts</span>
+    <span class="sc dash">&mdash;</span><span class="dl dash">&mdash;</span>
+    <span class="note">Running, 62% <span class="prog" aria-hidden="true"></span> 9m 10s so far, started 00:51 by CI #4812.</span>
+  </a></li>
+  <li class="run"><a href="#">
+    <span class="mk" aria-label="queued">&#9676;</span>
+    <span class="id">r-2284</span>
+    <span class="what"><b>chat-core-8b</b> <i>on</i> safety-refusals</span>
+    <span class="sc dash">&mdash;</span><span class="dl dash">&mdash;</span>
+    <span class="note">Queued by schedule. Not started.</span>
+  </a></li>
+</ol>
+
+<span class="vlabel" style="left:62px; top:620px">Passed</span>
+<ol class="group" style="top:620px" aria-label="Passed">
+  <li class="run"><a href="#">
+    <span class="mk" aria-label="passed">&#9675;</span>
+    <span class="id">r-2290</span>
+    <span class="what"><b>summarize-v3</b> <i>on</i> multilingual-legal-contracts-longform-eval-2026-q3</span>
+    <span class="sc">0.774</span><span class="dl">+0.006</span>
+    <span class="note">41m 55s, started 01:12 by M. Okafor.</span>
+  </a></li>
+  <li class="run"><a href="#">
+    <span class="mk" aria-label="passed">&#9675;</span>
+    <span class="id">r-2289</span>
+    <span class="what"><b>router-small</b> <i>on</i> intent-routing-v7</span>
+    <span class="sc">0.931</span><span class="dl">+0.012</span>
+  </a></li>
+  <li class="run"><a href="#">
+    <span class="mk" aria-label="passed">&#9675;</span>
+    <span class="id">r-2286</span>
+    <span class="what"><b>extract-json</b> <i>on</i> receipts-small</span>
+    <span class="sc">0.902</span><span class="dl">+0.000</span>
+  </a></li>
+  <li class="run"><a href="#">
+    <span class="mk" aria-label="passed">&#9675;</span>
+    <span class="id">r-2285</span>
+    <span class="what"><b>chat-core-8b</b> <i>on</i> helpfulness-pairwise</span>
+    <span class="sc">0.668</span><span class="dl">+0.021</span>
+  </a></li>
+</ol>
+
+<p class="foot">&#9675; passed &ensp; &#9651; passed with a regression &ensp; &#215; failed &ensp; &#9684; running &ensp; &#9676; queued<br><b>&mdash;</b> means not computed yet (running or queued). <b>0.000</b> is a real, computed score of zero.</p>
+
+<!-- right page: the selected run -->
+<div class="ribbon" aria-hidden="true"></div>
+<span class="vlabel" style="left:762px; top:80px">Selected run</span>
+<p class="rp kicker">r-2291</p>
+<h2 class="rp" style="top:80px">summarize-v3 on news-digest-2k</h2>
+<div class="rp meta">
+  <p>Passed in 14m 02s. Started 02:00 by schedule.</p>
+  <p>Baseline summarize-v2 @ r-2203 (0.853)</p>
+</div>
+
+<div class="rp score">
+  <span class="fig">0.812</span>
+  <span class="d"><small>vs baseline</small>&#8210;0.041</span>
+  <div class="hanko">
+    <svg width="72" height="72" viewBox="0 0 54 54" role="img" aria-label="Seal: check this">
+      <defs><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.6"/></filter></defs>
+      <g filter="url(#grain)" fill="none" stroke="#C23B22">
+        <rect x="3" y="3" width="48" height="48" rx="3" stroke-width="3"/>
+      </g>
+      <g filter="url(#grain)" fill="#C23B22" font-family="Shippori Mincho, serif" font-weight="600" font-size="19" text-anchor="middle">
+        <text x="27" y="25">確</text><text x="27" y="45">認</text>
+      </g>
+    </svg>
+    <p>Stamped: the one result to check today.</p>
+  </div>
+</div>
+<p class="rp why">Twice the <span class="n">&plusmn;0.020</span> noise band. Faithfulness fell the most, so read a few summaries before rerunning.</p>
+
+<span class="vlabel" style="left:762px; top:320px">Metrics</span>
+<table class="rp metrics">
+  <thead><tr><th>Metric</th><th style="width:100px">Score</th><th style="width:100px">Baseline</th><th style="width:100px">&Delta;</th></tr></thead>
+  <tbody>
+    <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td>&#8210;0.035</td></tr>
+    <tr><td>Faithfulness</td><td class="big">0.861</td><td>0.902</td><td class="big">&#8210;0.041</td></tr>
+    <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td>&#8210;0.011</td></tr>
+    <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td>+0.16</td></tr>
+  </tbody>
+</table>
+
+<span class="vlabel" style="left:762px; top:440px">Last 12 runs</span>
+<div class="rp chart">
+  <svg width="520" height="160" viewBox="0 0 520 160" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the 0.833 to 0.873 noise band">
+    <rect x="0" y="14" width="520" height="80" fill="rgba(46,58,89,0.09)"/>
+    <line x1="0" x2="520" y1="54" y2="54" stroke="#8A9099" stroke-width="1" stroke-dasharray="4 4"/>
+    <polyline fill="none" stroke="#2E3A59" stroke-width="1.4" stroke-linejoin="round"
+      points="20,68 63.6,58 107.3,62 150.9,50 194.5,54 238.2,60 281.8,46 325.5,56 369.1,64 412.7,58 456.4,54 500,136"/>
+    <circle cx="500" cy="136" r="4" fill="#EEF1F0" stroke="#2E3A59" stroke-width="1.4"/>
+    <text x="490" y="140" text-anchor="end" font-size="13" fill="#2E3A59" font-family="Zen Kaku Gothic New, sans-serif">0.812</text>
+    <text x="4" y="30" font-size="11" fill="#5E6570" font-family="Zen Kaku Gothic New, sans-serif">noise band 0.833&ndash;0.873</text>
+    <text x="4" y="50" font-size="11" fill="#5E6570" font-family="Zen Kaku Gothic New, sans-serif">baseline 0.853</text>
+  </svg>
+  <p>Oldest on the left. One row of dots is 0.010.</p>
+</div>
+
+<span class="vlabel" style="left:762px; top:640px">Log</span>
+<ol class="rp log">
+  <li><span>02:13:48</span><span>eval</span><span>1996/2000 samples scored</span></li>
+  <li><span>02:13:55</span><span>eval</span><span>2000/2000 samples scored</span></li>
+  <li class="warn"><span>02:13:55</span><span>warn</span><span>length_ratio above 1.15 on 38% of samples</span></li>
+  <li><span>02:14:01</span><span>agg</span><span>faithfulness=0.861 (baseline 0.902)</span></li>
+  <li><span>02:14:02</span><span>done</span><span>run r-2291 finished in 14m 02s</span></li>
+</ol>
+
+<div class="rp actions">
+  <button class="btn primary" type="button">Rerun evaluation</button>
+  <button class="btn secondary" type="button">Compare with baseline</button>
+  <button class="btn" type="button" disabled aria-describedby="off">Cancel run</button>
+</div>
+<p class="rp why-off" id="off">Cancel is unavailable: this run finished at 02:14:02.</p>
+<p class="rp pinned">Pinned comparisons: none yet.</p>
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals: last night's runs</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: var(--font-letter); font-size: var(--t-s); line-height: 1.3;
+    padding: 12px 20px 12px;
+  }
+  h1, h2, h3, p, ol, ul, table { margin: 0; padding: 0; }
+  ol, ul { list-style: none; }
+  a { color: inherit; }
+  button, input { font: inherit; color: inherit; }
+  .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+  .code { font-family: var(--font-code); }
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; background-color: var(--yellow); }
+
+  /* masthead: the page title, unboxed like a comic's logo */
+  .mast { display: flex; align-items: center; gap: 22px; height: 66px; }
+  .logo {
+    font-family: var(--font-shout); font-size: 54px; line-height: 1; letter-spacing: .04em;
+    color: var(--cyan); -webkit-text-stroke: 2.5px var(--ink); paint-order: stroke fill;
+    text-shadow: 3px 3px 0 var(--ink);
+  }
+  .issue { font-size: 13px; line-height: 1.3; }
+  .issue b { font-size: 15px; }
+  .nav { display: flex; gap: 0; margin-left: 8px; border: var(--border) solid var(--ink); }
+  .nav a {
+    font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: .04em;
+    padding: 7px 14px; text-decoration: none; border-left: var(--border) solid var(--ink);
+  }
+  .nav a:first-child { border-left: 0; }
+  .nav a:hover { background: var(--yellow); }
+  .nav a[aria-current] { background: var(--ink); color: var(--paper); }
+  .counts { margin-left: auto; font-size: 13px; text-align: right; line-height: 1.35; }
+  .counts b { font-family: var(--font-num); font-weight: 800; }
+  .search { display: flex; align-items: center; border: var(--border) solid var(--ink); height: 40px; width: 330px; padding: 0 6px 0 12px; }
+  .search input { border: 0; outline: 0; background: none; flex: 1; min-width: 0; font-size: 14px; font-weight: 700; }
+  .search input::placeholder { color: var(--grey); font-weight: 400; }
+  .search:focus-within { background: var(--yellow); }
+  .key { font-family: var(--font-code); font-weight: 600; font-size: 13px; border: 2px solid var(--ink); width: 24px; height: 24px; display: grid; place-items: center; }
+
+  /* the page: tiers of panels on a gutter grid */
+  .tier1 { display: grid; grid-template-columns: 196px 196px 360px 196px 196px 196px; gap: var(--gutter); height: 238px; margin-top: 8px; }
+  .tier2 { display: grid; grid-template-columns: 860px 1fr; gap: var(--gutter); height: 552px; margin-top: var(--gutter); }
+  .col { display: grid; grid-template-rows: 186px 140px 1fr; gap: var(--gutter); min-height: 0; }
+  .bottom { display: grid; grid-template-columns: 334px 1fr; gap: var(--gutter); min-height: 0; }
+  .stack { display: grid; grid-template-rows: 1fr 66px; gap: var(--gutter); min-height: 0; }
+
+  .panel { position: relative; border: var(--border) solid var(--ink); background-color: var(--paper); min-width: 0; min-height: 0; }
+  .cap {
+    position: absolute; top: 0; left: 0; z-index: 2;
+    background: var(--yellow); border-right: var(--border) solid var(--ink); border-bottom: var(--border) solid var(--ink);
+    padding: 3px 9px 2px; font-weight: 700; font-size: 12px; line-height: 1.25; text-transform: uppercase; letter-spacing: .03em;
+    max-width: 88%;
+  }
+  .cap.foot { top: auto; bottom: 0; border-bottom: 0; border-top: var(--border) solid var(--ink); max-width: 100%; font-size: 11px; }
+  .cap .num { font-weight: 800; letter-spacing: 0; }
+
+  /* small run panels */
+  .run { padding: 36px 14px 12px; display: flex; flex-direction: column; }
+  .run .id { font-weight: 700; font-size: 16px; }
+  .run .model { font-weight: 700; font-size: 13px; margin-top: 2px; }
+  .run .ds { font-size: 13px; overflow-wrap: anywhere; line-height: 1.2; }
+  .run .score { font-family: var(--font-num); font-weight: 800; font-size: 34px; line-height: 1; margin-top: auto; font-variant-numeric: tabular-nums; }
+  .run .delta { font-family: var(--font-num); font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .run .delta small { font-family: var(--font-letter); font-weight: 400; font-size: 12px; }
+  .run .st { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 2px solid var(--ink); }
+  .run .st b { text-transform: uppercase; letter-spacing: .03em; font-size: 12px; }
+  .run a.id { text-decoration: none; }
+  .run a.id:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+  .muted { color: var(--grey); }
+
+  .run.failed .score { color: var(--magenta-text); }
+  .run.failed { padding-right: 12px; }
+  .run.failed .top { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+  .run.failed .score { margin-top: 0; text-align: right; }
+  .burst { position: relative; margin: 8px -12px -12px -14px; flex: 1; display: grid; place-items: center; border-top: var(--border) solid var(--ink); padding: 6px 8px; }
+  .bshape { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .burst svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .burst polygon { fill: var(--paper); stroke: var(--ink); stroke-width: 3; stroke-linejoin: miter; vector-effect: non-scaling-stroke; }
+  .burst p { position: relative; padding: 0 58px; text-align: center; font-size: 12.5px; line-height: 1.22; font-weight: 700; }
+  .burst .code { font-weight: 600; font-size: 11.5px; color: var(--magenta-text); display: block; margin-bottom: 2px; }
+  .burst-tail { position: absolute; left: 118px; top: -16px; width: 34px; height: 26px; overflow: visible; z-index: 1; }
+  .burst-tail path { fill: var(--paper); stroke: var(--ink); stroke-width: 3; stroke-linejoin: miter; }
+
+  .run.running .score, .run.queued .score { color: var(--grey); }
+  .bar { height: 14px; border: 2px solid var(--ink); margin-top: 6px; position: relative; background: var(--paper); }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; border-right: 2px solid var(--ink); }
+  .run.running { padding-bottom: 44px; }
+  .run.running .prog { display: flex; align-items: center; gap: 10px; margin-top: auto; }
+  .run.running .prog .score { margin-top: 0; }
+  .run.running .prog .bar { flex: 1; margin-top: 0; }
+  .run.running .pct { font-weight: 800; font-size: 14px; }
+
+  /* the splash panel */
+  .splash { padding: 42px 22px 12px; display: flex; flex-direction: column; overflow: hidden; }
+  .splash .rid { font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: .03em; }
+  .splash-head { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
+  .splash h1 { font-weight: 700; font-size: var(--t-xl); line-height: 1.08; }
+  .splash .meta { font-size: 14px; margin-top: 6px; line-height: 1.4; }
+  .splash .meta b { font-weight: 700; }
+  .readout { display: flex; align-items: flex-end; gap: 18px; }
+  .readout .big { font-family: var(--font-shout); font-size: var(--t-3xl); line-height: .82; letter-spacing: .01em; }
+  .readout .dl { font-family: var(--font-shout); font-size: var(--t-2xl); line-height: .9; color: var(--magenta); -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; letter-spacing: .02em; }
+  .readout .dl small { display: block; font-family: var(--font-letter); font-weight: 700; font-size: 12px; color: var(--ink); -webkit-text-stroke: 0; text-transform: uppercase; letter-spacing: .03em; margin-top: 6px; }
+
+  .chart { position: relative; margin-top: 10px; width: 814px; height: 332px; }
+  .chart svg.plot { position: absolute; inset: 0; overflow: visible; }
+  .focus {
+    position: absolute; left: 700px; top: 249.5px; width: 620px; height: 620px; margin: -310px 0 0 -310px; pointer-events: none;
+    background: repeating-conic-gradient(from 0deg, rgb(17 17 17 / .75) 0 .9deg, transparent .9deg 6deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 30px, #000 32px 90px, transparent 140px);
+            mask: radial-gradient(circle, transparent 0 30px, #000 32px 90px, transparent 140px);
+  }
+  .plot text { font-family: var(--font-num); font-size: 12px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+  .plot text.lbl { font-family: var(--font-letter); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  .sfx {
+    position: absolute; left: 712px; top: 140px; transform: rotate(-9deg);
+    font-family: var(--font-shout); font-size: 50px; line-height: 1; letter-spacing: .03em;
+    color: var(--yellow); -webkit-text-stroke: 2.5px var(--ink); paint-order: stroke fill; text-shadow: 3px 3px 0 var(--ink);
+  }
+  .figcap { font-size: 12.5px; margin-top: auto; padding-top: 6px; border-top: 2px solid var(--ink); }
+
+  /* speech balloons: an oval, and a tail that points at the thing */
+  .bal {
+    position: absolute; z-index: 3; background: var(--paper); border: var(--border) solid var(--ink); border-radius: 50%;
+    padding: 16px 30px; text-align: center; font-weight: 700; font-size: 13px; line-height: 1.22; text-transform: uppercase; letter-spacing: .02em;
+  }
+  .bal .num { font-weight: 800; letter-spacing: 0; }
+  .tail { position: absolute; width: 36px; height: 40px; overflow: visible; }
+  .tail path { fill: var(--paper); stroke: var(--ink); stroke-width: 3; stroke-linejoin: miter; }
+  .bal.whisper { border-style: dashed; }
+  .bal.whisper .tail path { stroke-dasharray: 5 4; }
+
+  .drop-bal { left: 312px; top: 176px; width: 330px; }
+  .drop-bal .tail { right: -26px; top: 52px; transform: rotate(-62deg); }
+
+  /* metrics */
+  .metrics { padding: 34px 16px 10px; }
+  .metrics table { width: 318px; border-collapse: collapse; font-size: 14px; }
+  .metrics th { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; text-align: right; padding: 4px 0 4px 10px; border-bottom: 2px solid var(--ink); }
+  .metrics th:first-child, .metrics td:first-child { text-align: left; padding-left: 0; }
+  .metrics td { text-align: right; padding: 6px 0 5px 10px; border-bottom: 1px solid #D9D9D9; }
+  .metrics td.num { font-weight: 600; }
+  .metrics td:first-child { font-weight: 700; }
+  .metrics tr:last-child td { border-bottom: 0; }
+  .neg { color: var(--magenta-text); font-weight: 800 !important; }
+  .len-bal { right: 10px; top: 80px; width: 172px; padding: 14px 16px; font-size: 11.5px; }
+  .len-bal .tail { left: -24px; top: 44px; transform: rotate(80deg); width: 26px; height: 32px; }
+
+  /* the log: a screen inside the panel */
+  .log { background-color: var(--ink); color: #F4F4F4; padding: 32px 14px 10px; }
+  .log .cap { color: var(--ink); border-color: var(--ink); }
+  .log pre { margin: 0; font-family: var(--font-code); font-size: 12px; line-height: 1.6; white-space: pre; overflow: hidden; }
+  .log .w { color: var(--yellow); }
+  .log .k { color: var(--cyan); }
+
+  /* actions */
+  .actions { padding: 34px 14px 12px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+  .btn {
+    font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: .04em;
+    border: var(--border) solid var(--ink); background: var(--paper); padding: 7px 14px; cursor: pointer;
+  }
+  .btn:hover { background: var(--yellow); }
+  .btn:active { transform: translateY(2px); }
+  .btn.primary { background: var(--cyan); }
+  .btn.primary:hover { background: var(--yellow); }
+  .btn:disabled { color: var(--grey); border-color: var(--grey-dot); background: #F2F2F2; cursor: not-allowed; transform: none; }
+  .cancel-row { position: relative; width: 100%; }
+  .cancel-bal { left: 142px; top: -5px; width: 164px; padding: 7px 14px; font-size: 11px; }
+  .cancel-bal .tail { left: -20px; top: 8px; width: 24px; height: 26px; transform: rotate(80deg); }
+
+  .queued { padding: 32px 12px 8px; font-size: 13px; }
+  .queued .row1 { display: flex; justify-content: space-between; align-items: baseline; }
+  .queued .score { font-family: var(--font-num); font-weight: 800; font-size: 26px; color: var(--grey); line-height: 1; }
+  .pinned { padding: 8px 12px; font-size: 13px; line-height: 1.25; display: flex; flex-direction: column; justify-content: center; }
+  .pinned b { font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  .pinned.dots-grey { background-color: var(--paper); }
+  .pinned span { background: var(--paper); align-self: flex-start; padding: 0 3px; }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="logo" aria-label="Evals">EVALS</div>
+  <div class="issue"><b>atlas-research</b><br>runs from 23:00 to 02:00</div>
+  <nav class="nav" aria-label="Sections">
+    <a href="#" aria-current="page">Runs</a>
+    <a href="#">Datasets</a>
+    <a href="#">Models</a>
+    <a href="#">Baselines</a>
+    <a href="#">Settings</a>
+  </nav>
+  <p class="counts"><b>8</b> runs last night<br><b>5</b> passed, <b>1</b> failed, <b>1</b> running, <b>1</b> queued</p>
+  <label class="search"><input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets"><span class="key" title="Press / to search">/</span></label>
+</header>
+
+<main>
+  <section class="tier1" aria-label="Runs in the order they started">
+    <article class="panel run">
+      <p class="cap"><span class="num">23:00</span>, schedule</p>
+      <a href="#" class="id">r-2285</a>
+      <p class="model">chat-core-8b</p>
+      <p class="ds">helpfulness-pairwise</p>
+      <p class="score">0.668</p>
+      <p class="delta">+0.021 <small>vs baseline</small></p>
+      <p class="st"><b>Passed</b> in <span class="num">1h 06m</span></p>
+    </article>
+    <article class="panel run">
+      <p class="cap"><span class="num">23:58</span>, L. Brandt</p>
+      <a href="#" class="id">r-2286</a>
+      <p class="model">extract-json</p>
+      <p class="ds">receipts-small</p>
+      <p class="score">0.902</p>
+      <p class="delta">+0.000 <small>vs baseline</small></p>
+      <p class="st"><b>Passed</b> in <span class="num">2m 15s</span></p>
+    </article>
+    <article class="panel run failed">
+      <p class="cap"><span class="num">00:40</span>, CI #4809</p>
+      <div class="top">
+        <div>
+          <a href="#" class="id">r-2287</a>
+          <p class="model">extract-json</p>
+          <p class="ds">invoices-ocr</p>
+        </div>
+        <div>
+          <p class="score">0.000</p>
+          <p class="delta" style="text-align:right">&minus;0.884 <small>vs baseline</small></p>
+        </div>
+      </div>
+      <div class="burst dots-magenta" role="note"><div class="bshape">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="50.0,0.0 57.6,7.2 67.1,3.0 72.8,10.6 82.1,11.7 83.3,22.0 93.3,25.0 92.8,34.4 99.2,41.3 93.5,50.0 99.2,58.7 92.8,65.6 93.3,75.0 83.3,78.0 82.1,88.3 72.8,89.4 67.1,97.0 57.6,92.8 50.0,100.0 42.1,94.8 32.9,97.0 28.2,87.7 17.9,88.3 15.1,79.2 6.7,75.0 9.1,64.9 0.8,58.7 4.5,50.0 0.8,41.3 9.1,35.1 6.7,25.0 15.1,20.8 17.9,11.7 28.3,12.3 32.9,3.0 42.1,5.2"/></svg>
+        <p><span class="code">KeyError: 'line_items'</span>212 of 212 samples failed schema validation. Failed after 0m 41s, not a regression. Fix the output schema, then rerun.</p>
+      </div></div>
+    </article>
+    <article class="panel run running">
+      <p class="cap"><span class="num">00:51</span>, CI #4812</p>
+      <a href="#" class="id">r-2288</a>
+      <p class="model">router-small</p>
+      <p class="ds">adversarial-prompts</p>
+      <div class="prog"><p class="score" aria-label="not computed">&mdash;</p><div class="bar" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="r-2288 progress"><i class="dots-cyan"></i></div><span class="num pct">62%</span></div>
+      <p class="st"><b>Running</b>, <span class="num">9m 10s</span> so far</p>
+      <p class="cap foot">&mdash; means not computed yet. <span class="num">0.000</span> is a real zero.</p>
+    </article>
+    <article class="panel run">
+      <p class="cap"><span class="num">01:00</span>, schedule</p>
+      <a href="#" class="id">r-2289</a>
+      <p class="model">router-small</p>
+      <p class="ds">intent-routing-v7</p>
+      <p class="score">0.931</p>
+      <p class="delta">+0.012 <small>vs baseline</small></p>
+      <p class="st"><b>Passed</b> in <span class="num">3m 48s</span></p>
+    </article>
+    <article class="panel run">
+      <p class="cap"><span class="num">01:12</span>, M. Okafor</p>
+      <a href="#" class="id">r-2290</a>
+      <p class="model">summarize-v3</p>
+      <p class="ds">multilingual-legal-contracts-longform-eval-2026-q3</p>
+      <p class="score">0.774</p>
+      <p class="delta">+0.006 <small>vs baseline</small></p>
+      <p class="st"><b>Passed</b> in <span class="num">41m 55s</span></p>
+    </article>
+  </section>
+
+  <section class="tier2">
+    <article class="panel splash" aria-label="Selected run r-2291">
+      <p class="cap"><span class="num">02:00</span>, schedule. The last run of the night, and the one to look at.</p>
+      <div class="splash-head">
+        <div>
+          <p class="rid">Run r-2291, selected</p>
+          <h1>summarize-v3 on news-digest-2k</h1>
+          <p class="meta">Baseline <b>summarize-v2 @ r-2203 (<span class="num">0.853</span>)</b><br>Passed in <span class="num">14m 02s</span>, triggered by schedule at <span class="num">02:00</span></p>
+        </div>
+        <div class="readout">
+          <p class="big num" style="font-family:var(--font-shout)">0.812</p>
+          <p class="dl">&minus;0.041<small>vs baseline</small></p>
+        </div>
+      </div>
+
+      <div class="chart">
+        <div class="focus" aria-hidden="true"></div>
+        <svg class="plot" width="814" height="332" viewBox="0 0 814 332" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the noise band of 0.833 to 0.873.">
+          <defs>
+            <pattern id="bd" width="9" height="9" patternUnits="userSpaceOnUse">
+              <circle cx="2.2" cy="2.2" r="1.9" fill="#00AEEF"/><circle cx="6.7" cy="6.7" r="1.9" fill="#00AEEF"/>
+            </pattern>
+          </defs>
+          <rect x="56" y="43.6" width="644" height="135" fill="url(#bd)"/>
+          <line x1="56" y1="43.6" x2="700" y2="43.6" stroke="#111" stroke-width="1.5"/>
+          <line x1="56" y1="178.6" x2="700" y2="178.6" stroke="#111" stroke-width="1.5"/>
+          <g stroke="#111" stroke-width="1" opacity=".25">
+            <line x1="56" y1="87.5" x2="700" y2="87.5"/><line x1="56" y1="155" x2="700" y2="155"/><line x1="56" y1="222.5" x2="700" y2="222.5"/>
+          </g>
+          <line x1="56" y1="20" x2="56" y2="290" stroke="#111" stroke-width="3"/>
+          <line x1="56" y1="290" x2="700" y2="290" stroke="#111" stroke-width="3"/>
+          <g text-anchor="end">
+            <text x="46" y="24">0.88</text><text x="46" y="91.5">0.86</text><text x="46" y="159">0.84</text><text x="46" y="226.5">0.82</text><text x="46" y="294">0.80</text>
+          </g>
+          <line x1="56" y1="111.1" x2="700" y2="111.1" stroke="#111" stroke-width="2" stroke-dasharray="8 5"/>
+          <rect x="62" y="48" width="208" height="20" fill="#fff" stroke="#111" stroke-width="2"/>
+          <text class="lbl" x="70" y="62.5">noise band 0.833 to 0.873</text>
+          <text class="lbl" x="64" y="102">baseline 0.853</text>
+          <polyline fill="none" stroke="#111" stroke-width="4" stroke-linejoin="round" points="56,134.8 114.5,117.9 173.1,124.6 231.6,104.4 290.2,111.1 348.7,121.3 407.3,97.6 465.9,114.5 524.4,128.0 583,117.9 641.5,111.1"/>
+          <line x1="641.5" y1="111.1" x2="700" y2="249.5" stroke="#111" stroke-width="4"/>
+          <g fill="#fff" stroke="#111" stroke-width="3">
+            <circle cx="56" cy="134.8" r="6"/><circle cx="114.5" cy="117.9" r="6"/><circle cx="173.1" cy="124.6" r="6"/><circle cx="231.6" cy="104.4" r="6"/><circle cx="290.2" cy="111.1" r="6"/><circle cx="348.7" cy="121.3" r="6"/><circle cx="407.3" cy="97.6" r="6"/><circle cx="465.9" cy="114.5" r="6"/><circle cx="524.4" cy="128.0" r="6"/><circle cx="583" cy="117.9" r="6"/><circle cx="641.5" cy="111.1" r="6"/>
+          </g>
+          <circle cx="700" cy="249.5" r="13" fill="#EC008C" stroke="#111" stroke-width="3.5"/>
+          <text x="56" y="312" class="lbl">12 runs ago</text>
+          <rect x="672" y="300" width="56" height="17" fill="#fff"/><text x="700" y="313" class="lbl" text-anchor="middle">r-2291</text>
+        </svg>
+        <p class="sfx" aria-hidden="true">THUD!</p>
+        <p class="bal drop-bal">
+          <span class="num">0.812</span> is <span class="num">0.041</span> under the baseline. That's twice the <span class="num">&plusmn;0.02</span> noise band, so it's a real regression, not wobble.
+          <svg class="tail" viewBox="0 0 36 40" aria-hidden="true"><path d="M2 0 L34 40 L22 0"/></svg>
+        </p>
+      </div>
+      <p class="figcap">Score over the last 12 runs of summarize-v3 on news-digest-2k, oldest first. Dotted band: noise, <span class="num">0.833</span> to <span class="num">0.873</span>. Dashed line: baseline.</p>
+    </article>
+
+    <div class="col">
+      <article class="panel metrics">
+        <p class="cap">Where r-2291 lost points</p>
+        <p class="bal len-bal">Outputs ran long: length ratio over 1.15 on 38% of samples.<svg class="tail" viewBox="0 0 36 40" aria-hidden="true"><path d="M2 0 L30 40 L22 0"/></svg></p>
+        <table>
+          <thead><tr><th>Metric</th><th>Score</th><th>Baseline</th><th>&Delta;</th></tr></thead>
+          <tbody>
+            <tr><td>ROUGE-L</td><td class="num">0.412</td><td class="num">0.447</td><td class="num neg">&minus;0.035</td></tr>
+            <tr><td>Faithfulness</td><td class="num">0.861</td><td class="num">0.902</td><td class="num neg">&minus;0.041</td></tr>
+            <tr><td>Coverage</td><td class="num">0.790</td><td class="num">0.801</td><td class="num">&minus;0.011</td></tr>
+            <tr><td>Length ratio</td><td class="num">1.18</td><td class="num">1.02</td><td class="num"><b>+0.16</b></td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="panel log">
+        <p class="cap">Log tail, last 5 lines</p>
+<pre>02:13:48  <span class="k">eval</span>  1996/2000 samples scored
+02:13:55  <span class="k">eval</span>  2000/2000 samples scored
+02:13:55  <span class="w">warn  length_ratio above 1.15 on 38% of samples</span>
+02:14:01  <span class="k">agg </span>  faithfulness=0.861 (baseline 0.902)
+02:14:02  <span class="k">done</span>  run r-2291 finished in 14m 02s</pre>
+      </article>
+
+      <div class="bottom">
+        <article class="panel actions">
+          <p class="cap">What to do with r-2291</p>
+          <button class="btn primary">Rerun evaluation</button>
+          <button class="btn">Compare with baseline</button>
+          <div class="cancel-row">
+            <button class="btn" disabled aria-describedby="why-cancel">Cancel run</button>
+            <p class="bal whisper cancel-bal" id="why-cancel">Can't cancel: it finished at <span class="num">02:14:02</span>.<svg class="tail" viewBox="0 0 36 40" aria-hidden="true"><path d="M2 0 L18 40 L22 0"/></svg></p>
+          </div>
+        </article>
+        <div class="stack">
+          <article class="panel queued">
+            <p class="cap">Queued, schedule</p>
+            <div class="row1"><a href="#" class="id"><b>r-2284</b></a><span class="score" aria-label="not computed">&mdash;</span></div>
+            <p><b>chat-core-8b</b><br>safety-refusals</p>
+            <p class="muted"><b>Not started yet</b></p>
+          </article>
+          <article class="panel pinned dots-grey">
+            <b><span>Pinned comparisons</span></b>
+            <span>None yet. Compare a run to pin it here.</span>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Sans:wght@400..700&family=DM+Mono:wght@400&display=swap");
+
+:root {
+  --font-text: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-code: "DM Mono", ui-monospace, Consolas, monospace;
+
+  --paper: #FAFAF7;
+  --ink: #1C2B25;
+  --ink-2: #3F4E47;
+  --muted: #6B7770;
+  --rule: #D6DAD2;
+  --wash: #ECEEE7;
+  --leader: #A3ACA5;
+  --oxblood: #7A1F2B;
+
+  --t-note: 12.5px;
+  --t-ui: 13px;
+  --t-small: 15px;
+  --t-body: 17px;
+  --t-lede: 20px;
+  --t-head: 30px;
+  --t-display: 50px;
+
+  --measure: 34em;
+  --gutter: 56px;
+  --margin-note: 140px;
+  --radius: 0;
+}

@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evals: runs, last night</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--paper);color:var(--ink);font:400 var(--t-15)/1.35 var(--font-sign);display:grid;grid-template-rows:54px 512px 334px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--font-board)}
+
+/* signage strip */
+.signbar{display:flex;align-items:stretch;gap:40px;padding:0 24px;border-bottom:1px solid var(--rule)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand b{font-weight:900;font-size:var(--t-22);letter-spacing:-.01em;line-height:1}
+.brand small{display:block;font-size:var(--t-12);color:var(--ink-2);line-height:1.2;margin-top:2px}
+.route{position:relative;display:flex;margin:0;padding:0;list-style:none}
+.route::before{content:"";position:absolute;left:0;right:0;top:35px;height:4px;background:var(--rule)}
+.route li{display:flex}
+.route a{position:relative;display:block;padding:9px 30px 0 0;text-decoration:none;font-size:var(--t-15);color:var(--ink-2)}
+.route a::after{content:"";position:absolute;left:1px;top:31px;width:5px;height:12px;background:var(--grey)}
+.route a:hover{color:var(--ink)}
+.route a:hover::after{background:var(--ink)}
+.route a[aria-current]{color:var(--ink);font-weight:800}
+.route a[aria-current]::after{left:-4px;top:28px;width:18px;height:18px;border:4px solid var(--ink);border-radius:50%;background:#fff;box-sizing:border-box}
+.find{margin-left:auto;display:flex;align-items:center;gap:8px}
+.find label{font-size:var(--t-13);font-weight:700}
+.find input{width:300px;height:36px;border:2px solid var(--ink);border-radius:var(--r-sign);padding:4px 10px 0;font:inherit;font-size:var(--t-15);color:var(--ink);background:#fff}
+.find input::placeholder{color:#5E666E}
+.find input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+kbd{display:inline-grid;place-items:center;width:26px;height:26px;background:var(--ink);color:#fff;border-radius:4px;font:700 var(--t-13) var(--font-board)}
+
+/* the network */
+.network{position:relative;overflow:hidden}
+.map{position:absolute;inset:0;display:block}
+.map text{font-family:var(--font-sign);fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+.map .id{font-weight:800;font-size:14px}
+.map .v{font-size:12.5px;font-variant-numeric:tabular-nums}
+.map .red{fill:var(--closed);font-weight:700}
+.map .badge{font-weight:800;font-size:12px;fill:#fff;stroke:none}
+.map .hr{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.map .small{font-size:12px}
+.key{position:absolute;left:20px;top:16px;width:214px;background:#fff;border:2px solid var(--ink);border-radius:var(--r-sign);padding:8px 10px 9px;font-size:var(--t-12);line-height:1.25}
+.key h2{margin:0 0 6px;font-size:var(--t-15);font-weight:900}
+.key ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.key li{display:grid;grid-template-columns:30px 1fr;align-items:center;gap:6px}
+.key svg{display:block}
+.key .sep{border-top:1px solid var(--rule);margin-top:3px;padding-top:6px}
+.key .dash{font-weight:700;font-size:var(--t-15);text-align:center}
+.notice{position:absolute;left:398px;top:324px;width:496px;background:#fff;border:2px solid var(--closed);border-left-width:8px;border-radius:var(--r-sign);padding:6px 10px 7px;font-size:var(--t-12);line-height:1.3}
+.notice b{color:var(--closed);font-weight:800}
+.notice code{font-family:var(--font-board);font-size:11px;display:block;margin:2px 0 2px;color:var(--ink);white-space:nowrap}
+
+/* station information panel */
+.station{position:absolute;left:904px;top:14px;width:520px;height:484px;background:#fff;border:2px solid var(--ink);border-left:8px solid var(--line-blue);border-radius:0 var(--r-sign) var(--r-sign) 0;display:flex;flex-direction:column}
+.st-head{background:var(--ink);color:#fff;padding:10px 16px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 16px;align-items:start}
+.st-head .code{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:var(--t-12);color:#C9CED3}
+.st-head .code span{font:700 var(--t-12) var(--font-board);background:#fff;color:var(--ink);padding:2px 6px 0;border-radius:3px}
+.st-head h1{margin:0;font-size:var(--t-22);font-weight:800;line-height:1.1;letter-spacing:-.005em}
+.st-head .base{font-size:var(--t-13);color:#D6DADE;margin-top:3px}
+.st-head .score{grid-row:2/4;grid-column:2;text-align:right;line-height:1}
+.st-head .score b{display:block;font-size:var(--t-30);font-weight:800;font-variant-numeric:tabular-nums}
+.st-head .score em{font-style:normal;font-size:var(--t-18);font-weight:800;color:var(--flap-red);font-variant-numeric:tabular-nums}
+.change{margin:0;background:var(--closed);color:#fff;padding:6px 16px 5px;font-size:var(--t-13);line-height:1.3;display:flex;gap:8px;align-items:flex-start}
+.change svg{flex:none;margin-top:1px}
+.st-body{padding:10px 16px 10px;display:grid;grid-template-columns:232px 1fr;gap:10px 20px;flex:1}
+.st-body h2{margin:0 0 4px;font-size:var(--t-13);font-weight:800}
+.ran{grid-column:1/-1;margin:0;font-size:var(--t-13);color:var(--ink-2)}
+table.metrics{border-collapse:collapse;width:100%;font-size:var(--t-13);font-variant-numeric:tabular-nums}
+.metrics th{font-weight:700;text-align:right;padding:0 0 3px 6px;border-bottom:2px solid var(--ink);font-size:var(--t-12)}
+.metrics th:first-child,.metrics td:first-child{text-align:left;padding-left:0}
+.metrics td{text-align:right;padding:3px 0 2px 6px;border-bottom:1px solid var(--rule)}
+.metrics tr.lead td{font-weight:700}
+.chart svg{display:block}
+.chart text{font-family:var(--font-sign);font-size:10.5px;fill:var(--ink-2);font-variant-numeric:tabular-nums}
+.notices{grid-column:1/-1}
+.notices ol{list-style:none;margin:0;padding:4px 0 0;border-top:2px solid var(--ink);font:400 11.5px/1.5 var(--font-board);white-space:pre}
+.notices li b{font-weight:700}
+.acts{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{height:36px;padding:3px 14px 0;border-radius:var(--r-sign);font:700 var(--t-13) var(--font-sign);border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#2A3139}
+.btn:not(.primary):not(:disabled):hover{background:var(--zone)}
+.btn:disabled{border:2px dashed var(--planned);color:#7A828A;background:#fff;cursor:not-allowed}
+.acts p{margin:0;font-size:var(--t-12);color:var(--ink-2);flex-basis:100%;line-height:1.35}
+
+/* departures board */
+.board{background:var(--board);color:#fff;padding:8px 24px 0;--cell:13px}
+.board-head{display:flex;align-items:baseline;gap:22px;margin-bottom:3px}
+.board-head h2{margin:0;font-size:var(--t-18);font-weight:800;color:#fff}
+.counts{display:flex;gap:14px;font-size:var(--t-13);color:#C9CED3;margin:0;padding:0;list-style:none}
+.counts b{font:700 var(--t-15) var(--font-board);color:var(--flap-ink);background:var(--flap);padding:2px 4px 0;border-radius:var(--r-flap);margin-right:4px}
+.counts .bad b{color:var(--flap-red)}
+.legend{margin-left:auto;font-size:var(--t-12);color:#C9CED3}
+.legend b{font:700 var(--t-13) var(--font-board);color:var(--flap-ink)}
+table.dep{border-collapse:separate;border-spacing:var(--cell) 2px;margin:-2px 0 0 calc(-1 * var(--cell))}
+.dep th{font:600 var(--t-12) var(--font-sign);color:#AEB4BA;text-align:left;padding:0 0 1px;white-space:nowrap}
+.dep th.r{text-align:right}
+.dep td{padding:0;vertical-align:top}
+.f{display:block;box-sizing:border-box;width:calc(var(--n) * var(--cell));height:20px;overflow:hidden;white-space:pre;
+  font:700 16px/21px var(--font-board);letter-spacing:calc(var(--cell) - 1ch);padding-left:calc((var(--cell) - 1ch) / 2);color:var(--flap-ink);
+  background:
+    linear-gradient(var(--flap-hinge),var(--flap-hinge)) 0 10px / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg,var(--flap) 0 calc(var(--cell) - 2px),transparent calc(var(--cell) - 2px) var(--cell));
+  border-radius:var(--r-flap)}
+.f.red{color:var(--flap-red)}
+.f.dim{color:var(--flap-dim)}
+.f.white{color:#fff}
+.n5{--n:5}.n6{--n:6}.n9{--n:9}.n11{--n:11}.n12{--n:12}.n13{--n:13}.n28{--n:28}
+.lit{display:flex}
+.lit i{display:block;width:calc(var(--cell) - 2px);height:7px;margin-right:2px;background:var(--flap-ink);border-radius:var(--r-flap)}
+.lit i.off{background:var(--flap)}
+.bullet{display:block;width:6px;height:20px;background:var(--c);border-radius:2px;position:relative}
+.bullet.sel::after{content:"";position:absolute;left:-7px;top:1px;width:12px;height:12px;border:3px solid #fff;border-radius:50%;background:var(--board)}
+.dep tr.cont td{padding-top:0}
+.dep .split th{font-size:var(--t-12);line-height:1.2;color:#AEB4BA;padding:3px 0 0;border-top:1px solid #30363D}
+.dep tr:hover .f{background-color:transparent}
+</style>
+</head>
+<body>
+
+<header class="signbar">
+  <a class="brand" href="#">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M2 22 H11 L21 12 H28" fill="none" stroke="var(--line-blue)" stroke-width="5"/><circle cx="15" cy="18" r="0" /><circle cx="21" cy="12" r="5.5" fill="#fff" stroke="var(--ink)" stroke-width="3"/></svg>
+    <span><b>Evals</b><small>atlas-research</small></span>
+  </a>
+  <ol class="route" aria-label="Sections">
+    <li><a href="#" aria-current="page">Runs</a></li>
+    <li><a href="#">Datasets</a></li>
+    <li><a href="#">Models</a></li>
+    <li><a href="#">Baselines</a></li>
+    <li><a href="#">Settings</a></li>
+  </ol>
+  <div class="find">
+    <label for="q">Find</label>
+    <input id="q" type="search" placeholder="Search runs, models, datasets">
+    <kbd title="Press / to search">/</kbd>
+  </div>
+</header>
+
+<main class="network" aria-label="Network map of last night's runs">
+  <svg class="map" viewBox="0 0 1440 512" width="1440" height="512" role="img" aria-labelledby="maptitle">
+    <title id="maptitle">Runs placed by start time, 23:00 to 02:14. Each model is a line; each run is a station.</title>
+    <rect x="90" y="0" width="226" height="480" fill="var(--zone)"/>
+    <rect x="542" y="0" width="225" height="480" fill="var(--zone)"/>
+
+    <path d="M767 88 V146" stroke="var(--grey)" stroke-width="4" fill="none"/>
+    <circle cx="767" cy="146" r="7" fill="#fff" stroke="var(--grey)" stroke-width="3"/>
+
+    <path d="M190 410 L220 440 H852" stroke="var(--planned)" stroke-width="4" stroke-dasharray="8 6" fill="none"/>
+    <circle cx="861" cy="440" r="8" fill="#fff" stroke="var(--grey)" stroke-width="3" stroke-dasharray="4 3"/>
+
+    <path d="M817 30 V480" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="3 4"/>
+
+    <path d="M40 410 H190" stroke="var(--line-brown)" stroke-width="8" fill="none"/>
+    <path d="M40 400 V420 M190 400 V420" stroke="var(--line-brown)" stroke-width="5"/>
+    <path d="M90 410 V423" stroke="var(--line-brown)" stroke-width="5"/>
+
+    <path d="M200 374 L270 304 H520" stroke="var(--line-purple)" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M520 294 V314" stroke="var(--line-purple)" stroke-width="5"/>
+    <path d="M308 304 V317" stroke="var(--line-purple)" stroke-width="5"/>
+    <g transform="translate(466 304)">
+      <circle r="13" fill="#fff" stroke="var(--closed)" stroke-width="3"/>
+      <path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="var(--closed)" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+
+    <path d="M380 276 H400 L478 198 H660" stroke="var(--line-green)" stroke-width="8" fill="none"/>
+    <path d="M380 266 V286 M660 188 V208" stroke="var(--line-green)" stroke-width="5"/>
+    <path d="M542 198 V185" stroke="var(--line-green)" stroke-width="5"/>
+    <rect x="503" y="194" width="10" height="20" rx="1" fill="#fff" stroke="var(--line-green)" stroke-width="3"/>
+
+    <path d="M360 166 H400 L478 88 H587" stroke="var(--line-blue)" stroke-width="8" fill="none"/>
+    <path d="M587 88 H767" stroke="var(--line-blue)" stroke-width="8" stroke-dasharray="13 7" fill="none"/>
+    <path d="M767 88 H904" stroke="var(--line-blue)" stroke-width="8" fill="none"/>
+    <path d="M360 156 V176" stroke="var(--line-blue)" stroke-width="5"/>
+    <path d="M587 88 V75" stroke="var(--line-blue)" stroke-width="5"/>
+    <circle cx="767" cy="88" r="11" fill="#fff" stroke="var(--ink)" stroke-width="4"/>
+    <g transform="translate(719 42)">
+      <path d="M0 -10 L10 8 H-10 Z" fill="var(--closed)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M0 -3.5 V2.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cy="5.3" r="1.2" fill="#fff"/>
+    </g>
+
+    <rect x="262" y="156" width="92" height="20" rx="10" fill="var(--line-blue)"/>
+    <text class="badge" x="308" y="170.5" text-anchor="middle">summarize-v3</text>
+    <rect x="286" y="266" width="88" height="20" rx="10" fill="var(--line-green)"/>
+    <text class="badge" x="330" y="280.5" text-anchor="middle">router-small</text>
+    <rect x="528" y="294" width="86" height="20" rx="10" fill="var(--line-purple)"/>
+    <text class="badge" x="571" y="308.5" text-anchor="middle">extract-json</text>
+    <rect x="40" y="374" width="92" height="20" rx="10" fill="var(--line-brown)"/>
+    <text class="badge" x="86" y="388.5" text-anchor="middle">chat-core-8b</text>
+
+    <text class="id" x="587" y="48" text-anchor="middle">r-2290</text>
+    <text class="v" x="587" y="64" text-anchor="middle">0.774  +0.006</text>
+
+    <text class="id" x="767" y="48" text-anchor="middle">r-2291</text>
+    <text class="v" x="767" y="64" text-anchor="middle">0.812  <tspan class="red">−0.041</tspan></text>
+
+    <text class="small red" x="604" y="112">Service change</text>
+    <text class="small" x="604" y="127">0.041 below baseline,</text>
+    <text class="small" x="604" y="142">outside the ±0.020 band</text>
+
+    <text class="id" x="781" y="143" style="font-size:13px">Baseline r-2203</text>
+    <text class="v" x="781" y="159">summarize-v2, 0.853</text>
+
+    <text class="id" x="552" y="160" text-anchor="middle">r-2289</text>
+    <text class="v" x="552" y="176" text-anchor="middle">0.931  +0.012</text>
+
+    <text class="id" x="508" y="232" text-anchor="middle">r-2288</text>
+    <text class="v" x="508" y="248" text-anchor="middle">running 62%</text>
+
+    <text class="id" x="466" y="271" text-anchor="middle">r-2287 <tspan class="red">closed</tspan></text>
+    <text class="v" x="466" y="287" text-anchor="middle">0.000  −0.884</text>
+
+    <text class="id" x="308" y="338" text-anchor="middle">r-2286</text>
+    <text class="v" x="308" y="354" text-anchor="middle">0.902  +0.000</text>
+
+    <text class="id" x="90" y="441" text-anchor="middle">r-2285</text>
+    <text class="v" x="90" y="457" text-anchor="middle">0.668  +0.021</text>
+
+    <text class="id" x="848" y="414" text-anchor="end">r-2284 queued</text>
+    <text class="v" x="848" y="430" text-anchor="end">not started, score not computed</text>
+
+    <circle cx="817" cy="20" r="7" fill="var(--ink)"/>
+    <circle cx="817" cy="20" r="2.5" fill="#fff"/>
+    <text class="id" x="804" y="25" text-anchor="end" style="font-size:13px">You are here</text>
+
+    <path d="M90 480 H840" stroke="var(--ink)" stroke-width="1.5"/>
+    <path d="M90 480 v8 M316 480 v8 M542 480 v8 M767 480 v8" stroke="var(--ink)" stroke-width="1.5"/>
+    <path d="M146.4 480 v4 M202.9 480 v4 M259.3 480 v4 M372.4 480 v4 M428.9 480 v4 M485.3 480 v4 M598.4 480 v4 M654.9 480 v4 M711.3 480 v4 M823.4 480 v4" stroke="var(--ink)" stroke-width="1"/>
+    <text class="hr" x="90" y="501" text-anchor="middle">23:00</text>
+    <text class="hr" x="316" y="501" text-anchor="middle">00:00</text>
+    <text class="hr" x="542" y="501" text-anchor="middle">01:00</text>
+    <text class="hr" x="767" y="501" text-anchor="middle">02:00</text>
+    <text class="small" x="20" y="484">Start time</text>
+    <text class="hr" x="836" y="501">now 02:14</text>
+  </svg>
+
+  <aside class="key" aria-label="Key">
+    <h2>Key</h2>
+    <ul>
+      <li><svg width="30" height="8"><path d="M0 4H30" stroke="var(--line-blue)" stroke-width="8"/></svg>summarize-v3</li>
+      <li><svg width="30" height="8"><path d="M0 4H30" stroke="var(--line-green)" stroke-width="8"/></svg>router-small</li>
+      <li><svg width="30" height="8"><path d="M0 4H30" stroke="var(--line-purple)" stroke-width="8"/></svg>extract-json</li>
+      <li><svg width="30" height="8"><path d="M0 4H30" stroke="var(--line-brown)" stroke-width="8"/></svg>chat-core-8b</li>
+      <li class="sep"><svg width="30" height="16"><path d="M0 11H30" stroke="var(--ink)" stroke-width="6"/><path d="M15 11V2" stroke="var(--ink)" stroke-width="4"/></svg>Run finished, scored</li>
+      <li><svg width="30" height="16"><path d="M0 8H30" stroke="var(--ink)" stroke-width="6"/><rect x="11" y="2" width="8" height="14" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/></svg>Running now</li>
+      <li><svg width="30" height="16"><circle cx="15" cy="8" r="6" fill="#fff" stroke="var(--ink)" stroke-width="3"/></svg>Selected run, meets its baseline</li>
+      <li><svg width="30" height="16"><path d="M0 8H30" stroke="var(--ink)" stroke-width="6" stroke-dasharray="7 4"/></svg>Service change: outside ±0.020</li>
+      <li><svg width="30" height="16"><circle cx="15" cy="8" r="7" fill="#fff" stroke="var(--closed)" stroke-width="2.5"/><path d="M11.5 4.5l7 7m0-7l-7 7" stroke="var(--closed)" stroke-width="2.5"/></svg>Closed: run failed</li>
+      <li><svg width="30" height="16"><path d="M0 8H30" stroke="var(--planned)" stroke-width="4" stroke-dasharray="6 4"/></svg>Planned: queued</li>
+      <li class="sep"><span class="dash">—</span>Not computed yet</li>
+      <li><span class="dash num" style="font-size:12px">0.000</span>Computed, scored zero</li>
+    </ul>
+  </aside>
+
+  <div class="notice" role="note">
+    <b>Closed: r-2287 failed.</b> Not a regression.
+    <code>KeyError: 'line_items' — 212 of 212 samples failed schema validation</code>
+    Fix the extractor's output schema, then rerun.
+  </div>
+
+  <aside class="station" aria-labelledby="st-title">
+    <div class="st-head">
+      <div class="code"><span>r-2291</span>Passed in 14m 02s. Triggered by schedule at 02:00.</div>
+      <h1 id="st-title">summarize-v3 on news-digest-2k</h1>
+      <div class="score"><b>0.812</b><em>−0.041</em></div>
+      <div class="base">Baseline summarize-v2 @ r-2203 (0.853)</div>
+    </div>
+    <p class="change">
+      <svg width="16" height="15" viewBox="-10 -11 20 20" aria-hidden="true"><path d="M0 -10 L10 8 H-10 Z" fill="#fff"/><path d="M0 -3.5 V2.5" stroke="var(--closed)" stroke-width="2.2" stroke-linecap="round"/><circle cy="5.3" r="1.2" fill="var(--closed)"/></svg>
+      <span><b>Service change.</b> Score fell 0.041 below baseline, twice the ±0.020 noise band. Treat this as a regression, not noise.</span>
+    </p>
+    <div class="st-body">
+      <div>
+        <h2>Metrics</h2>
+        <table class="metrics">
+          <thead><tr><th>Metric</th><th>Score</th><th>Base</th><th>Δ</th></tr></thead>
+          <tbody>
+            <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td>−0.035</td></tr>
+            <tr class="lead"><td>Faithfulness</td><td>0.861</td><td>0.902</td><td>−0.041</td></tr>
+            <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td>−0.011</td></tr>
+            <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td>+0.16</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <figure class="chart" style="margin:0">
+        <h2>On-time performance, last 12 runs</h2>
+        <svg width="230" height="122" viewBox="0 0 230 122" role="img" aria-label="Score of the last 12 summarize-v3 runs on news-digest-2k. Eleven runs sit between 0.846 and 0.857 inside the noise band 0.833 to 0.873; the latest, r-2291, drops to 0.812 below it.">
+          <rect x="30" y="16.75" width="196" height="50" fill="var(--zone)"/>
+          <text x="34" y="27">noise band 0.833–0.873</text>
+          <path d="M30 41.75 H226" stroke="var(--grey)" stroke-width="1" stroke-dasharray="3 3"/>
+          <text x="0" y="12">0.88</text><text x="0" y="62">0.84</text><text x="0" y="111">0.80</text>
+          <path d="M30 108 H226" stroke="var(--ink)" stroke-width="1"/>
+          <polyline points="34,50.5 51.5,44.25 68.9,46.75 86.4,39.25 103.8,41.75 121.3,45.5 138.7,36.75 156.2,43 173.6,48 191.1,44.25 208.5,41.75" fill="none" stroke="var(--line-blue)" stroke-width="3.5" stroke-linejoin="round"/>
+          <path d="M208.5 41.75 L226 93" stroke="var(--line-blue)" stroke-width="3.5" stroke-dasharray="5 3"/>
+          <g fill="#fff" stroke="var(--line-blue)" stroke-width="2">
+            <circle cx="34" cy="50.5" r="2.6"/><circle cx="51.5" cy="44.25" r="2.6"/><circle cx="68.9" cy="46.75" r="2.6"/><circle cx="86.4" cy="39.25" r="2.6"/><circle cx="103.8" cy="41.75" r="2.6"/><circle cx="121.3" cy="45.5" r="2.6"/><circle cx="138.7" cy="36.75" r="2.6"/><circle cx="156.2" cy="43" r="2.6"/><circle cx="173.6" cy="48" r="2.6"/><circle cx="191.1" cy="44.25" r="2.6"/><circle cx="208.5" cy="41.75" r="2.6"/>
+          </g>
+          <circle cx="226" cy="93" r="4.5" fill="#fff" stroke="var(--ink)" stroke-width="2.5"/>
+          <text x="219" y="96" text-anchor="end" style="fill:var(--closed);font-weight:700">0.812</text>
+          <text x="30" y="121">12 runs ago</text>
+          <text x="226" y="121" text-anchor="end">r-2291</text>
+        </svg>
+      </figure>
+      <section class="notices" aria-label="Service notices, log tail">
+        <h2>Service notices</h2>
+<ol><li>02:13:48  eval  1996/2000 samples scored</li><li>02:13:55  eval  2000/2000 samples scored</li><li>02:13:55  <b>warn  length_ratio above 1.15 on 38% of samples</b></li><li>02:14:01  agg   faithfulness=0.861 (baseline 0.902)</li><li>02:14:02  done  run r-2291 finished in 14m 02s</li></ol>
+      </section>
+      <div class="acts">
+        <button class="btn primary">Rerun evaluation</button>
+        <button class="btn">Compare with baseline</button>
+        <button class="btn" disabled aria-describedby="cancel-why">Cancel run</button>
+        <p><span id="cancel-why">Cancel is unavailable: r-2291 finished at 02:14:02.</span> Pinned comparisons: none yet.</p>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<section class="board" aria-labelledby="board-title">
+  <div class="board-head">
+    <h2 id="board-title">Runs, 23:00 to 02:14</h2>
+    <ul class="counts">
+      <li><b>8</b>runs</li><li><b>5</b>passed</li><li class="bad"><b>1</b>failed</li><li><b>1</b>running</li><li><b>1</b>queued</li>
+    </ul>
+    <p class="legend"><b>—</b> not computed yet &nbsp; <b>0.000</b> computed, scored zero</p>
+  </div>
+  <table class="dep">
+    <thead>
+      <tr><th></th><th>Start</th><th>Run</th><th>Line</th><th>Dataset</th><th class="r">Score</th><th class="r">Δ base</th><th>Status</th><th>Duration</th><th>By</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><i class="bullet" style="--c:var(--line-green)"></i></td><td><span class="f n5">00:51</span></td><td><span class="f n6">r-2288</span></td><td><span class="f n12">router-small</span></td><td><span class="f n28">adversarial-prompts</span></td><td><span class="f n5">    —</span></td><td><span class="f n6">     —</span></td><td><span class="f n11 white">Running 62%</span></td><td><span class="f n13">9m 10s so far</span></td><td><span class="f n9">CI #4812</span></td></tr>
+      <tr class="cont"><td></td><td></td><td></td><td></td><td><span class="lit" role="img" aria-label="62 percent of samples scored"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></span></td><td colspan="5"></td></tr>
+      <tr><td><i class="bullet" style="--c:var(--line-brown)"></i></td><td><span class="f n5 dim">  —</span></td><td><span class="f n6">r-2284</span></td><td><span class="f n12">chat-core-8b</span></td><td><span class="f n28">safety-refusals</span></td><td><span class="f n5">    —</span></td><td><span class="f n6">     —</span></td><td><span class="f n11 dim">Queued</span></td><td><span class="f n13 dim">      —</span></td><td><span class="f n9">schedule</span></td></tr>
+      <tr class="split"><th colspan="10">Arrived, newest first</th></tr>
+      <tr class="sel"><td><i class="bullet sel" style="--c:var(--line-blue)"></i></td><td><span class="f n5">02:00</span></td><td><span class="f n6">r-2291</span></td><td><span class="f n12">summarize-v3</span></td><td><span class="f n28">news-digest-2k</span></td><td><span class="f n5">0.812</span></td><td><span class="f n6 red">−0.041</span></td><td><span class="f n11">Passed</span></td><td><span class="f n13">14m 02s</span></td><td><span class="f n9">schedule</span></td></tr>
+      <tr class="cont sel"><td></td><td></td><td></td><td></td><td><span class="f n28 red">Service change: regression</span></td><td colspan="5"></td></tr>
+      <tr><td><i class="bullet" style="--c:var(--line-blue)"></i></td><td><span class="f n5">01:12</span></td><td><span class="f n6">r-2290</span></td><td><span class="f n12">summarize-v3</span></td><td><span class="f n28" title="multilingual-legal-contracts-longform-eval-2026-q3">multilingual-legal-contracts</span></td><td><span class="f n5">0.774</span></td><td><span class="f n6">+0.006</span></td><td><span class="f n11">Passed</span></td><td><span class="f n13">41m 55s</span></td><td><span class="f n9">M. Okafor</span></td></tr>
+      <tr class="cont"><td></td><td></td><td></td><td></td><td><span class="f n28">-longform-eval-2026-q3</span></td><td colspan="5"></td></tr>
+      <tr><td><i class="bullet" style="--c:var(--line-green)"></i></td><td><span class="f n5">01:00</span></td><td><span class="f n6">r-2289</span></td><td><span class="f n12">router-small</span></td><td><span class="f n28">intent-routing-v7</span></td><td><span class="f n5">0.931</span></td><td><span class="f n6">+0.012</span></td><td><span class="f n11">Passed</span></td><td><span class="f n13">3m 48s</span></td><td><span class="f n9">schedule</span></td></tr>
+      <tr><td><i class="bullet" style="--c:var(--line-purple)"></i></td><td><span class="f n5">00:40</span></td><td><span class="f n6">r-2287</span></td><td><span class="f n12">extract-json</span></td><td><span class="f n28">invoices-ocr</span></td><td><span class="f n5">0.000</span></td><td><span class="f n6">−0.884</span></td><td><span class="f n11 red">Failed</span></td><td><span class="f n13">0m 41s</span></td><td><span class="f n9">CI #4809</span></td></tr>
+      <tr><td><i class="bullet" style="--c:var(--line-purple)"></i></td><td><span class="f n5">23:58</span></td><td><span class="f n6">r-2286</span></td><td><span class="f n12">extract-json</span></td><td><span class="f n28">receipts-small</span></td><td><span class="f n5">0.902</span></td><td><span class="f n6">+0.000</span></td><td><span class="f n11">Passed</span></td><td><span class="f n13">2m 15s</span></td><td><span class="f n9">L. Brandt</span></td></tr>
+      <tr><td><i class="bullet" style="--c:var(--line-brown)"></i></td><td><span class="f n5">23:00</span></td><td><span class="f n6">r-2285</span></td><td><span class="f n12">chat-core-8b</span></td><td><span class="f n28">helpfulness-pairwise</span></td><td><span class="f n5">0.668</span></td><td><span class="f n6">+0.021</span></td><td><span class="f n11">Passed</span></td><td><span class="f n13">1h 06m</span></td><td><span class="f n9">schedule</span></td></tr>
+    </tbody>
+  </table>
+</section>
+</body>
+</html>

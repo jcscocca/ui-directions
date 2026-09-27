@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap");
+
+:root {
+  --font-letter: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-value: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  --paper: #EEF3F4;
+  --tint: #DCE8EA;
+  --grid: #D2E0E3;
+  --grid-major: #B4CCD1;
+  --line-thin: #8FB0B7;
+  --cyan: #0E5A6B;
+  --ink: #13262B;
+  --muted: #4A6970;
+  --redline: #C8452C;
+  --redline-text: #B23A22;
+
+  --w-border: 2px;
+  --w-visible: 1.5px;
+  --w-hair: 1px;
+  --dash-hidden: 4px 3px;
+
+  --t-label: 11px;
+  --t-small: 13px;
+  --t-body: 15px;
+  --t-sub: 18px;
+  --t-title: 24px;
+  --t-display: 44px;
+
+  --u: 4px;
+  --row: 32px;
+  --radius: 0;
+}

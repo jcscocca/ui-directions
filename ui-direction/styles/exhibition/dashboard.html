@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evals: runs, atlas-research</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--wall);
+  color: var(--ink);
+  font: 400 var(--t-label)/1.45 var(--font-label);
+  font-variant-numeric: lining-nums;
+  min-width: 1440px;
+}
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.bad { color: var(--danger); }
+.num, .metrics td, .log span:nth-child(3n+1) { font-variant-numeric: tabular-nums lining-nums; }
+.sign { font-family: var(--font-label); font-weight: 300; }
+
+.stage { position: relative; width: 1440px; height: 900px; overflow: hidden; }
+
+/* header: set small on the wall, like the exhibition title by the door */
+.masthead { position: absolute; left: 56px; top: 26px; width: 840px; display: flex; align-items: baseline; gap: 30px; }
+.masthead h1 { margin: 0; font: italic 500 30px/1 var(--font-object); letter-spacing: -0.01em; }
+.masthead .ws { font-size: var(--t-label); color: var(--muted); margin-left: -20px; white-space: nowrap; }
+.masthead nav { display: flex; gap: 16px; font-size: 14px; }
+.masthead nav a { color: var(--muted); padding-bottom: 3px; }
+.masthead nav a:hover { color: var(--ink); }
+.masthead nav a[aria-current] { color: var(--ink); border-bottom: var(--rule); }
+.masthead nav small { font-size: 12px; font-style: italic; }
+.search { margin-left: auto; display: flex; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--ink); padding-bottom: 3px; }
+.search input { border: 0; background: transparent; font: 14px var(--font-label); color: var(--ink); width: 214px; padding: 0; }
+.search input::placeholder { color: var(--muted); }
+.search input:focus { outline: none; }
+.search:focus-within { border-bottom: 2px solid var(--brass); padding-bottom: 2px; }
+.search kbd { font: 12px var(--font-label); color: var(--muted); border: 1px solid var(--muted); padding: 0 5px; }
+
+/* exhibits: a numeral hung on the wall with a small label; size = score x 100px */
+.exhibit { position: absolute; display: block; }
+.exhibit .n { display: block; font-family: var(--font-object); font-weight: 400; line-height: 0.8; letter-spacing: -0.02em; font-optical-sizing: auto; }
+.exhibit .label { display: block; margin-top: 12px; width: 220px; font-size: var(--t-caption); line-height: 1.45; color: var(--muted); }
+.exhibit .label i { display: block; font: normal 600 13px/1.35 var(--font-label); color: var(--ink); margin-bottom: 2px; overflow-wrap: anywhere; }
+.exhibit .label b { color: var(--ink); font-weight: 600; }
+.exhibit .label b.bad, .exhibit .label .err { color: var(--danger); }
+.exhibit:hover .n { color: var(--room); }
+.exhibit:hover .label i { text-decoration: underline; text-decoration-color: var(--brass); text-underline-offset: 3px; }
+
+/* unscored runs hang as an empty space on the wall */
+.vacant { display: flex; align-items: center; justify-content: center; width: 124px; height: 72px; border: 1px dashed var(--muted); font: 300 30px/1 var(--font-label); color: var(--muted); position: relative; }
+.vacant .rail { position: absolute; left: -1px; bottom: -1px; height: 3px; background: var(--brass); }
+
+/* the centerpiece */
+.center-n { position: absolute; left: 40px; top: 262px; margin: 0; font: 400 var(--t-centerpiece)/0.78 var(--font-object); letter-spacing: -0.035em; font-optical-sizing: auto; }
+.wall-label { position: absolute; left: 616px; top: 268px; width: 270px; font-size: var(--t-label); line-height: 1.45; }
+.wall-label h2 { margin: 0 0 4px; font: 600 19px/1.25 var(--font-label); letter-spacing: -0.005em; }
+.wall-label p { margin: 0 0 8px; }
+.wall-label .meta { color: var(--muted); }
+.wall-label .delta { font: 400 34px/1 var(--font-object); color: var(--danger); margin: 10px 0 2px; letter-spacing: -0.01em; }
+.center-actions { position: absolute; left: 56px; top: 452px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { font: 600 13px/1 var(--font-label); padding: 10px 14px; border: 1px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }
+.btn.primary { background: var(--ink); color: var(--wall); }
+.btn.primary:hover { background: var(--room); border-color: var(--room); }
+.btn:not(.primary):not(:disabled):hover { background: var(--mat); }
+.btn:disabled { border-style: dashed; border-color: #A9A79F; color: #8D8B84; cursor: not-allowed; }
+.reason { font-size: var(--t-caption); color: var(--muted); margin: 7px 0 0; }
+
+/* the painted room */
+.room { position: absolute; left: 944px; top: 0; width: 496px; height: 698px; background: var(--room); color: var(--on-room); padding: 36px 44px 0 44px; }
+.room h2 { margin: 0 0 10px; font: italic 400 30px/1.05 var(--font-object); letter-spacing: -0.01em; }
+.room .intro { font-size: 14px; line-height: 1.5; margin: 0 0 16px; }
+.room .intro b { font-weight: 600; color: var(--danger-on-room); }
+.print { margin: 0; background: var(--mat); border: 1px solid var(--brass); padding: 12px 14px 6px; width: 408px; }
+.print svg { display: block; }
+.caption { font-size: var(--t-caption); color: var(--on-room-muted); margin: 8px 0 12px; line-height: 1.4; }
+.room h3 { margin: 0 0 4px; font: 600 var(--t-caption)/1.4 var(--font-label); color: var(--on-room-muted); }
+.metrics { width: 408px; border-collapse: collapse; font-size: 14px; margin-bottom: 14px; }
+.metrics th { font-weight: 400; font-size: var(--t-caption); color: var(--on-room-muted); text-align: right; padding: 0 0 3px; }
+.metrics th:first-child, .metrics td:first-child { text-align: left; }
+.metrics td { font-variant-numeric: tabular-nums; text-align: right; padding: 3px 0; border-top: 1px solid rgba(168,139,74,.55); }
+.metrics .worst td { font-weight: 600; }
+.metrics .worst td:last-child { color: var(--danger-on-room); }
+.log { display: grid; grid-template-columns: 62px 38px 1fr; font-size: var(--t-caption); line-height: 1.5; column-gap: 8px; }
+.log span:nth-child(3n+1), .log span:nth-child(3n+2) { color: var(--on-room-muted); }
+
+/* catalogue checklist */
+.checklist { position: absolute; left: 56px; right: 48px; top: 712px; }
+.checklist header { display: flex; align-items: baseline; gap: 22px; border-bottom: var(--rule); padding-bottom: 5px; }
+.checklist h2 { margin: 0; font: italic 400 20px/1 var(--font-object); }
+.checklist header p { margin: 0; font-size: var(--t-caption); color: var(--muted); }
+.checklist header p b { color: var(--ink); font-weight: 600; }
+.checklist table { width: 100%; border-collapse: collapse; font-size: var(--t-caption); }
+.checklist th { font-weight: 400; color: var(--muted); text-align: left; padding: 4px 12px 1px 0; }
+.checklist td { padding: 0 12px 0 0; line-height: 16px; white-space: nowrap; }
+.checklist th.num, .checklist td.num { text-align: right; }
+.checklist tr.on-view td { font-weight: 600; }
+.checklist .onview { font: italic 400 12px var(--font-object); color: var(--brass); }
+.checklist tbody tr:hover td { background: var(--mat); }
+.checklist a:hover { text-decoration: underline; text-decoration-color: var(--brass); }
+</style>
+</head>
+<body>
+<div class="stage">
+
+<header class="masthead">
+  <h1>Evals</h1>
+  <span class="ws">atlas-research</span>
+  <nav aria-label="Sections">
+    <a href="#" aria-current="page">Runs</a>
+    <a href="#">Datasets</a>
+    <a href="#">Models</a>
+    <a href="#">Baselines</a>
+    <a href="#">Settings</a>
+  </nav>
+  <label class="search"><input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets"><kbd>/</kbd></label>
+</header>
+
+<!-- upper hang: numeral size = score x 100px -->
+<a class="exhibit" href="#" style="left:56px; top:84px">
+  <span class="n" style="font-size:93px">0.931</span>
+  <span class="label"><i>router-small on intent-routing-v7</i><b>r-2289</b>, passed, +0.012. 3m 48s from 01:00, triggered by schedule.</span>
+</a>
+<a class="exhibit" href="#" style="left:352px; top:108px">
+  <span class="n" style="font-size:90px">0.902</span>
+  <span class="label"><i>extract-json on receipts-small</i><b>r-2286</b>, passed, +0.000. 2m 15s from 23:58, triggered by L. Brandt.</span>
+</a>
+<a class="exhibit" href="#" style="left:648px; top:80px">
+  <span class="n" style="font-size:77px">0.774</span>
+  <span class="label" style="width:238px"><i>summarize-v3 on multilingual-legal-contracts-longform-eval-2026-q3</i><b>r-2290</b>, passed, +0.006. 41m 55s from 01:12, triggered by M. Okafor.</span>
+</a>
+
+<!-- centerpiece -->
+<p class="center-n" aria-label="r-2291 scored 0.812">0.812</p>
+<div class="wall-label">
+  <h2>summarize-v3 on news-digest-2k</h2>
+  <p class="meta">r-2291. Thu 24 Sep, 02:00&ndash;02:14.</p>
+  <p>Medium: ROUGE-L, faithfulness, coverage and length ratio over 2,000 samples.</p>
+  <p class="meta">Provenance: triggered by schedule. Baseline summarize-v2 @ r-2203 (0.853).</p>
+  <div class="delta"><span class="sign">&minus;</span>0.041</div>
+  <p>against baseline. Twice the &plusmn;0.020 noise band, so a regression, not noise.</p>
+</div>
+<div class="center-actions">
+  <div class="actions">
+    <button class="btn primary" type="button">Rerun</button>
+    <button class="btn" type="button">Compare with baseline</button>
+    <button class="btn" type="button" disabled>Cancel</button>
+  </div>
+  <p class="reason">Cancel is unavailable: r-2291 finished at 02:14:02.<br>Pinned comparisons: none yet.</p>
+</div>
+
+<!-- lower hang -->
+<a class="exhibit" href="#" style="left:56px; top:560px">
+  <span class="n" style="font-size:67px">0.668</span>
+  <span class="label" style="width:180px"><i>chat-core-8b on helpfulness-pairwise</i><b>r-2285</b>, passed, +0.021. 1h 06m from 23:00, schedule.</span>
+</a>
+<a class="exhibit" href="#" style="left:266px; top:548px">
+  <span class="vacant">&mdash;<span class="rail" style="width:62%"></span></span>
+  <span class="label" style="width:172px"><i>router-small on adversarial-prompts</i><b>r-2288</b>, running, 62%. 9m 10s so far, from 00:51, CI #4812.</span>
+</a>
+<a class="exhibit" href="#" style="left:460px; top:560px">
+  <span class="n bad" style="font-size:28px">0.000</span>
+  <span class="label" style="width:250px"><i>extract-json on invoices-ocr</i><b class="bad">r-2287 failed</b> after 0m 41s (CI #4809, 00:40). &minus;0.884. <span class="err">KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation.</span> Fix the output schema, then rerun.</span>
+</a>
+<a class="exhibit" href="#" style="left:742px; top:548px">
+  <span class="vacant">&mdash;</span>
+  <span class="label" style="width:172px"><i>chat-core-8b on safety-refusals</i><b>r-2284</b>, queued by schedule. Not started.</span>
+</a>
+
+<!-- the painted room -->
+<section class="room" aria-labelledby="room-title">
+  <h2 id="room-title">Why 0.812 is a regression</h2>
+  <p class="intro">Its baseline, summarize-v2 at r-2203, scored 0.853, and the eleven runs before it all sat inside the &plusmn;0.020 band. This one is <b>0.021 below the band</b>. Faithfulness fell most, and the summaries ran long: length ratio 1.18 against 1.02.</p>
+  <figure class="print">
+    <svg width="380" height="128" viewBox="0 0 380 128" role="img" aria-label="Score over the last 12 runs">
+      <rect x="30" y="19.5" width="346" height="54" fill="#2F4A3A" fill-opacity="0.10"/>
+      <line x1="30" y1="46.5" x2="376" y2="46.5" stroke="#A88B4A" stroke-dasharray="3 3"/>
+      <line x1="30" y1="118" x2="376" y2="118" stroke="#1A1A1A" stroke-width="0.6" opacity="0.5"/>
+      <polyline fill="none" stroke="#1A1A1A" stroke-width="1.2" points="38.0,55.9 68.0,49.2 98.0,51.9 128.0,43.8 158.0,46.5 188.0,50.5 218.0,41.1 248.0,47.8 278.0,53.2 308.0,49.2 338.0,46.5 368.0,101.8"/>
+      <g fill="#1A1A1A"><circle cx="38.0" cy="55.9" r="2"/><circle cx="68.0" cy="49.2" r="2"/><circle cx="98.0" cy="51.9" r="2"/><circle cx="128.0" cy="43.8" r="2"/><circle cx="158.0" cy="46.5" r="2"/><circle cx="188.0" cy="50.5" r="2"/><circle cx="218.0" cy="41.1" r="2"/><circle cx="248.0" cy="47.8" r="2"/><circle cx="278.0" cy="53.2" r="2"/><circle cx="308.0" cy="49.2" r="2"/><circle cx="338.0" cy="46.5" r="2"/></g>
+      <circle cx="368" cy="101.8" r="4" fill="#A3262A"/>
+      <g font-family="Schibsted Grotesk, sans-serif" font-size="10" fill="#5C5B55">
+        <text x="26" y="23" text-anchor="end">.873</text>
+        <text x="26" y="50" text-anchor="end">.853</text>
+        <text x="26" y="77" text-anchor="end">.833</text>
+        <text x="26" y="121" text-anchor="end">.800</text>
+      </g>
+      <text x="358" y="106" text-anchor="end" font-family="Bodoni Moda, serif" font-style="italic" font-size="15" fill="#A3262A">0.812</text>
+    </svg>
+  </figure>
+  <p class="caption">Score of summarize-v3 on news-digest-2k, last 12 runs, oldest to newest. Shaded: noise band 0.833&ndash;0.873. Dashed: baseline 0.853.</p>
+  <table class="metrics">
+    <thead><tr><th>Metric</th><th>Score</th><th>Baseline</th><th>&Delta;</th></tr></thead>
+    <tbody>
+      <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td>&minus;0.035</td></tr>
+      <tr class="worst"><td>Faithfulness</td><td>0.861</td><td>0.902</td><td>&minus;0.041</td></tr>
+      <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td>&minus;0.011</td></tr>
+      <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td>+0.16</td></tr>
+    </tbody>
+  </table>
+  <h3>Log tail</h3>
+  <div class="log">
+    <span>02:13:48</span><span>eval</span><span>1996/2000 samples scored</span>
+    <span>02:13:55</span><span>eval</span><span>2000/2000 samples scored</span>
+    <span>02:13:55</span><span>warn</span><span>length_ratio above 1.15 on 38% of samples</span>
+    <span>02:14:01</span><span>agg</span><span>faithfulness=0.861 (baseline 0.902)</span>
+    <span>02:14:02</span><span>done</span><span>run r-2291 finished in 14m 02s</span>
+  </div>
+</section>
+
+<!-- catalogue checklist -->
+<section class="checklist" aria-labelledby="cl-title">
+  <header>
+    <h2 id="cl-title">Checklist</h2>
+    <p><b>8 runs</b> last night: 5 passed, 1 failed, 1 running, 1 queued. On the wall, each numeral hangs at 100px per point of score. An empty frame and <b>&mdash;</b> mean not computed yet; <b>0.000</b> is a computed score of zero.</p>
+  </header>
+  <table>
+    <thead><tr><th>Run</th><th>Model</th><th>Dataset</th><th class="num">Score</th><th class="num">&Delta; vs baseline</th><th>Status</th><th class="num">Duration</th><th>Triggered by</th><th class="num">Started</th></tr></thead>
+    <tbody>
+      <tr class="on-view"><td>r-2291 <span class="onview">on view</span></td><td>summarize-v3</td><td>news-digest-2k</td><td class="num">0.812</td><td class="num bad">&minus;0.041</td><td>Passed, <span class="bad">regressed</span></td><td class="num">14m 02s</td><td>schedule</td><td class="num">02:00</td></tr>
+      <tr><td><a href="#">r-2290</a></td><td>summarize-v3</td><td>multilingual-legal-contracts-longform-eval-2026-q3</td><td class="num">0.774</td><td class="num">+0.006</td><td>Passed</td><td class="num">41m 55s</td><td>M. Okafor</td><td class="num">01:12</td></tr>
+      <tr><td><a href="#">r-2289</a></td><td>router-small</td><td>intent-routing-v7</td><td class="num">0.931</td><td class="num">+0.012</td><td>Passed</td><td class="num">3m 48s</td><td>schedule</td><td class="num">01:00</td></tr>
+      <tr><td><a href="#">r-2288</a></td><td>router-small</td><td>adversarial-prompts</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td>Running, 62%</td><td class="num">9m 10s so far</td><td>CI #4812</td><td class="num">00:51</td></tr>
+      <tr><td><a href="#">r-2287</a></td><td>extract-json</td><td>invoices-ocr</td><td class="num">0.000</td><td class="num">&minus;0.884</td><td class="bad">Failed</td><td class="num">0m 41s</td><td>CI #4809</td><td class="num">00:40</td></tr>
+      <tr><td><a href="#">r-2286</a></td><td>extract-json</td><td>receipts-small</td><td class="num">0.902</td><td class="num">+0.000</td><td>Passed</td><td class="num">2m 15s</td><td>L. Brandt</td><td class="num">23:58</td></tr>
+      <tr><td><a href="#">r-2285</a></td><td>chat-core-8b</td><td>helpfulness-pairwise</td><td class="num">0.668</td><td class="num">+0.021</td><td>Passed</td><td class="num">1h 06m</td><td>schedule</td><td class="num">23:00</td></tr>
+      <tr><td><a href="#">r-2284</a></td><td>chat-core-8b</td><td>safety-refusals</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td>Queued</td><td class="num">&mdash;</td><td>schedule</td><td class="num">&mdash;</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:400 var(--t-15)/1.4 var(--font-sign);padding-bottom:76px;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+h2{margin:0;font-size:var(--t-15);font-weight:800}
+
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--rule)}
+.top b{font-weight:900;font-size:var(--t-22);line-height:1}
+.top time{margin-left:auto;font-weight:700;font-size:var(--t-15)}
+
+.book{display:grid;grid-template-columns:84px 1fr;gap:14px;padding:16px 16px 6px}
+.cover{width:84px;height:124px;background:var(--line-blue);color:#fff;border-radius:3px;padding:9px 8px 8px;display:flex;flex-direction:column;overflow:hidden}
+.cover strong{font:800 12px/1.08 var(--font-sign);text-transform:uppercase;letter-spacing:.01em}
+.cover svg{margin:auto 0 6px -8px;display:block}
+.cover small{font:600 9px/1.1 var(--font-sign)}
+.book h1{margin:0 0 4px;font-size:var(--t-22);line-height:1.12;font-weight:800;letter-spacing:-.005em}
+.book p{margin:0;font-size:var(--t-15)}
+.book .meta{margin-top:6px;font-size:var(--t-13);color:var(--ink-2)}
+.book .label{font-size:var(--t-12);font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.book .label i{width:14px;height:6px;background:var(--line-blue);border-radius:3px}
+
+.route{padding:4px 16px 0}
+.route svg{display:block;width:100%;height:auto}
+.route svg text{font-family:var(--font-sign);fill:var(--ink);font-variant-numeric:tabular-nums}
+.pages{display:flex;align-items:baseline;gap:8px;margin:2px 0 0;font-variant-numeric:tabular-nums}
+.pages b{font-size:var(--t-44);font-weight:900;line-height:1;letter-spacing:-.02em}
+.pages span{font-size:var(--t-18);font-weight:700}
+.pages em{margin-left:auto;font-style:normal;font-size:var(--t-15);color:var(--ink-2)}
+
+.board{margin:14px 16px 0;background:var(--board);border-radius:var(--r-sign);padding:10px 12px 12px;color:#D4D8DC;--cell:17px}
+.board h2{color:#fff;font-size:var(--t-13);margin-bottom:6px;display:flex;justify-content:space-between}
+.board h2 span{font-weight:400;color:#C9CED3}
+.row{display:flex;align-items:center;gap:10px;font-size:var(--t-13)}
+.row + .row{margin-top:6px}
+.row .k{width:64px;flex:none}
+.f{display:inline-block;box-sizing:border-box;width:calc(var(--n) * var(--cell));height:26px;white-space:pre;overflow:hidden;vertical-align:middle;
+  font:700 20px/27px var(--font-board);letter-spacing:calc(var(--cell) - 1ch);padding-left:calc((var(--cell) - 1ch) / 2);color:var(--flap-ink);
+  background:
+    linear-gradient(var(--flap-hinge),var(--flap-hinge)) 0 13px / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg,var(--flap) 0 calc(var(--cell) - 2px),transparent calc(var(--cell) - 2px) var(--cell));
+  border-radius:var(--r-flap)}
+.journey{padding:12px 16px 0}
+.journey svg{display:block;width:100%;height:auto}
+.journey p{margin:4px 0 0;font-size:var(--t-13)}
+.journey p b{font-weight:800}
+
+.log{display:block;width:calc(100% - 32px);margin:14px 16px 0;height:52px;border:0;border-radius:var(--r-sign);background:var(--ink);color:#fff;font:800 var(--t-18) var(--font-sign);padding-top:3px;cursor:pointer}
+.log:hover{background:#2A3139}
+.log:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+.next{padding:26px 16px 0}
+.next h2{margin-bottom:2px}
+.next .sub{margin:0 0 10px;font-size:var(--t-13);color:var(--ink-2)}
+.next ol{list-style:none;margin:0;padding:0;position:relative}
+.next ol::before{content:"";position:absolute;left:9px;top:10px;bottom:22px;width:5px;background:var(--ink)}
+.next li{position:relative;display:grid;grid-template-columns:44px 1fr auto;gap:0 8px;padding:0 0 14px;align-items:start}
+.next li::before{content:"";position:absolute;left:0;top:2px;width:23px;height:23px;border:4px solid var(--ink);border-radius:50%;background:#fff;box-sizing:border-box}
+.next li::after{content:"";position:absolute;left:22px;top:10px;width:16px;height:7px;background:var(--c)}
+.next .t{grid-column:2;font-weight:800;font-size:var(--t-15);line-height:1.25;overflow-wrap:anywhere;min-width:0}
+.next .a{grid-column:2;font-size:var(--t-13);color:var(--ink-2)}
+.next .pp{grid-column:3;grid-row:1;font-size:var(--t-13);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;padding-top:1px}
+
+.quote{margin:12px 16px 0;border:2px solid var(--ink);border-radius:var(--r-sign);overflow:hidden}
+.quote header{background:var(--ink);color:#fff;font-size:var(--t-13);font-weight:700;padding:5px 12px 3px;display:flex;justify-content:space-between}
+.quote blockquote{margin:0;padding:10px 12px 12px;font-size:var(--t-18);line-height:1.35;font-weight:600}
+
+.tabs{position:fixed;left:0;right:0;bottom:0;height:66px;background:#fff;border-top:1px solid var(--rule);margin:0;padding:0 16px;list-style:none;display:grid;grid-template-columns:repeat(4,1fr)}
+.tabs::before{content:"";position:absolute;left:16px;right:16px;top:17px;height:4px;background:var(--rule)}
+.tabs a{position:relative;display:block;height:100%;padding-top:30px;text-decoration:none;font-size:var(--t-13);color:var(--ink-2)}
+.tabs a::before{content:"";position:absolute;left:1px;top:13px;width:5px;height:12px;background:var(--grey)}
+.tabs a[aria-current]{color:var(--ink);font-weight:800}
+.tabs a[aria-current]::before{left:-4px;top:10px;width:18px;height:18px;border:4px solid var(--ink);border-radius:50%;background:#fff;box-sizing:border-box}
+.tabs a:focus-visible{outline-offset:-3px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <svg width="26" height="26" viewBox="0 0 30 30" aria-hidden="true"><path d="M2 22 H11 L21 12 H28" fill="none" stroke="var(--line-blue)" stroke-width="5"/><circle cx="21" cy="12" r="5.5" fill="#fff" stroke="var(--ink)" stroke-width="3"/></svg>
+  <b>Shelf</b>
+  <time datetime="2026-09-24">Thu 24 Sep</time>
+</header>
+
+<main>
+  <section class="book" aria-labelledby="cur">
+    <div class="cover" aria-hidden="true">
+      <strong>The Left Hand of Darkness</strong>
+      <svg width="84" height="28" viewBox="0 0 84 28"><path d="M0 22 H30 L46 6 H84" fill="none" stroke="#fff" stroke-width="4"/><circle cx="46" cy="6" r="4.5" fill="var(--line-blue)" stroke="#fff" stroke-width="2.5"/></svg>
+      <small>Ursula K. Le Guin</small>
+    </div>
+    <div>
+      <div class="label"><i></i>Currently reading</div>
+      <h1 id="cur">The Left Hand of Darkness</h1>
+      <p>Ursula K. Le Guin</p>
+      <p class="meta">Last read yesterday</p>
+    </div>
+  </section>
+
+  <section class="route" aria-label="Progress through the book">
+    <svg viewBox="0 0 358 78" role="img" aria-label="Page 184 of 304. Ticks every 50 pages.">
+      <text x="216" y="13" font-size="12" font-weight="800" text-anchor="middle">You are here, p. 184</text>
+      <path d="M216 17 V32" stroke="var(--ink)" stroke-width="1.5"/>
+      <path d="M8 44 H216" stroke="var(--line-blue)" stroke-width="8"/>
+      <path d="M216 44 H348" stroke="var(--line-blue)" stroke-width="8"/>
+      <path d="M218 44 H347" stroke="#fff" stroke-width="3"/>
+      <path d="M8 34 V54 M350 34 V54" stroke="var(--ink)" stroke-width="5"/>
+      <g stroke="var(--line-blue)" stroke-width="4">
+        <path d="M63.9 44 V56 M120.1 44 V56 M176.3 44 V56 M232.5 44 V56 M288.7 44 V56"/>
+      </g>
+      <g font-size="11" fill="var(--ink-2)" text-anchor="middle">
+        <text x="63.9" y="70">50</text><text x="120.1" y="70">100</text><text x="176.3" y="70">150</text><text x="232.5" y="70">200</text><text x="288.7" y="70">250</text>
+      </g>
+      <text x="8" y="70" font-size="11" font-weight="700" text-anchor="middle">p. 1</text>
+      <text x="350" y="70" font-size="11" font-weight="700" text-anchor="end">304</text>
+      <circle cx="216" cy="44" r="10" fill="#fff" stroke="var(--ink)" stroke-width="4"/>
+    </svg>
+    <p class="pages"><b>184</b><span>of 304 pages</span><em>61%, 120 to go</em></p>
+  </section>
+
+  <section class="board" aria-label="Today">
+    <h2>Today's service</h2>
+    <div class="row"><span class="k">Streak</span><span class="f" style="--n:2">11</span><span>days in a row</span></div>
+    <div class="row"><span class="k">Pages</span><span class="f" style="--n:2">08</span><span>read of</span><span class="f" style="--n:2">20</span><span>goal</span></div>
+  </section>
+
+  <section class="journey" aria-label="Today's goal">
+    <svg viewBox="0 0 358 46" role="img" aria-label="Today's journey: 8 of 20 pages read, 12 to go.">
+      <path d="M8 20 H134" stroke="var(--line-blue)" stroke-width="8"/>
+      <path d="M134 20 H350" stroke="var(--planned)" stroke-width="4" stroke-dasharray="6 5"/>
+      <path d="M8 20 V8 M26 20 V8 M44 20 V8 M62 20 V8 M80 20 V8 M98 20 V8 M116 20 V8" stroke="var(--line-blue)" stroke-width="4"/>
+      <path d="M152 20 V10 M170 20 V10 M188 20 V10 M206 20 V10 M224 20 V10 M242 20 V10 M260 20 V10 M278 20 V10 M296 20 V10 M314 20 V10 M332 20 V10" stroke="var(--planned)" stroke-width="3"/>
+      <path d="M350 8 V32" stroke="var(--ink)" stroke-width="5"/>
+      <circle cx="134" cy="20" r="9" fill="#fff" stroke="var(--ink)" stroke-width="4"/>
+      <text x="134" y="43" font-size="12" font-weight="700" text-anchor="middle" font-family="Overpass, sans-serif">8 read</text>
+      <text x="352" y="43" font-size="12" font-weight="700" text-anchor="end" font-family="Overpass, sans-serif">goal 20</text>
+    </svg>
+    <p><b>Goal not reached yet.</b> 12 more pages to reach today's 20.</p>
+  </section>
+
+  <button class="log" type="button">Log pages</button>
+
+  <section class="next" aria-labelledby="next-h">
+    <h2 id="next-h">Up next</h2>
+    <p class="sub">When you reach p. 304, change here for</p>
+    <ol>
+      <li style="--c:var(--line-green)"><span class="t">Piranesi</span><span class="a">Susanna Clarke</span><span class="pp">272 pp</span></li>
+      <li style="--c:var(--line-purple)"><span class="t">The Remains of the Day</span><span class="a">Kazuo Ishiguro</span><span class="pp">245 pp</span></li>
+      <li style="--c:var(--line-brown)"><span class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</span><span class="a">J. Placeholder-Smythe</span><span class="pp">1,104 pp</span></li>
+    </ol>
+  </section>
+
+  <figure class="quote" style="margin-bottom:20px">
+    <header><span>Saved highlight</span><span>p. 222</span></header>
+    <blockquote>“Light is the left hand of darkness and darkness the right hand of light.”</blockquote>
+  </figure>
+</main>
+
+<nav aria-label="Main">
+  <ul class="tabs">
+    <li><a href="#" aria-current="page">Today</a></li>
+    <li><a href="#">Library</a></li>
+    <li><a href="#">Highlights</a></li>
+    <li><a href="#">Stats</a></li>
+  </ul>
+</nav>
+</body>
+</html>

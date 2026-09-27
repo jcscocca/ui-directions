@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Jersey+10&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,600;0,6..12,700;0,6..12,800;1,6..12,400;1,6..12,600&family=Fira+Mono:wght@400;500&display=swap");
+
+:root {
+  --font-chrome: "Jersey 10", "Chicago", "Charcoal", monospace;
+  --font-body: "Nunito Sans", "Geneva", "Verdana", sans-serif;
+  --font-code: "Fira Mono", "Monaco", "Consolas", monospace;
+
+  --platinum: #DDDDDD;
+  --platinum-deep: #CCCCCC;
+  --bevel-hi: #FFFFFF;
+  --bevel-lo: #888888;
+  --frame: #222222;
+  --paper: #FFFFFF;
+  --sorted: #EEEEEE;
+  --ink: #1A1A1A;
+  --muted: #555555;
+  --disabled: #999999;
+  --select: #3A4FC7;
+  --select-soft: #D6DAF3;
+  --progress: #7482DA;
+  --desktop: #4F7F88;
+  --desktop-dot: #46737B;
+  --stop: #C42B1C;
+  --caution: #F2C230;
+  --sticky: #FFF3A0;
+
+  --t-chrome: 16px;
+  --t-small: 11px;
+  --t-body: 13px;
+  --t-sub: 15px;
+  --t-title: 20px;
+  --t-display: 56px;
+
+  --titlebar: 20px;
+  --menubar: 22px;
+  --u: 4px;
+  --row: 20px;
+  --radius-button: 5px;
+
+  --bevel-out: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
+  --bevel-in: inset 1px 1px 0 var(--bevel-lo), inset -1px -1px 0 var(--bevel-hi);
+  --shadow-front: 3px 3px 0 rgba(0, 0, 0, .45);
+  --shadow-back: 1px 1px 0 rgba(0, 0, 0, .35);
+}

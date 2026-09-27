@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper); color: var(--ribbon);
+    font-family: var(--font-typed); font-size: 14px; line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, p, ol, ul { margin: 0; padding: 0; }
+  a { color: inherit; }
+  :focus-visible { outline: 2.5px solid var(--ribbon); outline-offset: 3px; background-color: var(--riso-yellow); }
+  .cut { font-family: var(--font-cut); font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; }
+  .marker { font-family: var(--font-marker); color: var(--marker); }
+  .piece { position: relative; isolation: isolate; }
+  .piece::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; background: var(--stock);
+    box-shadow: 0 0 0 1px var(--edge), var(--lift); transform: rotate(var(--tilt, 0deg));
+  }
+  .tape {
+    position: absolute; z-index: 3; width: 70px; height: 20px; background: var(--tape); mix-blend-mode: multiply;
+    clip-path: polygon(0 8%, 6% 0, 12% 10%, 18% 0, 82% 0, 88% 12%, 94% 0, 100% 10%, 100% 90%, 94% 100%, 88% 88%, 82% 100%, 18% 100%, 12% 90%, 6% 100%, 0 92%);
+  }
+
+  .page { padding: 12px 16px 96px; position: relative; overflow: hidden; }
+  .ground { position: absolute; z-index: 0; pointer-events: none; mix-blend-mode: multiply; }
+  .ground.pink { right: -60px; top: 40px; width: 250px; height: 300px; background: radial-gradient(circle, var(--riso-pink) 1.1px, transparent 1.5px) 0 0 / 6px 6px; opacity: .5; transform: rotate(6deg); }
+
+  header { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; height: 48px; }
+  .logo { display: flex; gap: 2px; text-decoration: none; }
+  .logo span { font-family: var(--font-cut); font-size: 28px; line-height: 1; padding: 2px 4px 3px; display: inline-block; }
+  .logo span:nth-child(1) { background: var(--riso-blue); color: var(--stock); transform: rotate(-4deg); }
+  .logo span:nth-child(2) { background: var(--stock); color: var(--ribbon); box-shadow: 0 0 0 1px var(--edge); transform: rotate(3deg) translateY(2px); }
+  .logo span:nth-child(3) { background: var(--riso-yellow); color: var(--ribbon); transform: rotate(-2deg); }
+  .logo span:nth-child(4) { background: var(--stock); color: var(--riso-blue); box-shadow: 0 0 0 1px var(--edge); transform: rotate(4deg) translateY(-2px); }
+  .logo span:nth-child(5) { background: var(--ribbon); color: var(--stock); transform: rotate(-3deg) translateY(2px); }
+  .date { font-weight: 700; font-size: 14px; border: 1.5px solid var(--ribbon); padding: 3px 8px 2px; transform: rotate(2.5deg); }
+
+  /* current book */
+  .now { position: relative; z-index: 1; display: grid; grid-template-columns: 148px 1fr; gap: 16px; margin-top: 14px; }
+  .cover {
+    position: relative; width: 140px; height: 208px; transform: rotate(-2.2deg); margin: 6px 0 0 4px;
+    background: var(--riso-blue); color: var(--stock); overflow: hidden;
+    box-shadow: 1px 2px 0 rgba(27,42,74,.2);
+  }
+  .cover .dots { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,255,255,.35) 1px, transparent 1.4px) 0 0 / 5px 5px; }
+  .cover svg { position: absolute; left: 0; top: 64px; }
+  .cover .ttl { position: absolute; left: 10px; right: 10px; top: 10px; font-family: var(--font-cut); font-size: 21px; line-height: .98; text-transform: uppercase; }
+  .cover .au { position: absolute; left: 10px; right: 8px; bottom: 9px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .cover-wrap { position: relative; }
+  .cover-wrap .tape { left: 38px; top: -4px; transform: rotate(-7deg); }
+
+  .facts { padding-top: 4px; }
+  .facts .lab { font-family: var(--font-marker); color: var(--riso-blue); font-size: 15px; transform: rotate(-3deg); display: inline-block; }
+  .facts h1 { font-family: var(--font-cut); font-weight: 400; font-size: 25px; line-height: 1.02; margin-top: 2px; overflow-wrap: anywhere; }
+  .facts .by { margin-top: 4px; }
+  .pages { margin-top: 10px; display: flex; align-items: baseline; gap: 6px; }
+  .pages .big { font-family: var(--font-cut); font-size: 44px; line-height: 1; color: var(--riso-blue); }
+  .pages .of { font-size: 14px; }
+  .facts .last { font-size: 13px; margin-top: 2px; }
+
+  .progress { position: relative; z-index: 1; margin-top: 14px; }
+  .bar { position: relative; height: 22px; border: 1.5px solid var(--ribbon); background: var(--stock); }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 61%; background: var(--riso-blue); }
+  .bar i::after { content: ""; position: absolute; right: -3px; top: -3px; bottom: -3px; width: 5px; background: var(--riso-pink); mix-blend-mode: multiply; }
+  .bar b { position: absolute; left: 8px; top: 1px; color: var(--stock); font-size: 13px; }
+  .scale { display: flex; justify-content: space-between; font-size: 12px; margin-top: 3px; }
+
+  /* goal + streak */
+  .today { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 104px; gap: 14px; align-items: center; margin-top: 16px; }
+  .goal { padding: 10px 12px 10px; --tilt: -1deg; }
+  .goal h2 { font-family: var(--font-typed); font-size: 14px; font-weight: 700; }
+  .ticks { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin-top: 7px; }
+  .ticks span { height: 13px; border: 1.3px dashed var(--ribbon-faded); }
+  .ticks span.on { background: var(--riso-blue); border: 1.3px solid var(--riso-blue); }
+  .goal .left { margin-top: 7px; font-size: 13px; }
+  .goal .left .marker { font-size: 17px; margin-left: 2px; }
+  .stamp {
+    width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--riso-blue); color: var(--riso-blue);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; transform: rotate(-9deg);
+    box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 4.5px var(--riso-blue);
+    mix-blend-mode: multiply;
+  }
+  .stamp .n { font-family: var(--font-cut); font-size: 38px; line-height: .95; }
+  .stamp .w { font-family: var(--font-cut); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  .log {
+    position: relative; z-index: 1; display: block; width: 100%; margin-top: 18px; height: 54px; border: 0; cursor: pointer;
+    font-family: var(--font-cut); font-size: 22px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--stock); background: var(--riso-blue); transform: rotate(-0.8deg);
+    text-shadow: 0 1px 0 rgba(0,0,0,.25), 0 -1px 0 rgba(255,255,255,.3);
+    clip-path: polygon(0 10%, 6px 0, calc(100% - 6px) 0, 100% 10%, 100% 90%, calc(100% - 6px) 100%, 6px 100%, 0 90%);
+  }
+  .log:hover { filter: brightness(.88); }
+  .log:active { transform: rotate(-0.8deg) translateY(2px); }
+  .log:focus-visible { clip-path: none; outline: 3px solid var(--ribbon); outline-offset: 3px; background: var(--riso-blue); }
+
+  /* highlight */
+  .quote { position: relative; z-index: 1; margin-top: 30px; padding: 18px 18px 14px; --tilt: 1.6deg; }
+  .quote .tape.t1 { left: -10px; top: -6px; transform: rotate(-24deg); }
+  .quote .tape.t2 { right: -8px; bottom: -4px; transform: rotate(-20deg); }
+  .quote blockquote { margin: 0; font-style: italic; font-size: 16px; line-height: 1.45; }
+  .quote p { margin-top: 8px; font-size: 13px; }
+
+  /* up next: torn from a notebook */
+  .next { position: relative; z-index: 1; margin-top: 30px; padding: 22px 16px 26px; }
+  .next::before {
+    --tilt: -0.8deg; box-shadow: none; filter: drop-shadow(0 0 .6px rgba(27,42,74,.5));
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 25px, rgba(0,120,191,.25) 25px 26px) 0 50px / 100% calc(100% - 50px) no-repeat,
+      var(--stock);
+    clip-path: polygon(0 2.4%, 5% 0.6%, 10% 2%, 16% 0, 22% 1.8%, 29% 0.4%, 35% 2.2%, 42% 0.2%, 49% 1.6%, 56% 0, 62% 2%, 69% 0.5%, 76% 2.1%, 83% 0.2%, 90% 1.7%, 96% 0.3%, 100% 1.9%, 100% 100%, 0 100%);
+  }
+  .next h2 { font-family: var(--font-cut); font-weight: 400; font-size: 22px; line-height: 1; height: 26px; text-transform: uppercase; display: inline-block; background: var(--riso-yellow); padding: 3px 8px 1px; transform: rotate(-1.5deg); }
+  .next ol { list-style: none; margin-top: 2px; counter-reset: n; }
+  .next li { display: grid; grid-template-columns: 26px 1fr; line-height: 26px; counter-increment: n; }
+  .next li + li { margin-top: 26px; }
+    .next li::before { content: counter(n) "."; font-weight: 700; }
+  .next .t { font-weight: 700; overflow-wrap: anywhere; }
+  .next .a { font-size: 13px; }
+
+  /* nav as stickers along a taped strip */
+  nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; height: 70px;
+    background: var(--paper); border-top: 1.5px dashed var(--ribbon);
+    display: flex; justify-content: space-around; align-items: center; padding: 0 6px;
+  }
+  nav a {
+    font-family: var(--font-cut); font-size: 15px; letter-spacing: 0.03em; text-transform: uppercase; text-decoration: none;
+    color: var(--riso-blue); background: var(--stock); padding: 7px 11px 6px; border-radius: 999px;
+    box-shadow: 0 0 0 1.5px var(--riso-blue), 0 0 0 4px var(--stock), 0 0 0 5px var(--edge);
+    min-height: 44px; display: flex; align-items: center;
+  }
+  nav a:nth-child(2) { transform: rotate(2deg); }
+  nav a:nth-child(3) { transform: rotate(-2deg); }
+  nav a:nth-child(4) { transform: rotate(3deg); }
+  nav a[aria-current] { background: var(--riso-yellow); color: var(--ribbon); transform: rotate(-4deg); box-shadow: 0 0 0 1.5px var(--ribbon), 0 0 0 4px var(--stock), 0 0 0 5px var(--edge); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="ground pink" aria-hidden="true"></div>
+  <header>
+    <a class="logo" href="#" aria-label="Shelf"><span>S</span><span>H</span><span>E</span><span>L</span><span>F</span></a>
+    <p class="date">Thu 24 Sep</p>
+  </header>
+
+  <section class="now" aria-labelledby="book">
+    <div class="cover-wrap">
+      <span class="tape" aria-hidden="true"></span>
+      <div class="cover" aria-hidden="true">
+        <div class="dots"></div>
+        <svg width="140" height="120" viewBox="0 0 140 120">
+          <circle cx="58" cy="62" r="40" fill="#FF48B0" style="mix-blend-mode:multiply"/>
+          <circle cx="84" cy="62" r="40" fill="#FFE800" style="mix-blend-mode:multiply"/>
+        </svg>
+        <p class="ttl">The Left Hand of Darkness</p>
+        <p class="au">Ursula K. Le Guin</p>
+      </div>
+    </div>
+    <div class="facts">
+      <p class="lab">reading now</p>
+      <h1 id="book">The Left Hand of Darkness</h1>
+      <p class="by">Ursula K. Le Guin</p>
+      <p class="pages"><span class="big">184</span><span class="of">of 304 pages</span></p>
+      <p class="last">last read yesterday</p>
+    </div>
+  </section>
+
+  <div class="progress">
+    <div class="bar" role="progressbar" aria-valuenow="61" aria-valuemin="0" aria-valuemax="100" aria-label="Book progress"><i></i><b>61% read</b></div>
+    <div class="scale"><span>p. 1</span><span>120 pages left</span><span>p. 304</span></div>
+  </div>
+
+  <section class="today">
+    <div class="goal piece">
+      <h2>Today's goal: 20 pages</h2>
+      <div class="ticks" role="img" aria-label="8 of 20 pages read today">
+        <span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span>
+        <span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <p class="left">8 read. <span class="marker">not yet: 12 to go</span></p>
+    </div>
+    <div class="stamp" role="img" aria-label="Reading streak: 11 days"><span class="n">11</span><span class="w">day streak</span></div>
+  </section>
+
+  <button class="log" type="button">Log pages</button>
+
+  <figure class="quote piece" style="margin-left:0;margin-right:0">
+    <span class="tape t1" aria-hidden="true"></span>
+    <span class="tape t2" aria-hidden="true"></span>
+    <blockquote>&ldquo;Light is the left hand of darkness and darkness the right hand of light.&rdquo;</blockquote>
+    <p>saved highlight, p. 222</p>
+  </figure>
+
+  <section class="next piece" aria-labelledby="next-h">
+    <h2 id="next-h">Up next</h2>
+    <ol>
+      <li><div><p class="t">Piranesi</p><p class="a">Susanna Clarke, 272 pp</p></div></li>
+      <li><div><p class="t">The Remains of the Day</p><p class="a">Kazuo Ishiguro, 245 pp</p></div></li>
+      <li><div><p class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</p><p class="a">J. Placeholder-Smythe, 1,104 pp</p></div></li>
+    </ol>
+  </section>
+</div>
+
+<nav aria-label="Shelf">
+  <a href="#" aria-current="page">Today</a>
+  <a href="#">Library</a>
+  <a href="#">Highlights</a>
+  <a href="#">Stats</a>
+</nav>
+</body>
+</html>

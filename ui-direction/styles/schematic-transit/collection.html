@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wildbook: Saltmarsh Reach index</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{width:1440px;height:900px;overflow:hidden;background:var(--paper);color:var(--ink);font:400 var(--t-15)/1.35 var(--font-sign);display:grid;grid-template-rows:54px 52px 794px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+.signbar{display:flex;align-items:stretch;gap:40px;padding:0 24px;border-bottom:1px solid var(--rule)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand b{font-weight:900;font-size:var(--t-22);letter-spacing:-.01em;line-height:1}
+.brand small{display:block;font-size:var(--t-12);color:var(--ink-2);line-height:1.2;margin-top:2px}
+.route{position:relative;display:flex;margin:0;padding:0;list-style:none}
+.route::before{content:"";position:absolute;left:0;right:0;top:35px;height:4px;background:var(--rule)}
+.route li{display:flex}
+.route a{position:relative;display:block;padding:9px 30px 0 0;text-decoration:none;font-size:var(--t-15);color:var(--ink-2)}
+.route a::after{content:"";position:absolute;left:1px;top:31px;width:5px;height:12px;background:var(--grey)}
+.route a:hover{color:var(--ink)}
+.route a[aria-current]{color:var(--ink);font-weight:800}
+.route a[aria-current]::after{left:-4px;top:28px;width:18px;height:18px;border:4px solid var(--ink);border-radius:50%;background:#fff;box-sizing:border-box}
+.find{margin-left:auto;display:flex;align-items:center;gap:8px}
+.find label{font-size:var(--t-13);font-weight:700}
+.find input{width:270px;height:36px;border:2px solid var(--ink);border-radius:var(--r-sign);padding:4px 10px 0;font:inherit;font-size:var(--t-15);color:var(--ink);background:#fff}
+.find input::placeholder{color:#5E666E}
+
+.filters{display:flex;align-items:center;gap:20px;padding:0 24px;border-bottom:1px solid var(--rule);font-size:var(--t-13)}
+.grp{display:flex;align-items:center;gap:5px}
+.grp > span{font-weight:800;margin-right:4px}
+.chip{height:30px;padding:3px 8px 0;border:2px solid var(--ink);border-radius:var(--r-sign);background:#fff;font:600 var(--t-13) var(--font-sign);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip:hover{background:var(--zone)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.chip i{width:18px;height:6px;border-radius:3px;background:var(--c)}
+
+.network{position:relative;overflow:hidden}
+.map{position:absolute;left:0;top:0;display:block}
+.map text{font-family:var(--font-sign);fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+
+.cart{position:absolute;left:20px;top:16px;width:224px;background:#fff;border:2px solid var(--ink);border-radius:var(--r-sign);padding:10px 12px 10px}
+.cart h1{margin:0;font-size:var(--t-22);font-weight:900;line-height:1.05}
+.cart p{margin:2px 0 0;font-size:var(--t-12);color:var(--ink-2)}
+.cart .done{margin-top:8px;font-size:var(--t-15);color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+.cart svg{display:block;margin:6px 0 2px}
+
+.stn{position:absolute;display:grid;grid-template-columns:58px 1fr;gap:0 8px;align-items:start;text-decoration:none;width:180px}
+.stn:hover b{text-decoration:underline;text-decoration-thickness:2px}
+.stn:focus-visible{outline-offset:4px}
+.plate{width:58px;height:58px;border:2px solid var(--ink);border-radius:var(--r-sign);background:#fff;position:relative;overflow:hidden}
+.plate::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,var(--c1) 50%,var(--c2,var(--c1)) 50%)}
+.plate img{position:absolute;left:3px;top:9px;width:48px;height:45px;object-fit:contain}
+.seen .plate{background:var(--zone);border-color:var(--grey)}
+.seen .plate img{filter:brightness(0);opacity:.55}
+.seen .plate::before{opacity:.45}
+.plate .ph{position:absolute;inset:6px 0 0;display:grid;place-items:center;align-content:center;gap:1px;background:var(--zone);font-size:10px;line-height:1.1;text-align:center;color:var(--ink-2)}
+.plate .ph b{font-size:10.5px;color:var(--ink);font-weight:800}
+.txt{display:flex;flex-direction:column;gap:1px;min-width:0;font-size:var(--t-12);line-height:1.2}
+.txt .no{font:700 11px var(--font-board);color:var(--ink-2)}
+.txt b{font-size:var(--t-15);font-weight:800;line-height:1.1;overflow-wrap:anywhere}
+.txt .ty{color:var(--ink-2)}
+.txt .row{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px;margin-top:2px;white-space:nowrap}
+.txt .row > *{flex:none}
+.seen .txt b{color:var(--ink-2)}
+.seen .txt .st{font-style:italic;color:var(--ink-2)}
+
+.rar{font:700 11px/1 var(--font-sign);padding:3px 5px 1px;border-radius:3px;border:1.5px solid transparent}
+.rar.common{color:var(--grey);padding-left:0;padding-right:0;font-weight:600}
+.rar.uncommon{border-color:var(--ink)}
+.rar.rare{background:var(--ink);color:#fff;border-color:var(--ink)}
+.rar.mythic{--cell:11px;display:inline-block;width:calc(6 * var(--cell) + 8px);height:19px;padding:0 4px;border:0;background:var(--board);border-radius:3px;overflow:hidden;white-space:pre;
+  font:700 12px/19.5px var(--font-board);letter-spacing:calc(var(--cell) - 1ch);text-indent:calc((var(--cell) - 1ch) / 2);color:var(--flap-ink);
+  background-image:linear-gradient(var(--flap-hinge),var(--flap-hinge)),repeating-linear-gradient(90deg,var(--flap) 0 calc(var(--cell) - 1px),transparent calc(var(--cell) - 1px) var(--cell));
+  background-size:100% 1px,calc(100% - 8px) 15px;background-position:0 9px,4px 2px;background-repeat:no-repeat}
+.unk{position:absolute;font:700 12px var(--font-board);color:var(--ink-2);text-align:center;width:40px}
+
+.key{position:absolute;left:806px;top:420px;width:134px;background:#fff;border:2px solid var(--ink);border-radius:var(--r-sign);padding:8px 9px 9px;font-size:var(--t-12);line-height:1.2}
+.key h2{margin:0 0 5px;font-size:var(--t-15);font-weight:900}
+.key ul{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.key li{display:grid;grid-template-columns:24px 1fr;align-items:center;gap:6px}
+.key li.t{grid-template-columns:1fr}
+.key .sep{border-top:1px solid var(--rule);margin-top:3px;padding-top:6px}
+
+/* station information panel */
+.station{position:absolute;left:956px;top:10px;width:468px;height:772px;background:#fff;border:2px solid var(--ink);border-left:0;border-radius:0 var(--r-sign) var(--r-sign) 0;display:flex;flex-direction:column;overflow:hidden}
+.station::before{content:"";position:absolute;left:0;top:0;bottom:0;width:12px;background:linear-gradient(90deg,var(--line-blue) 50%,var(--line-orange) 50%)}
+.st-head,.st-body{margin-left:12px}
+.st-head{background:var(--ink);color:#fff;padding:10px 16px 12px}
+.st-head .code{display:flex;align-items:center;gap:8px;font-size:var(--t-12);color:#C9CED3}
+.st-head .code span{font:700 var(--t-12) var(--font-board);background:#fff;color:var(--ink);padding:2px 6px 0;border-radius:3px}
+.st-head h1{margin:4px 0 6px;font-size:var(--t-30);font-weight:900;line-height:1}
+.pills{display:flex;gap:6px;align-items:center}
+.pill{font-weight:800;font-size:var(--t-12);color:#fff;background:var(--c);border-radius:10px;padding:3px 10px 1px}
+.st-head .rar.rare{background:#fff;color:var(--ink);border-color:#fff;margin-left:6px}
+.st-body{padding:16px 16px 16px;display:flex;flex-direction:column;gap:18px;flex:1}
+.st-body h2{margin:0 0 5px;font-size:var(--t-13);font-weight:800}
+.hero{display:grid;grid-template-columns:196px 1fr;gap:16px}
+.hero .plate{width:196px;height:196px}
+.hero .plate::before{height:10px}
+.hero .plate img{left:12px;top:20px;width:168px;height:166px}
+.hero p{margin:0 0 10px;font-size:var(--t-15);line-height:1.4}
+dl.facts{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:var(--t-13);border-top:2px solid var(--ink);padding-top:6px}
+.facts dt{font-weight:800}
+.facts dd{margin:0;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:64px 1fr 28px;gap:7px 10px;align-items:center;font-size:var(--t-13)}
+.stats dt{font-weight:700}
+.stats dd{margin:0}
+.stats .v{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.track{position:relative;height:14px;background:linear-gradient(var(--rule),var(--rule)) 0 5px / 100% 4px no-repeat}
+.track::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,var(--grey) 0 1.5px,transparent 1.5px 25%);background-size:calc(100% + 1.5px) 100%;opacity:.7;clip-path:inset(0 0 60% 0)}
+.track i{position:absolute;left:0;top:3px;height:8px;width:calc(var(--v) * 1%);background:var(--ink)}
+.track i::after{content:"";position:absolute;right:-2px;top:-4px;width:5px;height:16px;background:var(--ink)}
+.evo svg{display:block}
+.evo text{font-family:var(--font-sign);fill:var(--ink)}
+.drops{list-style:none;margin:0;padding:0;font-size:var(--t-13);display:grid;gap:3px}
+.drops li{display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:3px}
+.drops span{color:var(--ink-2)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.btn{height:36px;padding:3px 14px 0;border-radius:var(--r-sign);font:700 var(--t-13) var(--font-sign);border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#2A3139}
+.btn:not(.primary):not(:disabled):hover{background:var(--zone)}
+.btn:disabled{border:2px dashed var(--planned);color:#7A828A;background:#fff;cursor:not-allowed}
+.acts p{margin:0;flex-basis:100%;font-size:var(--t-12);color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+<header class="signbar">
+  <a class="brand" href="#">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M2 22 H11 L21 12 H28" fill="none" stroke="var(--line-blue)" stroke-width="5"/><circle cx="21" cy="12" r="5.5" fill="#fff" stroke="var(--ink)" stroke-width="3"/></svg>
+    <span><b>Wildbook</b><small>Saltmarsh Reach</small></span>
+  </a>
+  <ol class="route" aria-label="Sections">
+    <li><a href="#" aria-current="page">Index</a></li>
+    <li><a href="#">Team</a></li>
+    <li><a href="#">Map</a></li>
+    <li><a href="#">Items</a></li>
+  </ol>
+  <div class="find">
+    <label for="q">Find</label>
+    <input id="q" type="search" placeholder="Search by name, number or type">
+  </div>
+</header>
+
+<div class="filters" role="toolbar" aria-label="Filter and sort">
+  <div class="grp"><span>Status</span>
+    <button class="chip" aria-pressed="true">All</button><button class="chip" aria-pressed="false">Caught</button><button class="chip" aria-pressed="false">Seen</button><button class="chip" aria-pressed="false">Unknown</button>
+  </div>
+  <div class="grp"><span>Type</span>
+    <button class="chip" aria-pressed="false" style="--c:var(--line-blue)"><i></i>Tide</button><button class="chip" aria-pressed="false" style="--c:var(--line-green)"><i></i>Moss</button><button class="chip" aria-pressed="false" style="--c:var(--line-orange)"><i></i>Ember</button><button class="chip" aria-pressed="false" style="--c:var(--line-purple)"><i></i>Gale</button><button class="chip" aria-pressed="false" style="--c:var(--line-brown)"><i></i>Stone</button>
+  </div>
+  <div class="grp"><span>Rarity</span>
+    <button class="chip" aria-pressed="false">Common</button><button class="chip" aria-pressed="false">Uncommon</button><button class="chip" aria-pressed="false">Rare</button><button class="chip" aria-pressed="false">Mythic</button>
+  </div>
+  <div class="grp" style="margin-left:auto"><span>Sort</span>
+    <button class="chip" aria-pressed="true">Number</button><button class="chip" aria-pressed="false">Name</button><button class="chip" aria-pressed="false">Rarity</button>
+  </div>
+</div>
+
+<main class="network" aria-label="Saltmarsh Reach index as a network map">
+  <svg class="map" width="960" height="794" viewBox="0 0 960 794" aria-hidden="true">
+    <!-- unsurveyed -->
+    <path d="M120 752 H560" stroke="var(--planned)" stroke-width="4" stroke-dasharray="8 6"/>
+    <!-- Stone -->
+    <path d="M500 400 V520 L420 600 H120" stroke="var(--line-brown)" stroke-width="8" fill="none"/>
+    <path d="M120 590 V610" stroke="var(--line-brown)" stroke-width="5"/>
+    <path d="M330 600 V613 M180 600 V587" stroke="var(--line-brown)" stroke-width="5"/>
+    <!-- Moss -->
+    <path d="M460 48 V180 L320 320 V470" stroke="var(--line-green)" stroke-width="8" fill="none"/>
+    <path d="M450 48 H470 M310 470 H330" stroke="var(--line-green)" stroke-width="5"/>
+    <path d="M460 70 H473" stroke="var(--line-green)" stroke-width="5"/>
+    <!-- Ember -->
+    <path d="M700 150 V240 L780 320 V700" stroke="var(--line-orange)" stroke-width="8" fill="none"/>
+    <path d="M770 700 H790" stroke="var(--line-orange)" stroke-width="5"/>
+    <path d="M780 520 H767 M780 640 H767" stroke="var(--line-orange)" stroke-width="5"/>
+    <!-- Gale -->
+    <path d="M120 400 V260 L230 150 H700" stroke="var(--line-purple)" stroke-width="8" fill="none"/>
+    <rect x="325" y="133" width="10" height="17" fill="#fff" stroke="var(--line-purple)" stroke-width="3"/>
+    <!-- Tide -->
+    <path d="M40 400 H960" stroke="var(--line-blue)" stroke-width="8"/>
+    <path d="M40 390 V410" stroke="var(--line-blue)" stroke-width="5"/>
+    <path d="M640 400 V413" stroke="var(--line-blue)" stroke-width="5"/>
+    <!-- interchanges: caught -->
+    <g fill="#fff" stroke="var(--ink)" stroke-width="4">
+      <circle cx="460" cy="150" r="11"/><circle cx="320" cy="400" r="11"/><circle cx="500" cy="400" r="11"/><circle cx="780" cy="400" r="11"/>
+    </g>
+    <!-- interchanges: seen -->
+    <g fill="#fff" stroke="var(--grey)" stroke-width="4">
+      <circle cx="700" cy="150" r="11"/><circle cx="120" cy="400" r="11"/>
+    </g>
+    <!-- selected -->
+    <circle cx="780" cy="400" r="18" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+    <!-- unknown stops -->
+    <g fill="#fff" stroke="var(--grey)" stroke-width="3" stroke-dasharray="4 3">
+      <circle cx="200" cy="752" r="9"/><circle cx="340" cy="752" r="9"/><circle cx="480" cy="752" r="9"/>
+    </g>
+    <text x="120" y="782" font-size="12" font-weight="700">Not yet surveyed: never seen</text>
+  </svg>
+
+  <div class="cart">
+    <h1>Saltmarsh Reach</h1>
+    <p>Index of 16. Types are lines; two-type creatures are interchanges.</p>
+    <div class="done">10 of 16 caught, 62%</div>
+    <svg width="198" height="22" viewBox="0 0 198 22" role="img" aria-label="10 caught, 3 seen but not caught, 3 never seen">
+      <path d="M4 11 H121" stroke="var(--ink)" stroke-width="6"/>
+      <path d="M121 11 H160" stroke="var(--grey)" stroke-width="3"/>
+      <path d="M160 11 H194" stroke="var(--planned)" stroke-width="3" stroke-dasharray="4 3"/>
+      <path d="M4 11 V2 M17 11 V2 M30 11 V2 M43 11 V2 M56 11 V2 M69 11 V2 M82 11 V2 M95 11 V2 M108 11 V2 M121 11 V2" stroke="var(--ink)" stroke-width="3.5"/>
+      <path d="M134 11 V3 M147 11 V3 M160 11 V3" stroke="var(--grey)" stroke-width="3"/>
+      <g fill="#fff" stroke="var(--planned)" stroke-width="2"><circle cx="173" cy="11" r="3.5"/><circle cx="185" cy="11" r="3.5"/><circle cx="195" cy="11" r="2.5"/></g>
+    </svg>
+    <p>3 seen, not caught. 3 never seen.</p>
+  </div>
+
+  <!-- stations -->
+  <a class="stn caught" href="#" style="left:480px;top:40px;--c1:var(--line-green)">
+    <span class="plate"><img src="../../art/reedling.svg" alt="Reedling"></span>
+    <span class="txt"><span class="no">001</span><b>Reedling</b><span class="ty">Moss</span><span class="row"><span class="rar common">Common</span>14 caught</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:478px;top:160px;--c1:var(--line-green);--c2:var(--line-purple)">
+    <span class="plate"><img src="../../art/bogwhistle.svg" alt="Bogwhistle"></span>
+    <span class="txt"><span class="no">002</span><b>Bogwhistle</b><span class="ty">Moss / Gale</span><span class="row"><span class="rar uncommon">Uncommon</span>3 caught</span></span>
+  </a>
+  <a class="stn seen" href="#" style="left:262px;top:62px;--c1:var(--line-purple)">
+    <span class="plate"><img src="../../art/mistheron.svg" alt="Mistheron, silhouette"></span>
+    <span class="txt"><span class="no">009</span><b>Mistheron</b><span class="st">Seen, not caught</span><span class="row"><span class="rar uncommon">Uncommon</span>Gale</span></span>
+  </a>
+  <a class="stn seen" href="#" style="left:722px;top:112px;--c1:var(--line-purple);--c2:var(--line-orange)">
+    <span class="plate"><img src="../../art/duskmote.svg" alt="Duskmote, silhouette"></span>
+    <span class="txt"><span class="no">015</span><b>Duskmote</b><span class="st">Seen, not caught</span><span class="row"><span class="rar mythic">MYTHIC</span>Gale / Ember</span></span>
+  </a>
+  <a class="stn seen" href="#" style="left:136px;top:416px;--c1:var(--line-purple);--c2:var(--line-blue)">
+    <span class="plate"><img src="../../art/stormgull.svg" alt="Stormgull, silhouette"></span>
+    <span class="txt"><span class="no">012</span><b>Stormgull</b><span class="st">Seen, not caught</span><span class="row"><span class="rar rare">Rare</span>Gale / Tide</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:128px;top:282px;--c1:var(--line-green);--c2:var(--line-blue)">
+    <span class="plate"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler"></span>
+    <span class="txt"><span class="no">010</span><b>Greater Spotted Marsh Wobbler</b><span class="ty">Moss / Tide</span><span class="row"><span class="rar uncommon">Uncommon</span>1 caught</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:514px;top:304px;--c1:var(--line-blue);--c2:var(--line-brown)">
+    <span class="plate"><img src="../../art/saltcrab.svg" alt="Saltcrab"></span>
+    <span class="txt"><span class="no">005</span><b>Saltcrab</b><span class="ty">Tide / Stone</span><span class="row"><span class="rar common">Common</span>6 caught</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:572px;top:420px;width:200px;--c1:var(--line-blue)">
+    <span class="plate"><img src="../../art/glimmerfry.svg" alt="Glimmerfry"></span>
+    <span class="txt"><span class="no">006</span><b>Glimmerfry</b><span class="ty">Tide</span><span class="row"><span class="rar uncommon">Uncommon</span>5 caught</span></span>
+  </a>
+  <a class="stn caught sel" href="#" aria-current="true" style="left:802px;top:298px;width:150px;--c1:var(--line-blue);--c2:var(--line-orange)">
+    <span class="plate"><img src="../../art/lanternfin.svg" alt="Lanternfin"></span>
+    <span class="txt"><span class="no">007</span><b>Lanternfin</b><span class="ty">Tide / Ember</span><span class="row"><span class="rar rare">Rare</span>3 caught</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:590px;top:496px;--c1:var(--line-orange)">
+    <span class="plate"><img src="../../art/emberkit.svg" alt="" onerror="this.outerHTML='&lt;span class=&quot;ph&quot;&gt;&lt;b&gt;Emberkit&lt;/b&gt;no image&lt;/span&gt;'"></span>
+    <span class="txt"><span class="no">011</span><b>Emberkit</b><span class="ty">Ember</span><span class="row"><span class="rar common">Common</span>7 caught</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:590px;top:616px;--c1:var(--line-orange)">
+    <span class="plate"><img src="../../art/cindermoth.svg" alt="Cindermoth"></span>
+    <span class="txt"><span class="no">003</span><b>Cindermoth</b><span class="ty">Ember</span><span class="row"><span class="rar common">Common</span>9 caught</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:252px;top:622px;--c1:var(--line-brown)">
+    <span class="plate"><img src="../../art/pebblepup.svg" alt="Pebblepup"></span>
+    <span class="txt"><span class="no">004</span><b>Pebblepup</b><span class="ty">Stone</span><span class="row"><span class="rar common">Common</span>22 caught</span></span>
+  </a>
+  <a class="stn caught" href="#" style="left:110px;top:506px;--c1:var(--line-brown)">
+    <span class="plate"><img src="../../art/cragback.svg" alt="Cragback"></span>
+    <span class="txt"><span class="no">014</span><b>Cragback</b><span class="ty">Stone</span><span class="row"><span class="rar rare">Rare</span>2 caught</span></span>
+  </a>
+  <span class="unk" style="left:180px;top:722px">008</span>
+  <span class="unk" style="left:320px;top:722px">013</span>
+  <span class="unk" style="left:460px;top:722px">016</span>
+
+  <aside class="key" aria-label="Key">
+    <h2>Key</h2>
+    <ul>
+      <li><svg width="24" height="8"><path d="M0 4H24" stroke="var(--line-blue)" stroke-width="8"/></svg>Tide</li>
+      <li><svg width="24" height="8"><path d="M0 4H24" stroke="var(--line-green)" stroke-width="8"/></svg>Moss</li>
+      <li><svg width="24" height="8"><path d="M0 4H24" stroke="var(--line-orange)" stroke-width="8"/></svg>Ember</li>
+      <li><svg width="24" height="8"><path d="M0 4H24" stroke="var(--line-purple)" stroke-width="8"/></svg>Gale</li>
+      <li><svg width="24" height="8"><path d="M0 4H24" stroke="var(--line-brown)" stroke-width="8"/></svg>Stone</li>
+      <li class="sep"><svg width="24" height="16"><path d="M0 11H24" stroke="var(--ink)" stroke-width="6"/><path d="M12 11V2" stroke="var(--ink)" stroke-width="4"/></svg>Caught</li>
+      <li><svg width="24" height="16"><path d="M0 8H24" stroke="var(--ink)" stroke-width="6"/><rect x="8" y="2" width="8" height="12" fill="#fff" stroke="var(--grey)" stroke-width="2.5"/></svg>Seen</li>
+      <li><svg width="24" height="16"><circle cx="12" cy="8" r="6" fill="#fff" stroke="var(--ink)" stroke-width="3"/></svg>Two types</li>
+      <li><svg width="24" height="16"><circle cx="12" cy="8" r="6" fill="#fff" stroke="var(--grey)" stroke-width="2.5" stroke-dasharray="3 2"/></svg>Never seen</li>
+      <li class="sep t"><span><span class="rar common">Common</span></span></li>
+      <li class="t"><span><span class="rar uncommon">Uncommon</span></span></li>
+      <li class="t"><span><span class="rar rare">Rare</span></span></li>
+      <li class="t"><span><span class="rar mythic">MYTHIC</span></span></li>
+    </ul>
+  </aside>
+
+  <aside class="station" aria-labelledby="st-title">
+    <div class="st-head">
+      <div class="code"><span>#007</span>Station information, Tide and Ember lines</div>
+      <h1 id="st-title">Lanternfin</h1>
+      <div class="pills"><span class="pill" style="--c:var(--line-blue)">Tide</span><span class="pill" style="--c:var(--line-orange)">Ember</span><span class="rar rare">Rare</span></div>
+    </div>
+    <div class="st-body">
+      <div class="hero">
+        <span class="plate" style="--c1:var(--line-blue);--c2:var(--line-orange)"><img src="../../art/lanternfin.svg" alt="Lanternfin"></span>
+        <div>
+          <p>Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</p>
+          <dl class="facts">
+            <dt>Habitat</dt><dd>Tidal caves, night only</dd>
+            <dt>First caught</dt><dd>12 Aug</dd>
+            <dt>Caught</dt><dd>3</dd>
+          </dl>
+        </div>
+      </div>
+      <section>
+        <h2>Stats, out of 100</h2>
+        <dl class="stats">
+          <dt>HP</dt><dd class="track" style="--v:62"><i></i></dd><dd class="v">62</dd>
+          <dt>Attack</dt><dd class="track" style="--v:48"><i></i></dd><dd class="v">48</dd>
+          <dt>Defense</dt><dd class="track" style="--v:55"><i></i></dd><dd class="v">55</dd>
+          <dt>Speed</dt><dd class="track" style="--v:81"><i></i></dd><dd class="v">81</dd>
+        </dl>
+      </section>
+      <section class="evo">
+        <h2>Evolution line</h2>
+        <svg width="420" height="58" viewBox="0 0 420 58" role="img" aria-label="Glimmerfry, number 006, evolves into Lanternfin, number 007, which evolves into number 008, not yet seen.">
+          <path d="M20 18 H210" stroke="var(--line-blue)" stroke-width="8"/>
+          <path d="M210 18 H386" stroke="var(--planned)" stroke-width="4" stroke-dasharray="8 6"/>
+          <path d="M20 18 V31" stroke="var(--line-blue)" stroke-width="5"/>
+          <circle cx="210" cy="18" r="11" fill="#fff" stroke="var(--ink)" stroke-width="4"/>
+          <circle cx="394" cy="18" r="9" fill="#fff" stroke="var(--grey)" stroke-width="3" stroke-dasharray="4 3"/>
+          <text x="12" y="50" font-size="13"><tspan font-family="Overpass Mono, monospace" font-size="11" font-weight="700">006</tspan> Glimmerfry</text>
+          <text x="210" y="50" font-size="13" font-weight="800" text-anchor="middle"><tspan font-family="Overpass Mono, monospace" font-size="11">007</tspan> Lanternfin</text>
+          <text x="404" y="50" font-size="11" font-weight="700" text-anchor="end" font-family="Overpass Mono, monospace" fill="var(--ink-2)">008</text>
+        </svg>
+      </section>
+      <section>
+        <h2>Drops</h2>
+        <ul class="drops">
+          <li>Lantern scale <span>common</span></li>
+          <li>Deep pearl <span>rare, 4% chance</span></li>
+        </ul>
+      </section>
+      <div class="acts">
+        <button class="btn primary">Show on map</button>
+        <button class="btn">Mark as favourite</button>
+        <button class="btn" disabled aria-describedby="team-why">Add to team</button>
+        <p id="team-why">Team is full (6 of 6). Remove one to add Lanternfin.</p>
+      </div>
+    </div>
+  </aside>
+</main>
+</body>
+</html>

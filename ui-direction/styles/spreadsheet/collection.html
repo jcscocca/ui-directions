@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Wildbook: Index sheet</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+
+.panes { flex: 1; min-height: 0; display: flex; overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.pane.left { width: 790px; flex: none; }
+.pane.right { flex: 1; }
+.split { width: 6px; flex: none; background: #D5D9DE; border-left: 1px solid var(--hdr-line); border-right: 1px solid var(--hdr-line); }
+.panehead { flex: none; height: 22px; display: flex; align-items: center; gap: 10px; padding: 0 10px; background: var(--chrome);
+  border-bottom: 1px solid var(--hdr-line); font-size: var(--fs-small); color: var(--ink-2); white-space: nowrap; overflow: hidden; }
+.panehead b { color: var(--ink); }
+.panehead code { font-family: var(--font-formula); font-size: 11px; color: var(--ink-3); }
+.sil { filter: brightness(0); opacity: .58; }
+.ph { width: 44px; height: 30px; border: 1px solid #B9BEC5; background: #EEF0F2; color: var(--ink-3);
+  font-size: 9px; line-height: 1; display: grid; place-items: center; text-align: center; }
+.ph + img { position: absolute; }
+.empty { width: 30px; height: 30px; border: 1px dashed #A7AEB7; display: inline-block; }
+.tint { position: relative; z-index: 5; pointer-events: none; background: var(--green-tint); }
+.slicer { padding: 6px; display: flex; flex-direction: column; gap: 3px; margin: 4px 6px 0 6px; }
+.sl-head { display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 0 2px 3px; }
+.sl-clear { width: 16px; height: 16px; border: 1px solid #D3D7DC; background: #F7F8F9; position: relative; padding: 0; }
+.sl-clear::before, .sl-clear::after { content: ""; position: absolute; left: 3px; right: 3px; top: 7px; height: 1px; background: #B9BEC5; transform: rotate(45deg); }
+.sl-clear::after { transform: rotate(-45deg); }
+.sl-item { height: 19px; display: flex; justify-content: space-between; align-items: center; padding: 0 7px; font-size: 12px;
+  border: 1px solid #9FB3CF; background: #E3EBF6; color: var(--ink); cursor: pointer; border-radius: 1px; }
+.sl-item .n { color: var(--ink-3); }
+.sl-item:hover { background: #D2DFF0; }
+.tbgroup { display: inline-flex; border: 1px solid var(--hdr-line); border-radius: 2px; overflow: hidden; }
+.tbgroup .tb { border: 0; border-radius: 0; border-right: 1px solid var(--hdr-line); }
+.tbgroup .tb:last-child { border-right: 0; }
+.tblabel { font-size: 12px; color: var(--ink-3); margin-right: 4px; }
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="titlebar">
+  <svg class="logo" viewBox="0 0 18 18" aria-hidden="true"><rect x="0.5" y="0.5" width="17" height="17" fill="none" stroke="#fff"/><path d="M0.5 6.5H17.5M0.5 12H17.5M6 0.5V17.5M12 0.5V17.5" stroke="#fff"/><rect x="6" y="6.5" width="6" height="5.5" fill="#fff"/></svg>
+  <span class="book">Wildbook</span>
+  <span class="ws">Region <b>Saltmarsh Reach</b></span>
+  <label class="search"><svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.2" fill="none" stroke="#737B85" stroke-width="1.5"/><path d="M8.6 8.6L12 12" stroke="#737B85" stroke-width="1.5"/></svg><input type="search" placeholder="Search by name, number or type" aria-label="Search by name, number or type"></label>
+  <span class="meta">10 of 16 caught</span>
+</header>
+<div class="toolbar" role="toolbar" aria-label="Sheet tools">
+  <button class="tb">Undo</button><button class="tb">Redo</button><span class="sep"></span>
+  <span class="tblabel">Sort by</span>
+  <span class="tbgroup"><button class="tb on" aria-pressed="true">Number</button><button class="tb">Name</button><button class="tb">Rarity</button></span>
+  <span class="sep"></span>
+  <button class="tb on" aria-pressed="true">Filter</button><button class="tb on" aria-pressed="true">Freeze rows 1 to 3</button><span class="sep"></span>
+  <button class="tb">Insert image in cell</button><button class="tb on" aria-pressed="true">Split view</button><button class="tb">Slicer</button>
+</div>
+<div class="fbar">
+  <div class="namebox" aria-label="Selected cell">B10</div>
+  <div class="fx" aria-hidden="true">fx</div>
+  <div class="formula" aria-label="Formula">=<span class="fn">IMAGE</span>(<span class="str">"lanternfin.svg"</span>)</div>
+</div>
+<div class="panes">
+  <section class="pane left" aria-label="Index">
+    <div class="panehead"><b>Index</b><span>rows 4 to 19, sorted by No.</span></div>
+    <div class="sheetwrap">
+<div class="sheet" role="grid" aria-label="Index" style="grid-template-columns:var(--rowhdr) 52px 64px 184px 114px 108px 126px 80px 40px;grid-template-rows:var(--colhdr) 28px 24px 24px 38px 38px 38px 38px 38px 38px 38px 38px 38px 38px 38px 38px 38px 38px 38px 38px 22px">
+<div class="corner" style="grid-area:1/1" aria-hidden="true"></div>
+<div class="ch on" style="grid-area:1/2" aria-hidden="true">A</div>
+<div class="ch on" style="grid-area:1/3" aria-hidden="true">B</div>
+<div class="ch on" style="grid-area:1/4" aria-hidden="true">C</div>
+<div class="ch on" style="grid-area:1/5" aria-hidden="true">D</div>
+<div class="ch on" style="grid-area:1/6" aria-hidden="true">E</div>
+<div class="ch on" style="grid-area:1/7" aria-hidden="true">F</div>
+<div class="ch on" style="grid-area:1/8" aria-hidden="true">G</div>
+<div class="ch" style="grid-area:1/9" aria-hidden="true">H</div>
+<div class="rh" style="grid-area:2/1" aria-hidden="true">1</div>
+<div class="rh" style="grid-area:3/1" aria-hidden="true">2</div>
+<div class="rh" style="grid-area:4/1" aria-hidden="true">3</div>
+<div class="rh" style="grid-area:5/1" aria-hidden="true">4</div>
+<div class="rh" style="grid-area:6/1" aria-hidden="true">5</div>
+<div class="rh" style="grid-area:7/1" aria-hidden="true">6</div>
+<div class="rh" style="grid-area:8/1" aria-hidden="true">7</div>
+<div class="rh" style="grid-area:9/1" aria-hidden="true">8</div>
+<div class="rh" style="grid-area:10/1" aria-hidden="true">9</div>
+<div class="rh on" style="grid-area:11/1" aria-hidden="true">10</div>
+<div class="rh" style="grid-area:12/1" aria-hidden="true">11</div>
+<div class="rh" style="grid-area:13/1" aria-hidden="true">12</div>
+<div class="rh" style="grid-area:14/1" aria-hidden="true">13</div>
+<div class="rh" style="grid-area:15/1" aria-hidden="true">14</div>
+<div class="rh" style="grid-area:16/1" aria-hidden="true">15</div>
+<div class="rh" style="grid-area:17/1" aria-hidden="true">16</div>
+<div class="rh" style="grid-area:18/1" aria-hidden="true">17</div>
+<div class="rh" style="grid-area:19/1" aria-hidden="true">18</div>
+<div class="rh" style="grid-area:20/1" aria-hidden="true">19</div>
+<div class="rh" style="grid-area:21/1" aria-hidden="true">20</div>
+<i class="c" style="grid-area:2/9"></i>
+<i class="c" style="grid-area:3/9"></i>
+<i class="c" style="grid-area:4/9"></i>
+<i class="c" style="grid-area:5/9"></i>
+<i class="c" style="grid-area:6/9"></i>
+<i class="c" style="grid-area:7/9"></i>
+<i class="c" style="grid-area:8/9"></i>
+<i class="c" style="grid-area:9/9"></i>
+<i class="c" style="grid-area:10/9"></i>
+<i class="c" style="grid-area:11/9"></i>
+<i class="c" style="grid-area:12/9"></i>
+<i class="c" style="grid-area:13/9"></i>
+<i class="c" style="grid-area:14/9"></i>
+<i class="c" style="grid-area:15/9"></i>
+<i class="c" style="grid-area:16/9"></i>
+<i class="c" style="grid-area:17/9"></i>
+<i class="c" style="grid-area:18/9"></i>
+<i class="c" style="grid-area:19/9"></i>
+<i class="c" style="grid-area:20/9"></i>
+<i class="c" style="grid-area:21/2"></i>
+<i class="c" style="grid-area:21/3"></i>
+<i class="c" style="grid-area:21/4"></i>
+<i class="c" style="grid-area:21/5"></i>
+<i class="c" style="grid-area:21/6"></i>
+<i class="c" style="grid-area:21/7"></i>
+<i class="c" style="grid-area:21/8"></i>
+<i class="c" style="grid-area:21/9"></i>
+<div class="x title" style="grid-area:2/2/3/9;">Saltmarsh Reach <span class="dim" style="font-size:13px;font-weight:400">creature index, 16 slots</span></div>
+<div class="x b" style="grid-area:3/2/4/5;">10 of 16 caught <span class="dim">(62%)</span></div>
+<div class="x r" style="grid-area:3/5/4/7;" title="Data bar: 10 of 16 caught"><span class="bar" style="width:62.5%"></span><span style="margin-left:auto">62%</span></div>
+<div class="x sub" style="grid-area:3/7/4/9;">3 seen, 3 unknown (blank rows)</div>
+<div class="x th" style="grid-area:4/2/5/3;"><span class="grow" style="text-align:right">No.</span><button class="fb sorted" aria-label="Filter No."></button></div>
+<div class="x th" style="grid-area:4/3/5/4;"><span class="grow">Image</span></div>
+<div class="x th" style="grid-area:4/4/5/5;"><span class="grow">Name</span><button class="fb" aria-label="Filter Name"></button></div>
+<div class="x th" style="grid-area:4/5/5/6;"><span class="grow">Type</span><button class="fb" aria-label="Filter Type"></button></div>
+<div class="x th" style="grid-area:4/6/5/7;"><span class="grow">Rarity</span><button class="fb" aria-label="Filter Rarity"></button></div>
+<div class="x th" style="grid-area:4/7/5/8;"><span class="grow">Status</span><button class="fb" aria-label="Filter Status"></button></div>
+<div class="x th" style="grid-area:4/8/5/9;"><span class="grow" style="text-align:right">Caught</span><button class="fb" aria-label="Filter Caught"></button></div>
+<div class="x r" style="grid-area:5/2/6/3;">001</div>
+<div class="x ctr" style="grid-area:5/3/6/4;"><img src="../../art/reedling.svg" alt="Reedling" width="36" height="36"></div>
+<div class="x " style="grid-area:5/4/6/5;">Reedling</div>
+<div class="x " style="grid-area:5/5/6/6;">Moss</div>
+<div class="x " style="grid-area:5/6/6/7;"><span class="common">Common</span></div>
+<div class="x good" style="grid-area:5/7/6/8;">Caught</div>
+<div class="x r" style="grid-area:5/8/6/9;">14</div>
+<div class="x r" style="grid-area:6/2/7/3;">002</div>
+<div class="x ctr" style="grid-area:6/3/7/4;"><img src="../../art/bogwhistle.svg" alt="Bogwhistle" width="36" height="36"></div>
+<div class="x " style="grid-area:6/4/7/5;">Bogwhistle</div>
+<div class="x " style="grid-area:6/5/7/6;">Moss / Gale</div>
+<div class="x " style="grid-area:6/6/7/7;"><span class="chip unc">Uncommon</span></div>
+<div class="x good" style="grid-area:6/7/7/8;">Caught</div>
+<div class="x r" style="grid-area:6/8/7/9;">3</div>
+<div class="x r" style="grid-area:7/2/8/3;">003</div>
+<div class="x ctr" style="grid-area:7/3/8/4;"><img src="../../art/cindermoth.svg" alt="Cindermoth" width="36" height="36"></div>
+<div class="x " style="grid-area:7/4/8/5;">Cindermoth</div>
+<div class="x " style="grid-area:7/5/8/6;">Ember</div>
+<div class="x " style="grid-area:7/6/8/7;"><span class="common">Common</span></div>
+<div class="x good" style="grid-area:7/7/8/8;">Caught</div>
+<div class="x r" style="grid-area:7/8/8/9;">9</div>
+<div class="x r" style="grid-area:8/2/9/3;">004</div>
+<div class="x ctr" style="grid-area:8/3/9/4;"><img src="../../art/pebblepup.svg" alt="Pebblepup" width="36" height="36"></div>
+<div class="x " style="grid-area:8/4/9/5;">Pebblepup</div>
+<div class="x " style="grid-area:8/5/9/6;">Stone</div>
+<div class="x " style="grid-area:8/6/9/7;"><span class="common">Common</span></div>
+<div class="x good" style="grid-area:8/7/9/8;">Caught</div>
+<div class="x r" style="grid-area:8/8/9/9;">22</div>
+<div class="x r" style="grid-area:9/2/10/3;">005</div>
+<div class="x ctr" style="grid-area:9/3/10/4;"><img src="../../art/saltcrab.svg" alt="Saltcrab" width="36" height="36"></div>
+<div class="x " style="grid-area:9/4/10/5;">Saltcrab</div>
+<div class="x " style="grid-area:9/5/10/6;">Tide / Stone</div>
+<div class="x " style="grid-area:9/6/10/7;"><span class="common">Common</span></div>
+<div class="x good" style="grid-area:9/7/10/8;">Caught</div>
+<div class="x r" style="grid-area:9/8/10/9;">6</div>
+<div class="x r" style="grid-area:10/2/11/3;">006</div>
+<div class="x ctr" style="grid-area:10/3/11/4;"><img src="../../art/glimmerfry.svg" alt="Glimmerfry" width="36" height="36"></div>
+<div class="x " style="grid-area:10/4/11/5;">Glimmerfry</div>
+<div class="x " style="grid-area:10/5/11/6;">Tide</div>
+<div class="x " style="grid-area:10/6/11/7;"><span class="chip unc">Uncommon</span></div>
+<div class="x good" style="grid-area:10/7/11/8;">Caught</div>
+<div class="x r" style="grid-area:10/8/11/9;">5</div>
+<div class="x r" style="grid-area:11/2/12/3;">007</div>
+<div class="x ctr" style="grid-area:11/3/12/4;"><img src="../../art/lanternfin.svg" alt="Lanternfin" width="36" height="36"></div>
+<div class="x " style="grid-area:11/4/12/5;">Lanternfin</div>
+<div class="x " style="grid-area:11/5/12/6;">Tide / Ember</div>
+<div class="x " style="grid-area:11/6/12/7;"><span class="chip rare">Rare</span></div>
+<div class="x good" style="grid-area:11/7/12/8;">Caught</div>
+<div class="x r" style="grid-area:11/8/12/9;">3</div>
+<div class="x r" style="grid-area:12/2/13/3;">008</div>
+<div class="x clear" style="grid-area:12/3/13/4;"></div>
+<div class="x clear" style="grid-area:12/4/13/5;"></div>
+<div class="x clear" style="grid-area:12/5/13/6;"></div>
+<div class="x clear" style="grid-area:12/6/13/7;"></div>
+<div class="x clear" style="grid-area:12/7/13/8;"></div>
+<div class="x clear" style="grid-area:12/8/13/9;"></div>
+<div class="x r" style="grid-area:13/2/14/3;">009</div>
+<div class="x ctr" style="grid-area:13/3/14/4;"><img class="sil" src="../../art/mistheron.svg" alt="Mistheron, silhouette (seen, not caught)" width="36" height="36"></div>
+<div class="x " style="grid-area:13/4/14/5;">Mistheron</div>
+<div class="x " style="grid-area:13/5/14/6;">Gale</div>
+<div class="x " style="grid-area:13/6/14/7;"><span class="chip unc">Uncommon</span></div>
+<div class="x warn" style="grid-area:13/7/14/8;">Seen, not caught</div>
+<div class="x r muted" style="grid-area:13/8/14/9;">0</div>
+<div class="x r" style="grid-area:14/2/15/3;">010</div>
+<div class="x ctr" style="grid-area:14/3/15/4;"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler" width="36" height="36"></div>
+<div class="x wrap mid" style="grid-area:14/4/15/5;;line-height:1.15">Greater Spotted Marsh Wobbler</div>
+<div class="x " style="grid-area:14/5/15/6;">Moss / Tide</div>
+<div class="x " style="grid-area:14/6/15/7;"><span class="chip unc">Uncommon</span></div>
+<div class="x good" style="grid-area:14/7/15/8;">Caught</div>
+<div class="x r" style="grid-area:14/8/15/9;">1</div>
+<div class="x r" style="grid-area:15/2/16/3;">011</div>
+<div class="x ctr err" style="grid-area:15/3/16/4;" title="IMAGE() could not load emberkit.svg. Showing a placeholder."><span class="ph" aria-hidden="true">No image</span><img src="../../art/emberkit.svg" alt="Emberkit" width="36" height="36" onerror="this.remove()"></div>
+<div class="x " style="grid-area:15/4/16/5;">Emberkit</div>
+<div class="x " style="grid-area:15/5/16/6;">Ember</div>
+<div class="x " style="grid-area:15/6/16/7;"><span class="common">Common</span></div>
+<div class="x good" style="grid-area:15/7/16/8;">Caught</div>
+<div class="x r" style="grid-area:15/8/16/9;">7</div>
+<div class="x r" style="grid-area:16/2/17/3;">012</div>
+<div class="x ctr" style="grid-area:16/3/17/4;"><img class="sil" src="../../art/stormgull.svg" alt="Stormgull, silhouette (seen, not caught)" width="36" height="36"></div>
+<div class="x " style="grid-area:16/4/17/5;">Stormgull</div>
+<div class="x " style="grid-area:16/5/17/6;">Gale / Tide</div>
+<div class="x " style="grid-area:16/6/17/7;"><span class="chip rare">Rare</span></div>
+<div class="x warn" style="grid-area:16/7/17/8;">Seen, not caught</div>
+<div class="x r muted" style="grid-area:16/8/17/9;">0</div>
+<div class="x r" style="grid-area:17/2/18/3;">013</div>
+<div class="x clear" style="grid-area:17/3/18/4;"></div>
+<div class="x clear" style="grid-area:17/4/18/5;"></div>
+<div class="x clear" style="grid-area:17/5/18/6;"></div>
+<div class="x clear" style="grid-area:17/6/18/7;"></div>
+<div class="x clear" style="grid-area:17/7/18/8;"></div>
+<div class="x clear" style="grid-area:17/8/18/9;"></div>
+<div class="x r" style="grid-area:18/2/19/3;">014</div>
+<div class="x ctr" style="grid-area:18/3/19/4;"><img src="../../art/cragback.svg" alt="Cragback" width="36" height="36"></div>
+<div class="x " style="grid-area:18/4/19/5;">Cragback</div>
+<div class="x " style="grid-area:18/5/19/6;">Stone</div>
+<div class="x " style="grid-area:18/6/19/7;"><span class="chip rare">Rare</span></div>
+<div class="x good" style="grid-area:18/7/19/8;">Caught</div>
+<div class="x r" style="grid-area:18/8/19/9;">2</div>
+<div class="x r" style="grid-area:19/2/20/3;background:var(--mythic-fill)">015</div>
+<div class="x ctr" style="grid-area:19/3/20/4;background:var(--mythic-fill)"><img class="sil" src="../../art/duskmote.svg" alt="Duskmote, silhouette (seen, not caught)" width="36" height="36"></div>
+<div class="x  b" style="grid-area:19/4/20/5;background:var(--mythic-fill)">Duskmote</div>
+<div class="x " style="grid-area:19/5/20/6;background:var(--mythic-fill)">Gale / Ember</div>
+<div class="x " style="grid-area:19/6/20/7;background:var(--mythic-fill)"><span class="chip myth">Mythic</span></div>
+<div class="x warn" style="grid-area:19/7/20/8;">Seen, not caught</div>
+<div class="x r muted" style="grid-area:19/8/20/9;background:var(--mythic-fill)">0</div>
+<div class="x r" style="grid-area:20/2/21/3;">016</div>
+<div class="x clear" style="grid-area:20/3/21/4;"></div>
+<div class="x clear" style="grid-area:20/4/21/5;"></div>
+<div class="x clear" style="grid-area:20/5/21/6;"></div>
+<div class="x clear" style="grid-area:20/6/21/7;"></div>
+<div class="x clear" style="grid-area:20/7/21/8;"></div>
+<div class="x clear" style="grid-area:20/8/21/9;"></div>
+<div class="freeze-h" style="grid-area:2/2/5/10;" aria-hidden="true"></div>
+<div class="tint" style="grid-area:11/2/12/3;" aria-hidden="true"></div>
+<div class="tint" style="grid-area:11/4/12/9;" aria-hidden="true"></div>
+<div class="selbox " style="grid-area:11/2/12/9;" aria-hidden="true"></div>
+</div>
+    </div>
+  </section>
+  <div class="split" aria-hidden="true"></div>
+  <section class="pane right" aria-label="Record">
+    <div class="panehead"><b>Record</b><code>=FILTER(Index!A4:G19, Index!A4:A19=7)</code></div>
+    <div class="sheetwrap">
+<div class="sheet" role="grid" aria-label="Record for #007 Lanternfin" style="grid-template-columns:30px 102px 112px 84px 84px 84px 84px 60px;grid-template-rows:var(--colhdr) 34px 26px 22px 22px 22px 22px 22px 22px 22px 22px 22px 22px 22px 46px 22px 22px 22px 22px 30px 22px 22px 22px 22px 22px 22px 22px 22px 22px 22px">
+<div class="corner" style="grid-area:1/1" aria-hidden="true"></div>
+<div class="ch" style="grid-area:1/2" aria-hidden="true">A</div>
+<div class="ch" style="grid-area:1/3" aria-hidden="true">B</div>
+<div class="ch" style="grid-area:1/4" aria-hidden="true">C</div>
+<div class="ch" style="grid-area:1/5" aria-hidden="true">D</div>
+<div class="ch" style="grid-area:1/6" aria-hidden="true">E</div>
+<div class="ch" style="grid-area:1/7" aria-hidden="true">F</div>
+<div class="ch" style="grid-area:1/8" aria-hidden="true">G</div>
+<div class="rh" style="grid-area:2/1" aria-hidden="true">1</div>
+<div class="rh" style="grid-area:3/1" aria-hidden="true">2</div>
+<div class="rh" style="grid-area:4/1" aria-hidden="true">3</div>
+<div class="rh" style="grid-area:5/1" aria-hidden="true">4</div>
+<div class="rh" style="grid-area:6/1" aria-hidden="true">5</div>
+<div class="rh" style="grid-area:7/1" aria-hidden="true">6</div>
+<div class="rh" style="grid-area:8/1" aria-hidden="true">7</div>
+<div class="rh" style="grid-area:9/1" aria-hidden="true">8</div>
+<div class="rh" style="grid-area:10/1" aria-hidden="true">9</div>
+<div class="rh" style="grid-area:11/1" aria-hidden="true">10</div>
+<div class="rh" style="grid-area:12/1" aria-hidden="true">11</div>
+<div class="rh" style="grid-area:13/1" aria-hidden="true">12</div>
+<div class="rh" style="grid-area:14/1" aria-hidden="true">13</div>
+<div class="rh" style="grid-area:15/1" aria-hidden="true">14</div>
+<div class="rh" style="grid-area:16/1" aria-hidden="true">15</div>
+<div class="rh" style="grid-area:17/1" aria-hidden="true">16</div>
+<div class="rh" style="grid-area:18/1" aria-hidden="true">17</div>
+<div class="rh" style="grid-area:19/1" aria-hidden="true">18</div>
+<div class="rh" style="grid-area:20/1" aria-hidden="true">19</div>
+<div class="rh" style="grid-area:21/1" aria-hidden="true">20</div>
+<div class="rh" style="grid-area:22/1" aria-hidden="true">21</div>
+<div class="rh" style="grid-area:23/1" aria-hidden="true">22</div>
+<div class="rh" style="grid-area:24/1" aria-hidden="true">23</div>
+<div class="rh" style="grid-area:25/1" aria-hidden="true">24</div>
+<div class="rh" style="grid-area:26/1" aria-hidden="true">25</div>
+<div class="rh" style="grid-area:27/1" aria-hidden="true">26</div>
+<div class="rh" style="grid-area:28/1" aria-hidden="true">27</div>
+<div class="rh" style="grid-area:29/1" aria-hidden="true">28</div>
+<div class="rh" style="grid-area:30/1" aria-hidden="true">29</div>
+<i class="c" style="grid-area:2/8"></i>
+<i class="c" style="grid-area:3/8"></i>
+<i class="c" style="grid-area:4/8"></i>
+<i class="c" style="grid-area:5/8"></i>
+<i class="c" style="grid-area:6/8"></i>
+<i class="c" style="grid-area:7/8"></i>
+<i class="c" style="grid-area:8/8"></i>
+<i class="c" style="grid-area:9/8"></i>
+<i class="c" style="grid-area:10/8"></i>
+<i class="c" style="grid-area:11/8"></i>
+<i class="c" style="grid-area:12/7"></i>
+<i class="c" style="grid-area:12/8"></i>
+<i class="c" style="grid-area:13/2"></i>
+<i class="c" style="grid-area:13/3"></i>
+<i class="c" style="grid-area:13/4"></i>
+<i class="c" style="grid-area:13/5"></i>
+<i class="c" style="grid-area:13/6"></i>
+<i class="c" style="grid-area:13/7"></i>
+<i class="c" style="grid-area:13/8"></i>
+<i class="c" style="grid-area:14/8"></i>
+<i class="c" style="grid-area:15/5"></i>
+<i class="c" style="grid-area:15/6"></i>
+<i class="c" style="grid-area:15/7"></i>
+<i class="c" style="grid-area:15/8"></i>
+<i class="c" style="grid-area:16/5"></i>
+<i class="c" style="grid-area:16/6"></i>
+<i class="c" style="grid-area:16/7"></i>
+<i class="c" style="grid-area:16/8"></i>
+<i class="c" style="grid-area:17/4"></i>
+<i class="c" style="grid-area:17/5"></i>
+<i class="c" style="grid-area:17/6"></i>
+<i class="c" style="grid-area:17/7"></i>
+<i class="c" style="grid-area:17/8"></i>
+<i class="c" style="grid-area:18/5"></i>
+<i class="c" style="grid-area:18/6"></i>
+<i class="c" style="grid-area:18/7"></i>
+<i class="c" style="grid-area:18/8"></i>
+<i class="c" style="grid-area:19/2"></i>
+<i class="c" style="grid-area:19/3"></i>
+<i class="c" style="grid-area:19/4"></i>
+<i class="c" style="grid-area:19/5"></i>
+<i class="c" style="grid-area:19/6"></i>
+<i class="c" style="grid-area:19/7"></i>
+<i class="c" style="grid-area:19/8"></i>
+<i class="c" style="grid-area:20/8"></i>
+<i class="c" style="grid-area:21/8"></i>
+<i class="c" style="grid-area:22/8"></i>
+<i class="c" style="grid-area:23/2"></i>
+<i class="c" style="grid-area:23/3"></i>
+<i class="c" style="grid-area:23/4"></i>
+<i class="c" style="grid-area:23/5"></i>
+<i class="c" style="grid-area:23/6"></i>
+<i class="c" style="grid-area:23/7"></i>
+<i class="c" style="grid-area:23/8"></i>
+<i class="c" style="grid-area:24/2"></i>
+<i class="c" style="grid-area:24/3"></i>
+<i class="c" style="grid-area:24/4"></i>
+<i class="c" style="grid-area:24/5"></i>
+<i class="c" style="grid-area:24/6"></i>
+<i class="c" style="grid-area:24/7"></i>
+<i class="c" style="grid-area:24/8"></i>
+<i class="c" style="grid-area:25/2"></i>
+<i class="c" style="grid-area:25/3"></i>
+<i class="c" style="grid-area:25/4"></i>
+<i class="c" style="grid-area:25/5"></i>
+<i class="c" style="grid-area:25/6"></i>
+<i class="c" style="grid-area:25/7"></i>
+<i class="c" style="grid-area:25/8"></i>
+<i class="c" style="grid-area:26/2"></i>
+<i class="c" style="grid-area:26/3"></i>
+<i class="c" style="grid-area:26/4"></i>
+<i class="c" style="grid-area:26/5"></i>
+<i class="c" style="grid-area:26/6"></i>
+<i class="c" style="grid-area:26/7"></i>
+<i class="c" style="grid-area:26/8"></i>
+<i class="c" style="grid-area:27/2"></i>
+<i class="c" style="grid-area:27/3"></i>
+<i class="c" style="grid-area:27/4"></i>
+<i class="c" style="grid-area:27/5"></i>
+<i class="c" style="grid-area:27/6"></i>
+<i class="c" style="grid-area:27/7"></i>
+<i class="c" style="grid-area:27/8"></i>
+<i class="c" style="grid-area:28/2"></i>
+<i class="c" style="grid-area:28/3"></i>
+<i class="c" style="grid-area:28/4"></i>
+<i class="c" style="grid-area:28/5"></i>
+<i class="c" style="grid-area:28/6"></i>
+<i class="c" style="grid-area:28/7"></i>
+<i class="c" style="grid-area:28/8"></i>
+<i class="c" style="grid-area:29/2"></i>
+<i class="c" style="grid-area:29/3"></i>
+<i class="c" style="grid-area:29/4"></i>
+<i class="c" style="grid-area:29/5"></i>
+<i class="c" style="grid-area:29/6"></i>
+<i class="c" style="grid-area:29/7"></i>
+<i class="c" style="grid-area:29/8"></i>
+<i class="c" style="grid-area:30/2"></i>
+<i class="c" style="grid-area:30/3"></i>
+<i class="c" style="grid-area:30/4"></i>
+<i class="c" style="grid-area:30/5"></i>
+<i class="c" style="grid-area:30/6"></i>
+<i class="c" style="grid-area:30/7"></i>
+<i class="c" style="grid-area:30/8"></i>
+<div class="x title" style="grid-area:2/2/3/8;font-size:20px;gap:8px"><span class="dim" style="font-size:20px;font-weight:600">#007</span>Lanternfin</div>
+<div class="x sub" style="grid-area:3/2/4/3;">Types</div>
+<div class="x " style="grid-area:3/3/4/4;">Tide / Ember</div>
+<div class="x sub" style="grid-area:3/4/4/5;">Rarity</div>
+<div class="x " style="grid-area:3/5/4/6;"><span class="chip rare">Rare</span></div>
+<div class="x sub" style="grid-area:3/6/4/7;">Caught</div>
+<div class="x r b" style="grid-area:3/7/4/8;">3</div>
+<div class="x ctr" style="grid-area:4/2/12/4;background:#FAFBFC"><img src="../../art/lanternfin.svg" alt="Lanternfin" width="176" height="176"></div>
+<div class="x wrap" style="grid-area:4/4/7/8;line-height:1.3;padding-top:4px">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it&rsquo;s kept out of salt water for more than a day.</div>
+<div class="x th" style="grid-area:7/4/8/5;">Stat</div>
+<div class="x th r" style="grid-area:7/5/8/6;">Value</div>
+<div class="x th sub" style="grid-area:7/6/8/8;"><span>0</span><span style="margin-left:auto">max 100</span></div>
+<div class="x " style="grid-area:8/4/9/5;">HP</div>
+<div class="x r b" style="grid-area:8/5/9/6;">62</div>
+<div class="x " style="grid-area:8/6/9/8;padding:0"><span class="bar" style="width:62%;background:var(--series)"></span></div>
+<div class="x " style="grid-area:9/4/10/5;">Attack</div>
+<div class="x r b" style="grid-area:9/5/10/6;">48</div>
+<div class="x " style="grid-area:9/6/10/8;padding:0"><span class="bar" style="width:48%;background:var(--series)"></span></div>
+<div class="x " style="grid-area:10/4/11/5;">Defense</div>
+<div class="x r b" style="grid-area:10/5/11/6;">55</div>
+<div class="x " style="grid-area:10/6/11/8;padding:0"><span class="bar" style="width:55%;background:var(--series)"></span></div>
+<div class="x " style="grid-area:11/4/12/5;">Speed</div>
+<div class="x r b" style="grid-area:11/5/12/6;">81</div>
+<div class="x " style="grid-area:11/6/12/8;padding:0"><span class="bar" style="width:81%;background:var(--series)"></span></div>
+<div class="x sub" style="grid-area:12/2/13/3;">Habitat</div>
+<div class="x " style="grid-area:12/3/13/5;">Tidal caves, night only</div>
+<div class="x sub" style="grid-area:12/5/13/6;">First caught</div>
+<div class="x " style="grid-area:12/6/13/7;">12 Aug</div>
+<div class="x th" style="grid-area:14/2/15/8;">Evolution line</div>
+<div class="x " style="grid-area:15/2/16/3;line-height:1.15;gap:4px;padding:0 4px"><img src="../../art/glimmerfry.svg" alt="" width="28" height="28"><span style="font-size:12px"><span class="dim">#006</span><br>Glimmerfry</span></div>
+<div class="x " style="grid-area:15/3/16/4;line-height:1.15;gap:4px;padding:0 4px;background:var(--green-tint)"><span class="dim">&rarr;</span><img src="../../art/lanternfin.svg" alt="" width="28" height="28"><span style="font-size:12px"><span class="dim">#007</span><br><b>Lanternfin</b></span></div>
+<div class="x " style="grid-area:15/4/16/5;gap:5px;padding:0 4px"><span class="dim">&rarr;</span><span class="empty" aria-label="unknown"></span><span class="dim">#008</span></div>
+<div class="x th" style="grid-area:16/2/17/3;">Drop</div>
+<div class="x th" style="grid-area:16/3/17/4;">Rarity</div>
+<div class="x th r" style="grid-area:16/4/17/5;">Chance</div>
+<div class="x " style="grid-area:17/2/18/3;">Lantern scale</div>
+<div class="x " style="grid-area:17/3/18/4;"><span class="common">Common</span></div>
+<div class="x " style="grid-area:18/2/19/3;">Deep pearl</div>
+<div class="x " style="grid-area:18/3/19/4;"><span class="chip rare">Rare</span></div>
+<div class="x r" style="grid-area:18/4/19/5;">4%</div>
+<div class="x btncell" style="grid-area:20/2/21/4;"><button class="btn pri">Show on map</button></div>
+<div class="x btncell" style="grid-area:20/4/21/6;"><button class="btn">Mark as favourite</button></div>
+<div class="x btncell" style="grid-area:20/6/21/8;"><button class="btn" disabled aria-describedby="team-why">Add to team</button></div>
+<div class="x muted i" style="grid-area:21/2/22/8;"><span id="team-why">Add to team is unavailable. Team is full (6 of 6). Remove one to add Lanternfin.</span></div>
+<div class="x sub i" style="grid-area:22/2/23/8;">Slicers filter the Index. Nothing is filtered: every value is on.</div>
+<div class="obj slicer" style="grid-area:23/2/30/4;" role="group" aria-label="Status filter"><div class="sl-head"><b>Status: All</b><button class="sl-clear" disabled aria-label="Clear filter (nothing filtered)"></button></div><button class="sl-item" aria-pressed="true"><span>Caught</span><span class="n">10</span></button><button class="sl-item" aria-pressed="true"><span>Seen</span><span class="n">3</span></button><button class="sl-item" aria-pressed="true"><span>Unknown</span><span class="n">3</span></button></div>
+<div class="obj slicer" style="grid-area:23/4/30/6;" role="group" aria-label="Type filter"><div class="sl-head"><b>Type</b><button class="sl-clear" disabled aria-label="Clear filter (nothing filtered)"></button></div><button class="sl-item" aria-pressed="true"><span>Tide</span><span class="n">5</span></button><button class="sl-item" aria-pressed="true"><span>Moss</span><span class="n">3</span></button><button class="sl-item" aria-pressed="true"><span>Ember</span><span class="n">4</span></button><button class="sl-item" aria-pressed="true"><span>Gale</span><span class="n">4</span></button><button class="sl-item" aria-pressed="true"><span>Stone</span><span class="n">3</span></button></div>
+<div class="obj slicer" style="grid-area:23/6/30/8;" role="group" aria-label="Rarity filter"><div class="sl-head"><b>Rarity</b><button class="sl-clear" disabled aria-label="Clear filter (nothing filtered)"></button></div><button class="sl-item" aria-pressed="true"><span>Common</span><span class="n">5</span></button><button class="sl-item" aria-pressed="true"><span>Uncommon</span><span class="n">4</span></button><button class="sl-item" aria-pressed="true"><span>Rare</span><span class="n">3</span></button><button class="sl-item" aria-pressed="true"><span>Mythic</span><span class="n">1</span></button></div>
+</div>
+    </div>
+  </section>
+</div>
+<nav class="tabs" aria-label="Sections">
+  <div class="tabnav"><button aria-label="Previous sheet">&lsaquo;</button><button aria-label="Next sheet">&rsaquo;</button></div>
+  <a class="tab" href="#" aria-current="page">Index</a>
+  <a class="tab" href="#">Team <span class="dim">6 of 6</span></a>
+  <a class="tab" href="#">Map</a>
+  <a class="tab" href="#">Items</a>
+  <button class="tab add" aria-label="Add sheet">+</button>
+  <div class="hscroll" aria-hidden="true"><span></span></div>
+</nav>
+<footer class="status">
+  <span>Ready</span>
+  <span>B14: image could not load (emberkit.svg), placeholder shown</span>
+  <span class="push">Selection A10:G10</span>
+  <span>Count: 7</span>
+  <span>100%</span>
+</footer>
+</div>
+</body>
+</html>

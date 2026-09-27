@@ -1,0 +1,51 @@
+@import url("https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Kalam:wght@400;700&family=Fragment+Mono&display=swap");
+
+:root {
+  --font-ui: "Albert Sans", "Segoe UI", sans-serif;
+  --font-hand: "Kalam", "Segoe Print", cursive;
+  --font-code: "Fragment Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  --canvas: #F3F4F6;
+  --grid-minor: #E6E8EC;
+  --grid-major: #DADDE3;
+  --surface: #FFFFFF;
+  --frame-fill: rgba(255, 255, 255, 0.55);
+  --frame-line: #C9CED8;
+  --node-line: #B9BFCB;
+  --ink: #1D2230;
+  --ink-2: #4A5163;
+  --muted: #636A7C;
+
+  --select: #2F6BFF;
+  --select-ink: #1F52D6;
+  --select-tint: #E4ECFF;
+  --sticky: #FFE58A;
+  --sticky-ink: #3B3210;
+  --sticky-error: #FFD3D0;
+
+  --ok: #1E8A4C;
+  --fail: #D12F3B;
+  --fail-ink: #A81E2A;
+  --regress: #D9590B;
+  --regress-ink: #B24407;
+  --mythic: #7A3FE0;
+
+  --cursor-a: #0E9F8A;
+  --cursor-b: #C4359B;
+  --cursor-c: #2F6BFF;
+
+  --t-11: 11px;
+  --t-12: 12px;
+  --t-13: 13px;
+  --t-15: 15px;
+  --t-18: 18px;
+  --t-22: 22px;
+  --t-28: 28px;
+  --t-48: 48px;
+
+  --grid-step: 24px;
+  --r-node: 10px;
+  --r-float: 12px;
+  --r-frame: 0;
+  --float-shadow: 0 1px 2px rgba(29, 34, 48, 0.08), 0 4px 14px rgba(29, 34, 48, 0.10);
+}

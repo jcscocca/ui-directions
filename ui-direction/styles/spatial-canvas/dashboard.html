@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals: Runs board, atlas-research</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { overflow: hidden; }
+  .board { position: relative; width: 1440px; height: 900px; overflow: hidden; }
+
+  .title h1 { margin: 0; font-size: var(--t-22); font-weight: 800; letter-spacing: -0.015em; }
+  .title p { margin: 3px 0 0; font-size: var(--t-13); color: var(--ink-2); }
+  .title p b { color: var(--ink); }
+
+  .run { width: 188px; }
+  .narrow { width: 176px; }
+  .rh { display: flex; align-items: center; gap: 6px; }
+  .rh .rid { font-weight: 600; font-size: 12.5px; }
+  .rh .t { margin-left: auto; color: var(--muted); font-size: var(--t-12); }
+  .ds { margin-top: 4px; font-size: var(--t-13); color: var(--ink); overflow-wrap: anywhere; line-height: 1.25; }
+  .sc { display: flex; align-items: baseline; gap: 10px; margin-top: 6px; }
+  .sc b { font-size: var(--t-22); font-weight: 700; letter-spacing: -0.01em; line-height: 1; }
+  .sc .d { font-size: var(--t-12); color: var(--ink-2); }
+  .sc .nc { color: var(--muted); font-weight: 500; }
+  .meta { margin-top: 6px; font-size: var(--t-12); color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+  .meta .s { color: var(--ink); font-weight: 600; }
+  .meta .s.fail { color: var(--fail-ink); }
+  .st { width: 14px; height: 14px; flex: none; }
+  .prog { margin-top: 7px; height: 6px; border-radius: 3px; background: var(--select-tint); overflow: hidden; }
+  .prog i { display: block; height: 100%; width: 62%; background: var(--select); }
+  .run.failed { border-color: var(--fail); }
+  .run.queued { border-style: dashed; border-color: #9AA1B0; background: rgba(255,255,255,0.7); }
+
+  .ghost { border-style: dashed; border-color: #9AA1B0; background: rgba(255,255,255,0.45); color: var(--ink-2); width: 176px; }
+  .ghost .kind { font-size: var(--t-11); font-weight: 600; color: var(--muted); }
+
+  /* expanded selected node */
+  .big { left: 820px; top: 120px; width: 580px; padding: 18px 22px 20px; z-index: 5; }
+  .big-head { display: flex; align-items: center; gap: 8px; font-size: var(--t-12); color: var(--ink-2); }
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 5px; border-radius: 999px; font-weight: 700; font-size: var(--t-12); }
+  .chip.ok { background: #E3F3EA; color: var(--ok); }
+  .big-head .when { margin-left: auto; }
+  .big h2 { margin: 8px 0 2px; font-size: var(--t-22); font-weight: 800; letter-spacing: -0.015em; line-height: 1.15; }
+  .base { color: var(--ink-2); font-size: var(--t-13); }
+  .scoreline { display: flex; align-items: flex-end; gap: 18px; margin-top: 14px; }
+  .scoreline .v { font-size: var(--t-48); font-weight: 800; letter-spacing: -0.03em; line-height: 0.9; }
+  .scoreline .dv { font-size: var(--t-28); font-weight: 800; color: var(--regress-ink); letter-spacing: -0.02em; line-height: 1; }
+  .scoreline .dv small { display: block; font-size: var(--t-11); font-weight: 600; color: var(--muted); letter-spacing: 0; margin-bottom: 3px; }
+  .scoreline .v small { display: block; font-size: var(--t-11); font-weight: 600; color: var(--muted); letter-spacing: 0; margin-bottom: 5px; }
+  .verdict { margin-left: auto; max-width: 196px; font-size: var(--t-13); line-height: 1.3; padding-left: 12px; border-left: 3px solid var(--regress); }
+  .verdict b { color: var(--regress-ink); }
+
+  .cols { display: grid; grid-template-columns: 238px 1fr; gap: 22px; margin-top: 18px; }
+  table.m { border-collapse: collapse; width: 100%; font-size: var(--t-13); }
+  table.m th { text-align: right; font-size: var(--t-11); font-weight: 600; color: var(--muted); padding: 0 0 5px; }
+  table.m th:first-child, table.m td:first-child { text-align: left; }
+  table.m td { text-align: right; padding: 5px 0; border-top: 1px solid #ECEEF2; }
+  table.m td:first-child { font-weight: 600; }
+  table.m td.neg { color: var(--regress-ink); font-weight: 600; }
+  table.m td.pos { color: var(--ink-2); }
+  .chart-cap { font-size: var(--t-12); color: var(--ink-2); margin-bottom: 4px; }
+  .chart-cap b { color: var(--ink); }
+  svg.chart text { font-family: var(--font-ui); font-size: 10.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .log { margin-top: 18px; background: #F4F5F8; border: 1px solid #E6E8EE; border-radius: 6px; padding: 8px 12px; }
+  .log-cap { font-size: var(--t-11); font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+  .log pre { margin: 0; font-family: var(--font-code); font-size: 11.5px; line-height: 1.6; color: var(--ink); white-space: pre; }
+  .log .w { color: var(--regress-ink); }
+
+  .actions { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+  .btn {
+    height: 34px; padding: 0 14px; border-radius: 8px; white-space: nowrap; border: 1px solid transparent; font-weight: 700; font-size: var(--t-13); cursor: pointer;
+  }
+  .btn.primary { background: var(--select); color: #fff; }
+  .btn.primary:hover { background: var(--select-ink); }
+  .btn.secondary { background: var(--surface); border-color: #BCC2CE; color: var(--ink); }
+  .btn.secondary:hover { border-color: var(--ink); }
+  .btn[disabled] { background: #F1F2F5; border: 1px dashed #B7BCC8; color: #8A90A0; cursor: not-allowed; font-weight: 600; }
+  .actions .why { font-size: var(--t-12); color: var(--muted); max-width: 140px; line-height: 1.25; }
+
+  .wire.warn { stroke: var(--regress); stroke-width: 2; }
+  .wire.dash { stroke-dasharray: 4 4; }
+  .wire-label.warn { border-color: var(--regress); color: var(--regress-ink); }
+
+  .pinned { border-style: dashed; background: transparent; }
+  .pinned p { margin: 0; padding: 10px 14px; color: var(--ink-2); font-size: var(--t-13); }
+  .pinned p b { color: var(--ink); }
+
+  .err { background: var(--sticky-error); color: #4A1115; }
+  .err .code { display: block; margin-bottom: 6px; color: var(--fail-ink); line-height: 1.4; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="g-pass" viewBox="0 0 14 14"><circle cx="7" cy="7" r="7" fill="#1E8A4C"/><path d="M3.8 7.2l2.1 2.1 4.3-4.5" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="g-fail" viewBox="0 0 14 14"><rect width="14" height="14" rx="3" fill="#D12F3B"/><path d="M4.5 4.5l5 5M9.5 4.5l-5 5" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="g-run" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="#E4ECFF" stroke-width="3"/><path d="M7 1.5 A5.5 5.5 0 1 1 1.9 9.1" fill="none" stroke="#2F6BFF" stroke-width="3"/></symbol>
+    <symbol id="g-queue" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.8" fill="none" stroke="#7B8294" stroke-width="1.5" stroke-dasharray="2.4 2"/></symbol>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8C93A3"/></marker>
+    <marker id="arrow-warn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#D9590B"/></marker>
+  </defs>
+</svg>
+
+<div class="board">
+
+  <!-- top-left: product, workspace, pages -->
+  <nav class="float bar" style="left:16px;top:14px" aria-label="Sections">
+    <span class="brand">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="9" height="9" rx="2" fill="#1D2230"/><rect x="12" y="12" width="9" height="9" rx="2" fill="#2F6BFF"/><path d="M10 5.5h3.5a2 2 0 0 1 2 2V12" fill="none" stroke="#1D2230" stroke-width="1.6"/></svg>
+      Evals
+    </span>
+    <span class="ws">atlas-research</span>
+    <span class="sep"></span>
+    <a class="tab" href="#" aria-current="page">Runs</a>
+    <a class="tab" href="#">Datasets</a>
+    <a class="tab" href="#">Models</a>
+    <a class="tab" href="#">Baselines</a>
+    <a class="tab" href="#">Settings</a>
+  </nav>
+
+  <!-- top-right: who's here, search -->
+  <div class="float bar" style="right:16px;top:14px;width:392px">
+    <div class="faces" aria-label="On this board: M. Okafor, L. Brandt, you">
+      <span class="face" style="background:var(--cursor-a)" title="M. Okafor">MO</span>
+      <span class="face" style="background:var(--cursor-b)" title="L. Brandt">LB</span>
+      <span class="face" style="background:var(--cursor-c)" title="You" style="font-size:9px">you</span>
+    </div>
+    <span class="sep"></span>
+    <label class="search" style="flex:1">
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 9.5L13 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="sr">Search</span>
+      <input type="search" placeholder="Search runs, models, datasets">
+      <kbd>/</kbd>
+    </label>
+  </div>
+
+  <!-- canvas heading -->
+  <div class="canvas-text title" style="left:36px;top:74px">
+    <h1>Last night's runs</h1>
+    <p><b>8 runs</b> overnight, 23:00 to 02:00: <b>5</b> passed, <b>1</b> failed, <b>1</b> running, <b>1</b> queued</p>
+  </div>
+
+  <!-- connectors -->
+  <svg class="wires" width="1440" height="900" aria-hidden="true">
+    <path class="wire" d="M276 226 C 300 226, 298 266, 322 266" marker-end="url(#arrow)"/>
+    <path class="wire" d="M224 448 C 246 448, 244 464, 266 464" marker-end="url(#arrow)"/>
+    <path class="wire dash" d="M300 406 C 300 350, 196 352, 196 292" marker-end="url(#arrow)"/>
+    <path class="wire dash" d="M130 700 V726" marker-end="url(#arrow)"/>
+    <path class="wire" d="M736 196 H818" marker-end="url(#arrow)"/>
+    <path class="wire warn" d="M736 380 C 790 380, 770 292, 818 292" marker-end="url(#arrow-warn)"/>
+  </svg>
+
+  <!-- frame: router-small -->
+  <section class="frame" style="left:72px;top:152px;width:448px;height:186px" aria-label="router-small">
+    <div class="frame-label">router-small<span>2 runs</span></div>
+  </section>
+  <article class="node run" tabindex="0" style="left:88px;top:168px">
+    <div class="rh"><svg class="st"><use href="#g-run"/></svg><span class="rid code">r-2288</span><span class="t">00:51</span></div>
+    <div class="ds">adversarial-prompts</div>
+    <div class="sc"><b class="nc">—</b><span class="d">running, 62%</span></div>
+    <div class="prog" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"><i></i></div>
+    <div class="meta"><span>9m 10s so far</span><span>CI #4812</span></div>
+  </article>
+  <article class="node run" tabindex="0" style="left:324px;top:210px">
+    <div class="rh"><svg class="st"><use href="#g-pass"/></svg><span class="rid code">r-2289</span><span class="t">01:00</span></div>
+    <div class="ds">intent-routing-v7</div>
+    <div class="sc"><b>0.931</b><span class="d">Δ +0.012</span></div>
+    <div class="meta"><span class="s">Passed</span><span>3m 48s</span><span>schedule</span></div>
+  </article>
+
+  <!-- frame: extract-json -->
+  <section class="frame" style="left:20px;top:376px;width:452px;height:160px" aria-label="extract-json">
+    <div class="frame-label">extract-json<span>2 runs</span></div>
+  </section>
+  <article class="node run" tabindex="0" style="left:36px;top:392px">
+    <div class="rh"><svg class="st"><use href="#g-pass"/></svg><span class="rid code">r-2286</span><span class="t">23:58</span></div>
+    <div class="ds">receipts-small</div>
+    <div class="sc"><b>0.902</b><span class="d">Δ +0.000</span></div>
+    <div class="meta"><span class="s">Passed</span><span>2m 15s</span><span>L. Brandt</span></div>
+  </article>
+  <article class="node run failed" tabindex="0" style="left:268px;top:408px">
+    <div class="rh"><svg class="st"><use href="#g-fail"/></svg><span class="rid code">r-2287</span><span class="t">00:40</span></div>
+    <div class="ds">invoices-ocr</div>
+    <div class="sc"><b>0.000</b><span class="d">Δ −0.884</span></div>
+    <div class="meta"><span class="s fail">Failed</span><span>0m 41s</span><span>CI #4809</span></div>
+  </article>
+  <div class="sticky err" style="left:282px;top:526px;width:206px;transform:rotate(-1.5deg)">
+    <span class="code">KeyError: 'line_items' — 212 of 212 samples failed schema validation</span>
+    Failed, not a regression. Fix the output schema, then rerun.
+  </div>
+
+  <!-- frame: chat-core-8b -->
+  <section class="frame" style="left:20px;top:572px;width:220px;height:258px" aria-label="chat-core-8b">
+    <div class="frame-label">chat-core-8b<span>2 runs</span></div>
+  </section>
+  <article class="node run" tabindex="0" style="left:36px;top:588px">
+    <div class="rh"><svg class="st"><use href="#g-pass"/></svg><span class="rid code">r-2285</span><span class="t">23:00</span></div>
+    <div class="ds">helpfulness-pairwise</div>
+    <div class="sc"><b>0.668</b><span class="d">Δ +0.021</span></div>
+    <div class="meta"><span class="s">Passed</span><span>1h 06m</span><span>schedule</span></div>
+  </article>
+  <article class="node run queued" tabindex="0" style="left:36px;top:728px">
+    <div class="rh"><svg class="st"><use href="#g-queue"/></svg><span class="rid code">r-2284</span><span class="t">not started</span></div>
+    <div class="ds">safety-refusals</div>
+    <div class="sc"><b class="nc">—</b><span class="d">Δ —</span></div>
+    <div class="meta"><span class="s">Queued</span><span>schedule</span></div>
+  </article>
+
+  <!-- legend sticky -->
+  <div class="sticky" style="left:262px;top:666px;width:252px;transform:rotate(1deg)">
+    <b>—</b> means not computed yet: the run is running or queued.<br><b>0.000</b> is a real score of zero.
+  </div>
+
+  <!-- empty state -->
+  <section class="frame pinned" style="left:268px;top:794px;width:252px;height:72px" aria-label="Pinned comparisons">
+    <div class="frame-label">Pinned comparisons<span>none yet</span></div>
+    <p>Nothing pinned. <b>Compare with baseline</b> on a run, then pin the result here.</p>
+  </section>
+
+  <!-- frame: summarize-v3 -->
+  <section class="frame" style="left:540px;top:96px;width:880px;height:660px" aria-label="summarize-v3">
+    <div class="frame-label">summarize-v3<span>2 runs, 1 selected</span></div>
+  </section>
+  <article class="node run narrow" tabindex="0" style="left:560px;top:132px">
+    <div class="rh"><svg class="st"><use href="#g-pass"/></svg><span class="rid code">r-2290</span><span class="t">01:12</span></div>
+    <div class="ds">multilingual-<wbr>legal-<wbr>contracts-<wbr>longform-<wbr>eval-<wbr>2026-<wbr>q3</div>
+    <div class="sc"><b>0.774</b><span class="d">Δ +0.006</span></div>
+    <div class="meta"><span class="s">Passed</span><span>41m 55s</span><span>M. Okafor</span></div>
+  </article>
+
+  <article class="node ghost" style="left:560px;top:334px" aria-label="Baseline run r-2203">
+    <div class="kind">Baseline, not in tonight's runs</div>
+    <div class="rh" style="margin-top:3px"><span class="rid code">r-2203</span></div>
+    <div class="ds" style="color:var(--ink-2)">summarize-v2 on news-digest-2k</div>
+    <div class="sc"><b style="font-weight:600">0.853</b></div>
+  </article>
+  <div class="wire-label" style="left:206px;top:340px">next CI run</div>
+  <div class="wire-label warn" style="left:747px;top:322px">Δ −0.041</div>
+
+  <div class="sticky" style="left:570px;top:484px;width:174px;transform:rotate(1.5deg)">
+    Noise band is baseline ±0.02, so 0.833 to 0.873. <b>0.812 is 0.021 below it.</b> Real regression.
+  </div>
+
+  <!-- selected, expanded: r-2291 -->
+  <article class="node big selected" tabindex="0" aria-label="Selected run r-2291">
+    <span class="h tl"></span><span class="h tm"></span><span class="h tr"></span>
+    <span class="h ml"></span><span class="h mr"></span>
+    <span class="h bl"></span><span class="h bm"></span><span class="h br"></span>
+    <span class="size-pill">r-2291 selected</span>
+
+    <div class="big-head">
+      <span class="chip ok"><svg class="st"><use href="#g-pass"/></svg>Passed</span>
+      <span class="rid code" style="font-weight:600;color:var(--ink)">r-2291</span>
+      <span class="when">Started 02:00 by schedule, took 14m 02s</span>
+    </div>
+    <h2>summarize-v3 on news-digest-2k</h2>
+    <div class="base">Baseline: summarize-v2 @ <span class="code">r-2203</span> (0.853)</div>
+
+    <div class="scoreline">
+      <div class="v"><small>Score</small>0.812</div>
+      <div class="dv"><small>Δ vs baseline</small>−0.041</div>
+      <p class="verdict"><b>Regression.</b> Outside the ±0.02 noise band by 0.021. Faithfulness fell the most.</p>
+    </div>
+
+    <div class="cols">
+      <table class="m">
+        <thead><tr><th>Metric</th><th>Score</th><th>Baseline</th><th>Δ</th></tr></thead>
+        <tbody>
+          <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td class="neg">−0.035</td></tr>
+          <tr><td>Faithfulness</td><td>0.861</td><td>0.902</td><td class="neg">−0.041</td></tr>
+          <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td class="pos">−0.011</td></tr>
+          <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td class="pos">+0.16</td></tr>
+        </tbody>
+      </table>
+      <figure style="margin:0">
+        <div class="chart-cap"><b>Last 12 runs</b> on news-digest-2k, oldest first</div>
+        <svg class="chart" width="284" height="150" viewBox="0 0 284 150" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the noise band 0.833 to 0.873.">
+          <rect x="32" y="23.2" width="246" height="64" fill="#E4ECFF"/>
+          <line x1="32" x2="278" y1="12" y2="12" stroke="#ECEEF2"/>
+          <line x1="32" x2="278" y1="76" y2="76" stroke="#ECEEF2"/>
+          <line x1="32" x2="278" y1="140" y2="140" stroke="#C9CED8"/>
+          <line x1="32" x2="278" y1="55.2" y2="55.2" stroke="#636A7C" stroke-dasharray="3 3"/>
+          <text x="0" y="15">0.88</text><text x="0" y="79">0.84</text><text x="0" y="143">0.80</text>
+          <text x="36" y="34" style="fill:#1F52D6">noise band 0.833–0.873</text>
+          <polyline fill="none" stroke="#1D2230" stroke-width="1.8" stroke-linejoin="round" points="34,66.4 56.4,58.4 78.7,61.6 101.1,52 123.4,55.2 145.8,60 168.2,48.8 190.5,56.8 212.9,63.2 235.2,58.4 257.6,55.2"/>
+          <path d="M257.6 55.2 L276 120.8" fill="none" stroke="#D9590B" stroke-width="2"/>
+          <g fill="#1D2230">
+            <circle cx="34" cy="66.4" r="2.4"/><circle cx="56.4" cy="58.4" r="2.4"/><circle cx="78.7" cy="61.6" r="2.4"/><circle cx="101.1" cy="52" r="2.4"/><circle cx="123.4" cy="55.2" r="2.4"/><circle cx="145.8" cy="60" r="2.4"/><circle cx="168.2" cy="48.8" r="2.4"/><circle cx="190.5" cy="56.8" r="2.4"/><circle cx="212.9" cy="63.2" r="2.4"/><circle cx="235.2" cy="58.4" r="2.4"/><circle cx="257.6" cy="55.2" r="2.4"/>
+          </g>
+          <circle cx="276" cy="120.8" r="4.5" fill="#fff" stroke="#D9590B" stroke-width="2.5"/>
+          <text x="226" y="124" style="fill:#B24407;font-weight:700">0.812</text>
+          <text x="36" y="102">baseline 0.853 dashed</text>
+        </svg>
+      </figure>
+    </div>
+
+    <div class="log">
+      <div class="log-cap">Log, last 5 lines</div>
+<pre>02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+<span class="w">02:13:55  warn  length_ratio above 1.15 on 38% of samples</span>
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</pre>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary">Rerun evaluation</button>
+      <button class="btn secondary">Compare with baseline</button>
+      <button class="btn" disabled aria-describedby="why-cancel">Cancel run</button>
+      <span class="why" id="why-cancel">Can't cancel: it finished at 02:14:02.</span>
+    </div>
+  </article>
+
+  <!-- collaborators -->
+  <div class="cursor" style="left:704px;top:262px">
+    <svg width="18" height="20" viewBox="0 0 18 20" aria-hidden="true"><path d="M1 1l15 8-6.5 1.8L6.5 18z" fill="#0E9F8A" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span class="who" style="background:var(--cursor-a)">M. Okafor</span>
+  </div>
+  <div class="cursor" style="left:120px;top:498px">
+    <svg width="18" height="20" viewBox="0 0 18 20" aria-hidden="true"><path d="M1 1l15 8-6.5 1.8L6.5 18z" fill="#C4359B" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span class="who" style="background:var(--cursor-b)">L. Brandt</span>
+  </div>
+
+  <!-- tool bar + zoom -->
+  <div class="float tools" style="left:50%;bottom:16px;transform:translateX(-50%)" role="toolbar" aria-label="Canvas tools">
+    <button class="tool" aria-pressed="true" aria-label="Select (V)"><svg width="18" height="18" viewBox="0 0 18 18"><path d="M3 2l11 6-4.8 1.3L7 14z" fill="currentColor"/></svg><span class="k">V</span></button>
+    <button class="tool" aria-pressed="false" aria-label="Pan (H)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5.5 9V4.5a1.2 1.2 0 0 1 2.4 0V8M7.9 8V3a1.2 1.2 0 0 1 2.4 0v5M10.3 8V4a1.2 1.2 0 0 1 2.4 0v6.5c0 3-2 5-4.7 5-2 0-3.2-1-4.3-2.8L2.3 10a1.1 1.1 0 0 1 1.9-1.1L5.5 11"/></svg><span class="k">H</span></button>
+    <button class="tool" aria-pressed="false" aria-label="Frame (F)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2v14M13 2v14M2 5h14M2 13h14"/></svg><span class="k">F</span></button>
+    <button class="tool" aria-pressed="false" aria-label="Sticky note (S)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M3 3h12v8l-4 4H3z"/><path d="M11 15v-4h4"/></svg><span class="k">S</span></button>
+    <button class="tool" aria-pressed="false" aria-label="Connector (L)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="4" cy="14" r="2"/><path d="M5.5 12.5L14 4M10 4h4v4"/></svg><span class="k">L</span></button>
+    <button class="tool" aria-pressed="false" aria-label="Comment (C)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M9 2.5a6.5 6.5 0 1 1-3.3 12.1L2.5 15.5l.9-3.2A6.5 6.5 0 0 1 9 2.5z"/></svg><span class="k">C</span></button>
+    <span class="sep" style="width:1px;align-self:stretch;margin:6px 4px;background:#E3E6EB"></span>
+    <div class="zoom">
+      <button aria-label="Zoom out">−</button>
+      <output aria-label="Zoom level">64%</output>
+      <button aria-label="Zoom in">+</button>
+    </div>
+  </div>
+
+  <!-- minimap -->
+  <div class="float minimap" style="right:16px;bottom:16px" aria-label="Minimap">
+    <svg width="168" height="94" viewBox="0 0 168 94" aria-hidden="true">
+      <rect x="0" y="0" width="168" height="94" fill="#F3F4F6"/>
+      <g fill="#fff" stroke="#B9BFCB" stroke-width="0.8">
+        <rect x="30" y="30" width="36" height="11"/><rect x="30" y="44" width="36" height="11"/><rect x="30" y="64" width="36" height="11"/>
+        <rect x="70" y="20" width="68" height="52"/>
+        <rect x="8" y="10" width="16" height="12"/><rect x="146" y="60" width="14" height="22"/>
+      </g>
+      <rect x="95" y="23" width="40" height="46" fill="#E4ECFF" stroke="#2F6BFF" stroke-width="0.8"/>
+      <rect x="27" y="14" width="114" height="70" fill="none" stroke="#2F6BFF" stroke-width="1.5" rx="1.5"/>
+    </svg>
+  </div>
+
+</div>
+</body>
+</html>

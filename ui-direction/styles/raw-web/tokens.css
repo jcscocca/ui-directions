@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400;1,700&family=Cousine:wght@400;700&display=swap");
+
+:root {
+  --font-text: "Tinos", "Times New Roman", Times, serif;
+  --font-code: "Cousine", "Courier New", Courier, monospace;
+
+  --paper: #FFFFFF;
+  --ink: #000000;
+  --link: #0000EE;
+  --visited: #551A8B;
+  --bad: #CC0000;
+}
+
+/* The whole stylesheet. Everything else is the browser's default rendering. */
+body {
+  font-family: var(--font-text);
+  color: var(--ink);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+pre, code, kbd, samp, tt { font-family: var(--font-code); font-size: 0.8125em; }
+progress { accent-color: var(--ink); }
+a:link { color: var(--link); }
+a:visited { color: var(--visited); }
+.bad { color: var(--bad); }
+:focus-visible { outline: 2px dotted var(--ink); outline-offset: 2px; }

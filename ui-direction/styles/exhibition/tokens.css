@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Schibsted+Grotesk:ital,wght@0,400..700;1,400&display=swap");
+
+:root {
+  --font-object: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --font-label: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+
+  --wall: #F1F0EC;
+  --mat: #F8F7F3;
+  --room: #2F4A3A;
+  --ink: #1A1A1A;
+  --muted: #5C5B55;
+  --brass: #A88B4A;
+  --danger: #A3262A;
+  --on-room: #EDEBE4;
+  --on-room-muted: #B7C1B6;
+  --danger-on-room: #F4A391;
+
+  --t-caption: 12px;
+  --t-label: 13px;
+  --t-text: 15px;
+  --t-title: 22px;
+  --t-room: 34px;
+  --t-exhibit-scale: 100px; /* a numeral's size = score x this */
+  --t-centerpiece: 220px;
+
+  --rule: 1px solid var(--brass);
+  --radius: 0;
+}

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: this evening</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--ink); color: var(--ivory);
+    font-family: var(--font-ui); font-size: 15px; line-height: 1.45;
+    font-variant-numeric: tabular-nums lining-nums; overflow-x: hidden;
+  }
+  h1, h2, p, ol, ul, figure, blockquote { margin: 0; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 1px solid var(--gold); outline-offset: 4px; box-shadow: 0 0 0 4px var(--ink), 0 0 0 5px var(--gold); }
+  .caps { font-family: var(--font-ui); font-size: var(--t-caps); font-weight: 500; letter-spacing: var(--track-caps); text-transform: uppercase; }
+  .it { font-family: var(--font-display); font-style: italic; }
+
+  .frame { position: fixed; inset: 10px; border: 1px solid var(--gold); pointer-events: none; z-index: 20; }
+  .frame::after { content: ""; position: absolute; inset: 4px; border: 1px solid var(--gold); }
+  .orn { position: absolute; width: 30px; height: 30px; }
+  .orn.tl { left: -1px; top: -1px; }
+  .orn.tr { right: -1px; top: -1px; transform: scaleX(-1); }
+  .orn.bl { left: -1px; bottom: -1px; transform: scaleY(-1); }
+  .orn.br { right: -1px; bottom: -1px; transform: scale(-1, -1); }
+  .card-inner { padding: 30px 30px 110px; }
+
+  header { text-align: center; }
+  header .brand { font-family: var(--font-display); font-style: italic; font-size: 26px; line-height: 1; color: var(--gold); }
+  header .date { font-size: 17px; color: var(--ivory-dim); margin-top: 2px; }
+  .flourish { display: flex; align-items: center; gap: 10px; margin: 14px auto 0; width: 70%; }
+  .flourish::before, .flourish::after { content: ""; flex: 1; border-top: 1px solid var(--gold-dim); }
+  .flourish i { width: 6px; height: 6px; border: 1px solid var(--gold); transform: rotate(45deg); }
+
+  .book { text-align: center; margin-top: 16px; }
+  .book .lbl { font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--gold); }
+  .book h1 { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 38px; line-height: 1.02; margin-top: 8px; overflow-wrap: anywhere; }
+  .book .by { margin-top: 8px; color: var(--ivory-dim); }
+
+  .pair { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; justify-items: center; margin-top: 20px; }
+  .pair .sep { width: 1px; height: 120px; background: var(--gold-dim); }
+  .cover {
+    width: 96px; height: 142px; background: var(--midnight); border: 1px solid var(--gold); outline: 1px solid var(--gold-dim); outline-offset: 3px;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 12px 8px 10px; text-align: center;
+  }
+  .cover .ct { font-family: var(--font-display); font-style: italic; font-size: 14px; line-height: 1.05; color: var(--ivory); }
+  .cover .ca { font-family: var(--font-ui); font-size: 7px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+  .ring { position: relative; width: 136px; height: 136px; }
+  .ring svg { position: absolute; inset: 0; }
+  .ring .in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring .pg { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 46px; line-height: .9; }
+  .ring .of { color: var(--gold); margin-top: 6px; font-size: 10px; }
+  .progress-note { text-align: center; margin-top: 10px; font-size: 17px; color: var(--ivory-dim); }
+
+  .tonight { display: grid; grid-template-columns: 1fr 1px 1fr; margin-top: 20px; border-top: 1px solid var(--gold-dim); border-bottom: 1px solid var(--gold-dim); padding: 12px 0; }
+  .tonight .sep { background: var(--gold-dim); }
+  .tonight > div { padding: 0 12px; }
+  .tonight .lbl { color: var(--gold); display: block; }
+  .tonight .big { font-family: var(--font-display); font-style: italic; font-size: 34px; line-height: 1; margin-top: 4px; }
+  .tonight .big small { font-size: 17px; color: var(--ivory-dim); }
+  .tonight .sub { font-size: 12.5px; color: var(--ivory-dim); margin-top: 3px; }
+  .goal-line { position: relative; height: 3px; margin-top: 8px; border-top: 1px dotted var(--gold-dim); }
+  .goal-line i { position: absolute; left: 0; top: -2px; height: 3px; width: 40%; background: var(--gold); }
+  .goal-line b { position: absolute; left: 40%; top: -5px; width: 1px; height: 9px; background: var(--ivory); }
+
+  .log {
+    display: block; width: 100%; margin-top: 18px; height: 50px; border: 1px solid var(--gold); background: var(--gold); color: var(--ink);
+    font-family: var(--font-ui); font-size: 12.5px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; cursor: pointer;
+    transition: background-color .2s;
+  }
+  .log:hover { background: var(--ivory); border-color: var(--ivory); }
+  .log:active { background: #D9C28F; }
+
+  .quote { text-align: center; margin-top: 34px; }
+  .quote .mark { font-family: var(--font-display); font-size: 56px; line-height: .4; color: var(--gold); display: block; height: 24px; }
+  .quote blockquote { font-family: var(--font-display); font-style: italic; font-size: 23px; line-height: 1.2; }
+  .quote figcaption { margin-top: 10px; color: var(--gold); font-size: 17px; }
+
+  .later { margin-top: 34px; }
+  .later h2 { display: flex; align-items: center; gap: 12px; color: var(--gold); font-weight: 500; }
+  .later h2::before, .later h2::after { content: ""; flex: 1; border-top: 1px solid var(--gold-dim); }
+  .later ol { list-style: none; margin-top: 12px; }
+  .later li { display: grid; grid-template-columns: 34px 1fr; padding: 9px 0; border-bottom: 1px solid rgba(201,164,92,.18); }
+  .later .n { font-family: var(--font-display); font-style: italic; font-size: 19px; color: var(--gold); line-height: 1.2; }
+  .later .t { font-family: var(--font-display); font-size: 20px; line-height: 1.15; overflow-wrap: anywhere; }
+  .later .a { font-size: 13px; color: var(--ivory-dim); margin-top: 2px; }
+
+  body::before { content: ""; position: fixed; left: 0; right: 0; top: 0; height: 16px; background: var(--ink); z-index: 10; }
+  nav::before { content: ""; position: absolute; left: 16px; right: 16px; top: 0; border-top: 1px solid var(--gold); }
+  nav {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 74px; padding-bottom: 16px; z-index: 10;
+    background: var(--ink);
+    display: flex; justify-content: center; align-items: center; gap: 12px;
+  }
+  nav a { color: var(--ivory-dim); padding: 14px 2px; border-bottom: 1px solid transparent; }
+  nav a[aria-current] { color: var(--gold); border-bottom-color: var(--gold); padding-bottom: 4px; padding-top: 4px; }
+  nav i { width: 4px; height: 4px; background: var(--gold-dim); transform: rotate(45deg); }
+</style>
+</head>
+<body>
+<div class="frame" aria-hidden="true">
+  <svg class="orn tl" viewBox="0 0 30 30"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 20 A20 20 0 0 1 20 0"/><path d="M0 14 A14 14 0 0 1 14 0"/><path d="M4 4 L12 12"/></g></svg>
+  <svg class="orn tr" viewBox="0 0 30 30"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 20 A20 20 0 0 1 20 0"/><path d="M0 14 A14 14 0 0 1 14 0"/><path d="M4 4 L12 12"/></g></svg>
+  <svg class="orn bl" viewBox="0 0 30 30"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 20 A20 20 0 0 1 20 0"/><path d="M0 14 A14 14 0 0 1 14 0"/><path d="M4 4 L12 12"/></g></svg>
+  <svg class="orn br" viewBox="0 0 30 30"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 20 A20 20 0 0 1 20 0"/><path d="M0 14 A14 14 0 0 1 14 0"/><path d="M4 4 L12 12"/></g></svg>
+</div>
+<div class="card">
+  <div class="card-inner">
+    <header>
+      <p class="brand">Shelf</p>
+      <p class="date it">Thu 24 Sep</p>
+      <div class="flourish" aria-hidden="true"><i></i></div>
+    </header>
+
+    <section class="book" aria-labelledby="book-h">
+      <p class="lbl">Now reading</p>
+      <h1 id="book-h">The Left Hand of Darkness</h1>
+      <p class="by caps">Ursula K. Le Guin</p>
+
+      <div class="pair">
+        <div class="cover" aria-hidden="true"><span class="ct">The Left Hand of Darkness</span>
+          <svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="12" fill="none" stroke="#C9A45C" stroke-width="1"/><path d="M17 5 A12 12 0 0 1 17 29 Z" fill="#C9A45C"/></svg>
+          <span class="ca">Le Guin</span></div>
+        <span class="sep" aria-hidden="true"></span>
+        <div class="ring" role="img" aria-label="Page 184 of 304, 61 percent">
+          <svg viewBox="0 0 136 136" width="136" height="136" aria-hidden="true">
+            <circle cx="68" cy="68" r="62" fill="none" stroke="#8A7447" stroke-width="1" stroke-dasharray="1 4"/>
+            <circle cx="68" cy="68" r="62" fill="none" stroke="#C9A45C" stroke-width="2" stroke-dasharray="237.6 389.6" transform="rotate(-90 68 68)"/>
+            <circle cx="68" cy="68" r="56" fill="none" stroke="#C9A45C" stroke-width="0.6" opacity=".5"/>
+          </svg>
+          <div class="in"><span class="pg">184</span><span class="of caps">of 304 pages</span></div>
+        </div>
+      </div>
+      <p class="progress-note it">Sixty-one percent read. Last read yesterday.</p>
+    </section>
+
+    <section class="tonight" aria-label="Today">
+      <div>
+        <span class="lbl caps">Tonight's goal</span>
+        <p class="big">8 <small>of 20 pages</small></p>
+        <div class="goal-line" role="img" aria-label="8 of 20 pages read"><i></i><b></b></div>
+        <p class="sub">12 pages still to go.</p>
+      </div>
+      <span class="sep" aria-hidden="true"></span>
+      <div>
+        <span class="lbl caps">Streak</span>
+        <p class="big">11 <small>days</small></p>
+        <p class="sub">Days in a row with pages logged.</p>
+      </div>
+    </section>
+
+    <button class="log" type="button">Log pages</button>
+
+    <figure class="quote">
+      <span class="mark" aria-hidden="true">&ldquo;</span>
+      <blockquote>Light is the left hand of darkness and darkness the right hand of light.</blockquote>
+      <figcaption class="it">Your saved highlight, page 222</figcaption>
+    </figure>
+
+    <section class="later" aria-labelledby="later-h">
+      <h2 class="caps" id="later-h">Later this evening</h2>
+      <ol>
+        <li><span class="n">i.</span><div><p class="t">Piranesi</p><p class="a">Susanna Clarke, 272 pages</p></div></li>
+        <li><span class="n">ii.</span><div><p class="t">The Remains of the Day</p><p class="a">Kazuo Ishiguro, 245 pages</p></div></li>
+        <li><span class="n">iii.</span><div><p class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</p><p class="a">J. Placeholder-Smythe, 1,104 pages</p></div></li>
+      </ol>
+    </section>
+  </div>
+</div>
+
+<nav class="caps" aria-label="Shelf">
+  <a href="#" aria-current="page">Today</a><i aria-hidden="true"></i>
+  <a href="#">Library</a><i aria-hidden="true"></i>
+  <a href="#">Highlights</a><i aria-hidden="true"></i>
+  <a href="#">Stats</a>
+</nav>
+</body>
+</html>

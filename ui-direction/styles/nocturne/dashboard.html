@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Evals: last night's runs, atlas-research</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--ink); color: var(--ivory);
+    font-family: var(--font-ui); font-size: var(--t-ui); line-height: 1.45; font-weight: 400;
+    font-variant-numeric: tabular-nums lining-nums;
+    min-width: 1360px; min-height: 860px;
+  }
+  h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 1px solid var(--gold); outline-offset: 4px; box-shadow: 0 0 0 4px var(--ink), 0 0 0 5px var(--gold); }
+  .caps { font-family: var(--font-ui); font-size: var(--t-caps); font-weight: 500; letter-spacing: var(--track-caps); text-transform: uppercase; }
+
+  /* ---------- the double frame ---------- */
+  .frame { position: fixed; inset: var(--frame-outer); border: var(--hair) solid var(--gold); pointer-events: none; z-index: 5; }
+  .frame::after { content: ""; position: absolute; inset: var(--frame-gap); border: var(--hair) solid var(--gold); }
+  .orn { position: absolute; width: 46px; height: 46px; }
+  .orn.tl { left: -1px; top: -1px; }
+  .orn.tr { right: -1px; top: -1px; transform: scaleX(-1); }
+  .orn.bl { left: -1px; bottom: -1px; transform: scaleY(-1); }
+  .orn.br { right: -1px; bottom: -1px; transform: scale(-1, -1); }
+
+  .page { position: relative; height: 100%; padding: 34px 50px 34px; display: flex; flex-direction: column; }
+
+  /* ---------- masthead ---------- */
+  .mast { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; }
+  .mast .ws { padding-top: 14px; color: var(--gold); }
+  .mast .ws span { display: block; font-family: var(--font-display); font-style: italic; font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--ivory-dim); margin-top: 2px; }
+  .title { text-align: center; }
+  .title h1 { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: var(--t-mast); line-height: 1; letter-spacing: 0.01em; }
+  .title p { font-family: var(--font-display); font-style: italic; font-size: 19px; color: var(--ivory-dim); margin-top: 4px; }
+  .search { justify-self: end; padding-top: 10px; width: 330px; }
+  .search label { display: block; color: var(--gold); margin-bottom: 4px; }
+  .search .field { display: flex; align-items: center; gap: 10px; border-bottom: var(--hair) solid var(--gold-dim); padding-bottom: 4px; }
+  .search input { flex: 1; min-width: 0; font: inherit; font-size: 14px; color: var(--ivory); background: transparent; border: 0; padding: 2px 0; }
+  .search input::placeholder { color: var(--ivory-dim); }
+  .search input:focus-visible { outline: none; box-shadow: none; }
+  .search .field:focus-within { border-bottom-color: var(--gold); box-shadow: 0 1px 0 var(--gold); }
+  kbd { font-family: var(--font-ui); font-size: 11px; color: var(--gold); border: var(--hair) solid var(--gold-dim); padding: 0 6px; }
+
+  nav.sections { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 14px; }
+  nav.sections a { color: var(--ivory-dim); padding: 4px 2px; border-bottom: var(--hair) solid transparent; }
+  nav.sections a:hover { color: var(--ivory); border-bottom-color: var(--gold-dim); }
+  nav.sections a[aria-current] { color: var(--gold); border-bottom-color: var(--gold); }
+  nav.sections i { width: 5px; height: 5px; background: var(--gold-dim); transform: rotate(45deg); display: inline-block; }
+
+  .rule { display: flex; align-items: center; gap: 12px; margin: 14px 0 0; }
+  .rule::before, .rule::after { content: ""; flex: 1; height: 3px; border-top: var(--hair) solid var(--gold); border-bottom: var(--hair) solid var(--gold-dim); }
+  .rule i { width: 7px; height: 7px; border: var(--hair) solid var(--gold); transform: rotate(45deg); }
+
+  /* ---------- three columns ---------- */
+  .programme-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 500px 1fr; column-gap: 40px; margin-top: 20px; }
+  .col-h { display: flex; align-items: center; gap: 12px; color: var(--gold); margin-bottom: 14px; }
+  .col-h::before, .col-h::after { content: ""; flex: 1; border-top: var(--hair) solid var(--gold-dim); }
+
+  /* programme (left) */
+  .programme ol { list-style: none; }
+  .entry { display: grid; grid-template-columns: 50px 1fr auto; column-gap: 12px; padding: 5px 10px 6px 8px; border-left: var(--hair) solid transparent; }
+  .entry + .entry { border-top: var(--hair) solid rgba(201, 164, 92, 0.18); }
+  .entry:hover { background: rgba(23, 38, 64, 0.7); }
+  .entry.sel { background: var(--midnight); border-left-color: var(--gold); }
+  .entry .time { font-family: var(--font-display); font-style: italic; font-size: 19px; color: var(--gold); line-height: 1.25; }
+  .entry .model { font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 1.2; }
+  .entry .model a:hover { text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
+  .entry .ds { font-family: var(--font-ui); font-weight: 400; font-size: 12.5px; color: var(--ivory); overflow-wrap: anywhere; margin-left: 6px; }
+  .entry .meta { font-size: 12px; color: var(--ivory-dim); }
+  .entry .fig { text-align: right; font-size: 15px; line-height: 1.3; white-space: nowrap; }
+  .entry .fig small { display: block; font-size: 12px; color: var(--ivory-dim); }
+  .entry .fig small.reg { color: var(--garnet-text); }
+  .none { color: var(--ivory-dim); }
+  .fail { color: var(--garnet-text); }
+  .entry .err { grid-column: 2 / 4; margin-top: 3px; font-family: var(--font-code); font-weight: 300; font-size: 11px; color: var(--garnet-text); border-left: 2px solid var(--garnet); padding-left: 8px; }
+  .entry .err span { font-family: var(--font-ui); color: var(--ivory-dim); display: block; }
+  .run-bar { display: inline-block; width: 44px; height: 3px; background: var(--gold-dim); vertical-align: 2px; margin: 0 4px; position: relative; opacity: .7; }
+  .run-bar i { position: absolute; left: 0; top: -1px; height: 5px; width: 62%; background: var(--gold); }
+
+  /* feature (centre) */
+  .feature { background: var(--midnight); border: var(--hair) solid var(--gold-dim); padding: 18px 28px 18px; position: relative; display: flex; flex-direction: column; }
+  .feature .col-h { margin-bottom: 8px; }
+  .col-h .id { text-transform: none; letter-spacing: 0.12em; }
+  .feature h2 { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: var(--t-title); line-height: 1.1; text-align: center; }
+  .feature .base { text-align: center; color: var(--ivory-dim); font-size: 13px; margin-top: 4px; }
+  .readout { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; margin-top: 8px; }
+  .readout .score { font-family: var(--font-display); font-style: italic; font-weight: 300; font-size: 124px; line-height: .82; letter-spacing: -0.02em; text-align: center; }
+  .readout .lbl { color: var(--gold); display: block; margin-bottom: 4px; white-space: nowrap; letter-spacing: 0.14em; }
+  .readout .left { text-align: left; padding-bottom: 8px; }
+  .readout .right { text-align: right; padding-bottom: 8px; }
+  .readout .delta { font-family: var(--font-display); font-style: italic; font-size: 34px; line-height: 1; color: var(--garnet-text); }
+  .readout .plain { font-family: var(--font-display); font-style: italic; font-size: 22px; line-height: 1; }
+  .verdict { text-align: center; font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--ivory); margin-top: 10px; }
+  .verdict b { font-weight: 500; color: var(--garnet-text); }
+  .chart { margin-top: 10px; }
+  .chart figcaption { font-size: 12px; color: var(--ivory-dim); margin-top: 2px; }
+  .actions { margin-top: auto; padding-top: 14px; display: flex; justify-content: center; gap: 12px; }
+  .cancel-line { display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 12px; }
+  .btn {
+    white-space: nowrap; font-family: var(--font-ui); font-size: 11.5px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+    height: 38px; padding: 0 18px; border-radius: 0; cursor: pointer; transition: background-color .2s, color .2s;
+  }
+  .btn.primary { background: var(--gold); color: var(--ink); border: var(--hair) solid var(--gold); }
+  .btn.primary:hover { background: var(--ivory); border-color: var(--ivory); }
+  .btn.second { background: transparent; color: var(--gold); border: var(--hair) solid var(--gold); }
+  .btn.second:hover { background: var(--midnight-2); color: var(--ivory); }
+  .btn:disabled { background: transparent; color: var(--gold-dim); border: var(--hair) dashed var(--gold-dim); cursor: not-allowed; }
+  .why { font-size: 12px; color: var(--ivory-dim); max-width: 200px; line-height: 1.35; }
+
+  /* notes (right) */
+  .notes h3 { font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 20px; line-height: 1.1; margin-bottom: 6px; }
+  .notes section + section { margin-top: 16px; }
+  table { border-collapse: collapse; width: 100%; }
+  th { text-align: left; font-weight: 500; color: var(--gold); padding: 0 0 5px; border-bottom: var(--hair) solid var(--gold-dim); }
+  th.n, td.n { text-align: right; }
+  td { padding: 5px 0; border-bottom: var(--hair) solid rgba(201, 164, 92, 0.18); font-size: 14px; }
+  td:first-child { font-family: var(--font-display); font-size: 17px; }
+  td.reg { color: var(--garnet-text); }
+  .log { font-family: var(--font-code); font-weight: 300; font-size: 11px; line-height: 1.7; color: var(--ivory); white-space: pre; border-left: var(--hair) solid var(--gold-dim); padding-left: 12px; }
+  .log .w { color: var(--gold); }
+  dl.key { display: grid; grid-template-columns: 58px 1fr; gap: 5px 12px; font-size: 13px; }
+  dl.key dt { font-family: var(--font-display); font-size: 18px; line-height: 1.1; color: var(--gold); }
+  dl.key dd { color: var(--ivory); }
+  .empty { font-family: var(--font-display); font-style: italic; font-size: 17px; color: var(--ivory-dim); }
+</style>
+</head>
+<body>
+<div class="frame" aria-hidden="true">
+  <svg class="orn tl" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+  <svg class="orn tr" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+  <svg class="orn bl" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+  <svg class="orn br" viewBox="0 0 46 46"><g fill="none" stroke="#C9A45C" stroke-width="1"><path d="M0 30 A30 30 0 0 1 30 0"/><path d="M0 22 A22 22 0 0 1 22 0"/><path d="M6 6 L20 20"/><path d="M0 14 L6 14 L6 6 L14 6 L14 0"/></g><rect x="19" y="19" width="5" height="5" transform="rotate(45 21.5 21.5)" fill="#C9A45C"/></svg>
+</div>
+
+<div class="page">
+  <header>
+    <div class="mast">
+      <p class="ws caps">atlas-research<span>workspace</span></p>
+      <div class="title">
+        <h1>Evals</h1>
+        <p>Last night's runs, 23:00 to 02:00. Eight in all: five passed, one failed, one running, one queued.</p>
+      </div>
+      <form class="search" role="search" onsubmit="return false">
+        <label class="caps" for="q">Search</label>
+        <div class="field"><input id="q" type="search" placeholder="Search runs, models, datasets"><kbd title="Press / to search">/</kbd></div>
+      </form>
+    </div>
+    <nav class="sections caps" aria-label="Sections">
+      <a href="#" aria-current="page">Runs</a><i aria-hidden="true"></i>
+      <a href="#">Datasets</a><i aria-hidden="true"></i>
+      <a href="#">Models</a><i aria-hidden="true"></i>
+      <a href="#">Baselines</a><i aria-hidden="true"></i>
+      <a href="#">Settings</a>
+    </nav>
+    <div class="rule" aria-hidden="true"><i></i></div>
+  </header>
+
+  <main class="programme-grid">
+    <section class="programme" aria-labelledby="prog-h">
+      <h2 class="col-h caps" id="prog-h">The programme</h2>
+      <ol>
+        <li class="entry sel" aria-current="true">
+          <span class="time">02:00</span>
+          <div><p class="model"><a href="#">summarize-v3</a> <span class="ds">news-digest-2k</span></p><p class="meta">r-2291, passed in 14m 02s, by schedule</p></div>
+          <p class="fig">0.812<small class="reg">&minus;0.041</small></p>
+        </li>
+        <li class="entry">
+          <span class="time">01:12</span>
+          <div><p class="model"><a href="#">summarize-v3</a> <span class="ds">multilingual-legal-contracts-longform-eval-2026-q3</span></p><p class="meta">r-2290, passed in 41m 55s, by M. Okafor</p></div>
+          <p class="fig">0.774<small>+0.006</small></p>
+        </li>
+        <li class="entry">
+          <span class="time">01:00</span>
+          <div><p class="model"><a href="#">router-small</a> <span class="ds">intent-routing-v7</span></p><p class="meta">r-2289, passed in 3m 48s, by schedule</p></div>
+          <p class="fig">0.931<small>+0.012</small></p>
+        </li>
+        <li class="entry">
+          <span class="time">00:51</span>
+          <div><p class="model"><a href="#">router-small</a> <span class="ds">adversarial-prompts</span></p><p class="meta">r-2288, running<span class="run-bar" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="r-2288 progress"><i></i></span>62%, 9m 10s so far, by CI #4812</p></div>
+          <p class="fig none">&mdash;<small>&mdash;</small></p>
+        </li>
+        <li class="entry">
+          <span class="time">00:40</span>
+          <div><p class="model"><a href="#">extract-json</a> <span class="ds">invoices-ocr</span></p><p class="meta"><span class="fail">r-2287, failed after 0m 41s</span>, by CI #4809</p></div>
+          <p class="fig">0.000<small>&minus;0.884</small></p>
+          <p class="err">KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation<span>Fix the extractor's output schema, then rerun. A failure, not a regression.</span></p>
+        </li>
+        <li class="entry">
+          <span class="time">23:58</span>
+          <div><p class="model"><a href="#">extract-json</a> <span class="ds">receipts-small</span></p><p class="meta">r-2286, passed in 2m 15s, by L. Brandt</p></div>
+          <p class="fig">0.902<small>+0.000</small></p>
+        </li>
+        <li class="entry">
+          <span class="time">23:00</span>
+          <div><p class="model"><a href="#">chat-core-8b</a> <span class="ds">helpfulness-pairwise</span></p><p class="meta">r-2285, passed in 1h 06m, by schedule</p></div>
+          <p class="fig">0.668<small>+0.021</small></p>
+        </li>
+        <li class="entry">
+          <span class="time none">&mdash;</span>
+          <div><p class="model"><a href="#">chat-core-8b</a> <span class="ds">safety-refusals</span></p><p class="meta">r-2284, queued, by schedule</p></div>
+          <p class="fig none">&mdash;<small>&mdash;</small></p>
+        </li>
+      </ol>
+    </section>
+
+    <section class="feature" aria-labelledby="feat-h">
+      <p class="col-h caps">Selected <span class="id">r-2291</span></p>
+      <h2 id="feat-h">summarize-v3 on news-digest-2k</h2>
+      <p class="base">Baseline: summarize-v2 @ r-2203 (0.853)</p>
+      <div class="readout">
+        <p class="left"><span class="lbl caps">Baseline</span><span class="plain">0.853</span></p>
+        <p class="score" aria-label="Score 0.812">0.812</p>
+        <p class="right"><span class="lbl caps">&Delta; vs baseline</span><span class="delta">&minus;0.041</span></p>
+      </div>
+      <p class="verdict"><b>A regression, not noise:</b> twice the &plusmn;0.020 band.</p>
+
+      <figure class="chart">
+        <svg width="444" height="200" viewBox="-12 0 496 218" role="img" aria-label="Score over the last 12 runs: eleven runs between 0.846 and 0.857, inside the band 0.833 to 0.873; the newest, r-2291, at 0.812.">
+          <rect x="34" y="29.1" width="424" height="86.0" fill="#C9A45C" opacity=".07"/>
+          <line x1="34" y1="29.1" x2="458" y2="29.1" stroke="#8A7447" stroke-width="1" stroke-dasharray="1 3"/>
+          <line x1="34" y1="115.1" x2="458" y2="115.1" stroke="#8A7447" stroke-width="1" stroke-dasharray="1 3"/>
+          <line x1="34" y1="72.1" x2="458" y2="72.1" stroke="#8A7447" stroke-width="1" stroke-dasharray="6 4"/>
+          <line x1="34" y1="186.0" x2="458" y2="186.0" stroke="#8A7447" stroke-width="1"/>
+          <polyline fill="none" stroke="#C9A45C" stroke-width="1.2" points="44,87.1 80,76.4 116,80.7 152,67.8 188,72.1 224,78.5 260,63.5 296,74.2 332,82.8 368,76.4 404,72.1 440,160.2"/>
+          <g fill="#C9A45C"><circle cx="44" cy="87.1" r="2.2"/><circle cx="80" cy="76.4" r="2.2"/><circle cx="116" cy="80.7" r="2.2"/><circle cx="152" cy="67.8" r="2.2"/><circle cx="188" cy="72.1" r="2.2"/><circle cx="224" cy="78.5" r="2.2"/><circle cx="260" cy="63.5" r="2.2"/><circle cx="296" cy="74.2" r="2.2"/><circle cx="332" cy="82.8" r="2.2"/><circle cx="368" cy="76.4" r="2.2"/><circle cx="404" cy="72.1" r="2.2"/></g>
+          <circle cx="440" cy="160.2" r="4" fill="#B0414B"/>
+          <circle cx="440" cy="160.2" r="8.5" fill="none" stroke="#B0414B" stroke-width="1"/>
+          <g font-family="Jost, sans-serif" font-size="10.5" fill="#B4AFA2" letter-spacing="0.04em">
+            <text x="28" y="33.1" text-anchor="end">0.873</text>
+            <text x="28" y="76.1" text-anchor="end">0.853</text>
+            <text x="28" y="119.1" text-anchor="end">0.833</text>
+            <text x="28" y="190.0" text-anchor="end">0.800</text>
+            <text x="44" y="204.0" text-anchor="middle">12 runs ago</text>
+            <text x="440" y="204.0" text-anchor="middle" fill="#EFE8D8">r-2291</text>
+          </g>
+          <text x="424" y="165.2" text-anchor="end" font-family="Cormorant, serif" font-style="italic" font-size="16" fill="#E08A92">0.812, below the band</text>
+        </svg>
+        <figcaption>Score over the last 12 runs, oldest to newest. Dotted lines bound the noise band, baseline &plusmn;0.020; the dashed line is the baseline.</figcaption>
+      </figure>
+
+      <div class="actions">
+        <button class="btn primary" type="button">Rerun evaluation</button>
+        <button class="btn second" type="button">Compare with baseline</button>
+      </div>
+      <div class="cancel-line">
+        <button class="btn" type="button" disabled aria-describedby="why">Cancel run</button>
+        <p class="why" id="why">Unavailable: r-2291 finished at 02:14:02.</p>
+      </div>
+    </section>
+
+    <aside class="notes" aria-labelledby="notes-h">
+      <h2 class="col-h caps" id="notes-h">Notes</h2>
+      <section aria-labelledby="m-h">
+        <h3 id="m-h">The metrics</h3>
+        <table>
+          <thead><tr><th class="caps">Metric</th><th class="caps n">Score</th><th class="caps n">Baseline</th><th class="caps n">&Delta;</th></tr></thead>
+          <tbody>
+            <tr><td>ROUGE-L</td><td class="n">0.412</td><td class="n">0.447</td><td class="n reg">&minus;0.035</td></tr>
+            <tr><td>Faithfulness</td><td class="n">0.861</td><td class="n">0.902</td><td class="n reg">&minus;0.041</td></tr>
+            <tr><td>Coverage</td><td class="n">0.790</td><td class="n">0.801</td><td class="n">&minus;0.011</td></tr>
+            <tr><td>Length ratio</td><td class="n">1.18</td><td class="n">1.02</td><td class="n reg">+0.16</td></tr>
+          </tbody>
+        </table>
+      </section>
+      <section aria-labelledby="l-h">
+        <h3 id="l-h">The last five lines</h3>
+<p class="log">02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+<span class="w">02:13:55  warn  length_ratio above 1.15 on 38%</span>
+<span class="w">                of samples</span>
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</p>
+      </section>
+      <section aria-labelledby="k-h">
+        <h3 id="k-h">Reading the figures</h3>
+        <dl class="key">
+          <dt>&mdash;</dt><dd>Not computed: the run is queued or still running.</dd>
+          <dt>0.000</dt><dd>Computed, and scored zero.</dd>
+          <dt>&Delta;</dt><dd>Score minus the model's baseline. Within &plusmn;0.020 is noise.</dd>
+        </dl>
+      </section>
+      <section aria-labelledby="p-h">
+        <h3 id="p-h">Pinned comparisons</h3>
+        <p class="empty">None yet. Compare a run with its baseline, then pin it here.</p>
+      </section>
+    </aside>
+  </main>
+</div>
+</body>
+</html>

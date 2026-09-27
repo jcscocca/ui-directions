@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evals · runs · constructivist</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--paper); color: var(--black); }
+  body { font: 400 var(--t-body)/1.3 var(--font-body); font-variant-numeric: tabular-nums lining-nums; }
+  .stage { position: relative; width: 1440px; height: 900px; overflow: hidden; margin: 0 auto; }
+  .ground { position: absolute; inset: 0; width: 1440px; height: 900px; }
+  .abs { position: absolute; }
+  .axis { transform-origin: 0 50%; transform: rotate(var(--axis)); white-space: nowrap; display: flex; align-items: center; }
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+  .on-black :focus-visible { outline-color: var(--on-black); }
+
+  /* masthead */
+  .mast { left: 32px; top: 20px; display: flex; align-items: baseline; gap: 18px; }
+  .brand { font: 900 44px/1 var(--font-display); letter-spacing: .01em; text-transform: uppercase; margin: 0; }
+  .ws { font-size: var(--t-small); }
+  .nav { display: flex; gap: 16px; margin-left: 10px; }
+  .nav a { font: 700 22px/1 var(--font-display); text-transform: uppercase; color: var(--black); text-decoration: none; padding: 2px 0 4px; }
+  .nav a[aria-current] { border-bottom: var(--bar) solid var(--red); }
+  .nav a:hover { color: var(--red-ink); }
+  .search { left: 32px; top: 80px; display: flex; align-items: center; gap: 8px; width: 320px; border-bottom: 3px solid var(--black); padding-bottom: 4px; }
+  .search input { flex: 1; border: 0; background: transparent; font: 400 var(--t-body)/1.2 var(--font-body); color: var(--black); padding: 2px 0; }
+  .search input::placeholder { color: var(--graphite); }
+  .search input:focus-visible { outline: none; }
+  .search:focus-within { border-bottom-color: var(--red); }
+  kbd { font: 400 12px/1 var(--font-mono); background: var(--black); color: var(--paper); padding: 3px 6px; }
+
+  /* the finding on the axis */
+  .headline { left: 34px; top: 310px; height: 130px; width: 1100px; margin: 0;
+    font: 900 88px/1 var(--font-display); text-transform: uppercase; color: var(--paper); letter-spacing: .01em; padding-top: 6px; }
+  .counts { left: 392px; top: 346px; height: 48px; width: 440px; gap: 18px; padding-left: 14px; color: var(--paper); }
+  .counts span { font: 800 18px/1 var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
+  .counts b { font: 900 30px/1 var(--font-display); margin-right: 4px; }
+  .counts .bad b { color: var(--red); }
+  .lede { left: 476px; top: 392px; width: 340px; margin: 0; font-size: 16px; line-height: 1.25; }
+  .lede strong { font-weight: 700; }
+
+  /* runs table */
+  .runs { left: 32px; top: 474px; width: 862px; }
+  table { border-collapse: collapse; width: 100%; }
+  .runs::before { content: ""; display: block; height: var(--bar-heavy); width: 900px; background: var(--black); }
+  .runs th { font: 800 14px/1 var(--font-display); text-transform: uppercase; letter-spacing: .04em; text-align: left; padding: 8px 6px 6px; border-bottom: 2px solid var(--black); }
+  .runs td { padding: 5px 6px; border-bottom: 1px solid var(--tone-soft); vertical-align: baseline; font-size: 15px; }
+  .runs .num { text-align: right; }
+  .runs td.id { font: 800 21px/1 var(--font-display); }
+  .runs td.ds { max-width: 200px; overflow-wrap: anywhere; line-height: 1.15; }
+  .runs tr.sel td { background: var(--black); color: var(--on-black); border-bottom-color: var(--black); }
+  .runs tr.sel td:last-child { position: relative; }
+  .runs tr.sel td:last-child::after { content: ""; position: absolute; left: 100%; top: 0; bottom: -1px; width: 140px; background: var(--black); }
+  .runs tr:not(.sel):not(.err):hover td { background: var(--paper-deep); }
+  .dash { color: var(--graphite); }
+  .reg { display: inline-block; background: var(--red); color: var(--paper); font-weight: 700; padding: 1px 7px; border-radius: 999px; }
+  .st-fail { font-weight: 700; background: var(--red); color: var(--paper); padding: 1px 6px; }
+  .st-queued { color: var(--graphite); }
+  .prog { display: inline-block; width: 44px; height: 8px; border: 1.5px solid var(--black); margin-left: 6px; vertical-align: 1px; background: linear-gradient(90deg, var(--black) 62%, transparent 62%); }
+  tr.err td { border-bottom: 1px solid var(--tone-soft); padding: 0 6px 8px; font-size: 14px; }
+  tr.err td span { border-left: var(--bar) solid var(--red); padding-left: 8px; display: block; }
+  tr.err code { font: 400 13px/1.3 var(--font-mono); }
+  .legend { display: flex; gap: 28px; margin-top: 10px; font-size: 14px; line-height: 1.25; }
+  .legend p { margin: 0; }
+  .legend .empty { color: var(--graphite); border-left: 3px solid var(--tone); padding-left: 8px; }
+
+  /* detail in the black slab */
+  .on-black { color: var(--on-black); }
+  .dtitle { left: 848px; top: 190px; height: 44px; font: 800 30px/1 var(--font-display); text-transform: uppercase; color: var(--on-black); letter-spacing: .01em; }
+  .dtitle small { text-transform: none; font: 700 18px/1 var(--font-body); color: var(--on-black-soft); margin-right: 12px; letter-spacing: .04em; }
+  .score { left: 912px; top: 230px; width: 500px; display: grid; grid-template-columns: auto auto 1fr; align-items: center; column-gap: 18px; }
+  .score .big { font: 800 var(--t-figure)/0.9 var(--font-display); }
+  .ring { width: 104px; height: 104px; border-radius: 50%; background: var(--red); color: var(--paper); display: grid; place-content: center; text-align: center; }
+  .ring b { font: 900 30px/1 var(--font-display); }
+  .ring span { font-size: 12px; line-height: 1.1; }
+  .score p { margin: 0; font-size: 14px; line-height: 1.3; color: var(--on-black-soft); }
+  .score p b { color: var(--on-black); font-weight: 700; }
+  .metrics { left: 936px; top: 346px; width: 270px; }
+  .metrics th { font: 800 13px/1 var(--font-display); text-transform: uppercase; letter-spacing: .04em; text-align: right; padding: 0 0 6px; border-bottom: 2px solid var(--on-black); color: var(--on-black-soft); }
+  .metrics th:first-child, .metrics td:first-child { text-align: left; }
+  .metrics td { text-align: right; padding: 4px 0; font-size: 15px; border-bottom: 1px solid #3A3936; }
+  .metrics td.neg { font-weight: 700; }
+  .actions { left: 1236px; top: 352px; width: 176px; display: grid; gap: 6px; }
+  button { font: 800 16px/1 var(--font-display); text-transform: uppercase; letter-spacing: .05em; border: 0; padding: 9px 12px; cursor: pointer; text-align: left; }
+  .b-primary { background: var(--red); color: var(--paper); }
+  .b-primary:hover { background: var(--red-ink); }
+  .b-secondary { background: transparent; color: var(--on-black); box-shadow: inset 0 0 0 2px var(--on-black); }
+  .b-secondary:hover { background: #2A2927; }
+  button:disabled { background: transparent; color: #6E6B65; box-shadow: inset 0 0 0 2px #45433F; cursor: not-allowed; text-decoration: line-through; }
+  .actions .why { font-size: 12px; line-height: 1.25; color: var(--on-black-soft); margin: 0; }
+  .chart { left: 994px; top: 500px; width: 420px; }
+  .chart figcaption { font-size: 12px; line-height: 1.25; color: var(--on-black-soft); margin-top: 2px; }
+  .chart figcaption b { color: var(--on-black); }
+  figure { margin: 0; }
+  .log { left: 1046px; top: 730px; width: 384px; }
+  .log h2, .chart h2 { font: 800 15px/1 var(--font-display); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 6px; color: var(--on-black); }
+  .log pre { margin: 0; font: 400 11px/1.55 var(--font-mono); color: var(--on-black); white-space: pre-wrap; }
+  .log .w { color: var(--black); background: var(--on-black); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <svg class="ground" viewBox="0 0 1440 900" aria-hidden="true">
+    <defs>
+      <pattern id="ht" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.7" fill="#8C8A84"/></pattern>
+    </defs>
+    <circle cx="330" cy="236" r="118" fill="url(#ht)"/>
+    <!-- black slab: top edge on the axis, left edge on the cut -->
+    <polygon points="820,189.6 1460,-18.4 1460,900 1050.8,900" fill="#111111"/>
+    <!-- red band -->
+    <polygon points="-20,325.5 1460,-155.4 1460,-18.4 -20,462.5" fill="#D52B1E"/>
+    <!-- counts bar, parallel below the band -->
+    <polygon points="392,344.6 836,200.3 836,248.7 392,393" fill="#111111"/>
+    <!-- construction rule on the cut -->
+  </svg>
+
+  <header class="abs mast">
+    <h1 class="brand">Evals</h1>
+    <span class="ws">atlas-research</span>
+    <nav class="nav" aria-label="Sections">
+      <a href="#" aria-current="page">Runs</a>
+      <a href="#">Datasets</a>
+      <a href="#">Models</a>
+      <a href="#">Baselines</a>
+      <a href="#">Settings</a>
+    </nav>
+  </header>
+  <label class="abs search">
+    <input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets">
+    <kbd>/</kbd>
+  </label>
+
+  <p class="abs axis headline" role="heading" aria-level="2">summarize-v3 fell 0.041</p>
+
+  <div class="abs axis counts" aria-label="8 runs: 5 passed, 1 failed, 1 running, 1 queued">
+    <span><b>8</b>runs</span><span><b>5</b>passed</span><span class="bad"><b>1</b>failed</span><span><b>1</b>running</span><span><b>1</b>queued</span>
+  </div>
+
+  <p class="abs lede">r-2291 scored <strong>0.812</strong> against a 0.853 baseline. The noise band is ±0.020, so this drop is a <strong>regression</strong>, not noise. r-2287 is a separate crash: failed, not a regression.</p>
+
+  <section class="abs runs" aria-label="Runs">
+    <table>
+      <thead>
+        <tr><th>Run</th><th>Model</th><th>Dataset</th><th class="num">Score</th><th class="num">Δ base</th><th>Status</th><th class="num">Duration</th><th>By</th><th class="num">Start</th></tr>
+      </thead>
+      <tbody>
+        <tr class="sel" aria-selected="true"><td class="id">r-2291</td><td>summarize-v3</td><td class="ds">news-digest-2k</td><td class="num">0.812</td><td class="num"><span class="reg">−0.041</span></td><td>Passed</td><td class="num">14m 02s</td><td>schedule</td><td class="num">02:00</td></tr>
+        <tr><td class="id">r-2290</td><td>summarize-v3</td><td class="ds">multilingual-legal-contracts-longform-eval-2026-q3</td><td class="num">0.774</td><td class="num">+0.006</td><td>Passed</td><td class="num">41m 55s</td><td>M. Okafor</td><td class="num">01:12</td></tr>
+        <tr><td class="id">r-2289</td><td>router-small</td><td class="ds">intent-routing-v7</td><td class="num">0.931</td><td class="num">+0.012</td><td>Passed</td><td class="num">3m 48s</td><td>schedule</td><td class="num">01:00</td></tr>
+        <tr><td class="id">r-2288</td><td>router-small</td><td class="ds">adversarial-prompts</td><td class="num dash">—</td><td class="num dash">—</td><td>Running 62%<span class="prog" aria-hidden="true"></span></td><td class="num">9m 10s so far</td><td>CI #4812</td><td class="num">00:51</td></tr>
+        <tr><td class="id">r-2287</td><td>extract-json</td><td class="ds">invoices-ocr</td><td class="num">0.000</td><td class="num">−0.884</td><td><span class="st-fail">Failed</span></td><td class="num">0m 41s</td><td>CI #4809</td><td class="num">00:40</td></tr>
+        <tr class="err"><td></td><td colspan="8"><span><code>KeyError: 'line_items' — 212 of 212 samples failed schema validation</code>. Fix the extractor's output schema, then rerun.</span></td></tr>
+        <tr><td class="id">r-2286</td><td>extract-json</td><td class="ds">receipts-small</td><td class="num">0.902</td><td class="num">+0.000</td><td>Passed</td><td class="num">2m 15s</td><td>L. Brandt</td><td class="num">23:58</td></tr>
+        <tr><td class="id">r-2285</td><td>chat-core-8b</td><td class="ds">helpfulness-pairwise</td><td class="num">0.668</td><td class="num">+0.021</td><td>Passed</td><td class="num">1h 06m</td><td>schedule</td><td class="num">23:00</td></tr>
+        <tr><td class="id">r-2284</td><td>chat-core-8b</td><td class="ds">safety-refusals</td><td class="num dash">—</td><td class="num dash">—</td><td class="st-queued">Queued</td><td class="num dash">—</td><td>schedule</td><td class="num dash">—</td></tr>
+      </tbody>
+    </table>
+    <div class="legend">
+      <p><b>—</b> not computed yet (queued or running). <b>0.000</b> is a real score of zero.</p>
+      <p>Red marks a Δ outside the ±0.020 noise band, or a failure.</p>
+      <p class="empty">Pinned comparisons: none yet.</p>
+    </div>
+  </section>
+
+  <div class="abs axis dtitle"><small>r-2291</small>summarize-v3 on news-digest-2k</div>
+
+  <section class="abs score on-black" aria-label="Selected run r-2291">
+    <div class="big">0.812</div>
+    <div class="ring"><b>−0.041</b><span>vs baseline</span></div>
+    <p>Baseline <b>summarize-v2 @ r-2203 (0.853)</b>.<br>Passed in 14m 02s.<br>Started 02:00 by schedule.</p>
+  </section>
+
+  <table class="abs metrics on-black">
+    <thead><tr><th>Metric</th><th>Score</th><th>Baseline</th><th>Δ</th></tr></thead>
+    <tbody>
+      <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td class="neg">−0.035</td></tr>
+      <tr><td>Faithfulness</td><td>0.861</td><td>0.902</td><td class="neg">−0.041</td></tr>
+      <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td>−0.011</td></tr>
+      <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td>+0.16</td></tr>
+    </tbody>
+  </table>
+
+  <div class="abs actions on-black">
+    <button class="b-primary">Rerun</button>
+    <button class="b-secondary">Compare with baseline</button>
+    <button disabled aria-describedby="why">Cancel</button>
+    <p class="why" id="why">Cancel is unavailable: r-2291 finished at 02:14:02.</p>
+  </div>
+
+  <figure class="abs chart on-black">
+    <h2>Last 12 runs</h2>
+    <svg viewBox="0 0 420 176" width="420" height="168" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the noise band.">
+      <defs><pattern id="htb" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.6" fill="#6A675F"/></pattern></defs>
+      <rect x="40" y="32.3" width="360" height="70" fill="url(#htb)"/>
+      <line x1="40" y1="67.3" x2="400" y2="67.3" stroke="#E6E3DC" stroke-width="1" stroke-dasharray="4 4"/>
+      <g font-family="PT Sans Narrow, sans-serif" font-size="12" fill="#A9A59C">
+        <text x="34" y="36" text-anchor="end">0.873</text>
+        <text x="34" y="71" text-anchor="end">0.853</text>
+        <text x="34" y="106" text-anchor="end">0.833</text>
+        <text x="34" y="143" text-anchor="end">0.812</text>
+        <text x="40" y="172">12 runs ago</text>
+        <text x="400" y="172" text-anchor="end" fill="#E6E3DC">r-2291</text>
+      </g>
+      <polyline fill="none" stroke="#E6E3DC" stroke-width="3" stroke-linejoin="miter"
+        points="40,79.5 72.7,70.8 105.5,74.3 138.2,63.8 170.9,67.3 203.6,72.5 236.4,60.3 269.1,69 301.8,76 334.5,70.8 367.3,67.3 400,139"/>
+      <g fill="#E6E3DC">
+        <rect x="37" y="76.5" width="6" height="6"/><rect x="69.7" y="67.8" width="6" height="6"/><rect x="102.5" y="71.3" width="6" height="6"/><rect x="135.2" y="60.8" width="6" height="6"/><rect x="167.9" y="64.3" width="6" height="6"/><rect x="200.6" y="69.5" width="6" height="6"/><rect x="233.4" y="57.3" width="6" height="6"/><rect x="266.1" y="66" width="6" height="6"/><rect x="298.8" y="73" width="6" height="6"/><rect x="331.5" y="67.8" width="6" height="6"/><rect x="364.3" y="64.3" width="6" height="6"/>
+      </g>
+      <circle cx="400" cy="139" r="15" fill="none" stroke="#D52B1E" stroke-width="6"/>
+      <circle cx="400" cy="139" r="4" fill="#E6E3DC"/>
+    </svg>
+    <figcaption>Oldest first. Dotted field: noise band <b>0.833–0.873</b> around baseline 0.853 (dashed). Red ring: r-2291.</figcaption>
+  </figure>
+
+  <section class="abs log on-black" aria-label="Log tail">
+    <h2>Log tail</h2>
+<pre>02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+02:13:55  <span class="w">warn</span>  length_ratio above 1.15 on 38% of samples
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</pre>
+  </section>
+</div>
+</body>
+</html>

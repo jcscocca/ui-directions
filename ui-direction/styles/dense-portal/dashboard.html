@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals: atlas-research</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { min-width: 1280px; }
+  .page {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr) 352px 228px;
+    grid-template-areas:
+      "side alert alert alert"
+      "side main  run   right";
+    grid-template-rows: auto 1fr;
+    gap: var(--gutter);
+    padding: var(--gutter) 12px 12px;
+    align-items: start;
+  }
+  .side  { grid-area: side;  display: grid; gap: var(--gutter); }
+  .alert-row { grid-area: alert; }
+  .main  { grid-area: main;  display: grid; gap: var(--gutter); }
+  .run   { grid-area: run;   display: grid; gap: var(--gutter); }
+  .right { grid-area: right; display: grid; gap: var(--gutter); }
+
+  /* alert module: two items side by side */
+  .alerts { display: grid; grid-template-columns: 1fr 1fr; }
+  .alerts li { padding: 6px 10px 7px; }
+  .alerts li + li { border-left: 1px solid var(--rule); }
+  .alerts .hl { font-size: var(--fs-13); font-weight: 800; }
+  .alerts .hl a { color: var(--alert); }
+  .alerts p { font-size: var(--fs-11); margin-top: 2px; }
+  .alerts .err { font-family: var(--font-code); font-size: var(--fs-11); color: var(--bad); background: var(--alert-wash); padding: 1px 4px; display: inline; }
+
+  /* side menu */
+  .loading::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 4px; border: 1.5px solid var(--rule-2); border-top-color: var(--blue); border-radius: 50%; vertical-align: -1px; animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .loading::after { animation: none; } }
+  .side .blist { font-size: var(--fs-11); }
+  .side .blist a { overflow-wrap: anywhere; }
+  .side .blist .c { color: var(--ink-2); font-size: var(--fs-10); }
+
+  /* runs table */
+  .runs td:nth-child(1), .runs td:nth-child(2), .runs td:nth-child(6), .runs td:nth-child(8) { white-space: nowrap; }
+  .runs td:nth-child(1) { font-weight: 700; }
+  .runs td:nth-child(3) { overflow-wrap: anywhere; }
+  .runs td.num { white-space: nowrap; }
+  .runs td.when, .runs td.dur { white-space: nowrap; }
+  .runs tr.sel td { background: var(--select); }
+  .runs tr.sel td:first-child { box-shadow: inset 3px 0 0 var(--blue); }
+  .runs tr.errrow td { padding-top: 0; font-size: var(--fs-11); color: var(--ink); }
+  .runs tr.errrow code { font-family: var(--font-code); color: var(--bad); }
+  .runs tr[hidden] { display: none; }
+  .runs tr:hover:not(.errrow) td { background: #F7F9FD; }
+  .runs tr.sel:hover td { background: var(--select); }
+  .d-neg { color: var(--bad); font-weight: 700; }
+
+  /* selected run module */
+  .runhead { display: grid; grid-template-columns: auto auto 1fr; gap: 0 14px; align-items: end; padding-bottom: 6px; border-bottom: 1px dotted var(--rule); }
+  .runhead h3 { grid-column: 1 / -1; font-size: var(--fs-13); font-weight: 800; margin-bottom: 4px; }
+  .fig { font-size: var(--fs-fig); font-weight: 800; line-height: 1.1; }
+  .fig small { display: block; font-size: var(--fs-10); font-weight: 500; color: var(--ink-2); }
+  .fig.bad { color: var(--bad); }
+  .runhead .note { font-size: var(--fs-11); align-self: end; }
+  .facts { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: 0 14px; font-size: var(--fs-11); margin: 5px 0 6px; }
+  .facts dt { font-size: var(--fs-10); color: var(--ink-2); }
+  .facts dd { font-weight: 700; }
+  .facts div { display: grid; }
+  .base { font-size: var(--fs-11); margin-bottom: 6px; }
+  .metrics { margin-bottom: 8px; border: 1px solid var(--rule); }
+  .actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .why { font-size: var(--fs-10); color: var(--ink-2); margin-top: 4px; }
+
+  /* chart */
+  .chart svg { display: block; width: 100%; height: auto; }
+  .chart .mod-b { padding-bottom: 6px; }
+  .chart text { font-family: var(--font); font-size: 10px; fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 12px; font-size: var(--fs-10); color: var(--ink-2); margin-top: 3px; }
+  .legend i { display: inline-block; width: 10px; height: 8px; margin-right: 3px; vertical-align: -1px; }
+
+  /* log */
+  .log { font-family: var(--font-code); font-size: var(--fs-11); line-height: 1.55; white-space: pre; overflow-x: auto; background: var(--wash); padding: 5px 8px; border: 1px solid var(--rule); }
+  .log .w { font-weight: 700; }
+
+  /* 2-up row under runs */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gutter); align-items: start; }
+  .ranking .who { font-size: var(--fs-11); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ranking .who b { margin-right: 4px; }
+  .ranking .sc { font-weight: 700; }
+  .unranked { font-size: var(--fs-10); color: var(--ink-2); margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--rule); }
+
+  .key { font-size: var(--fs-11); }
+  .key div { display: grid; grid-template-columns: 46px 1fr; gap: 6px; padding: 2px 0; }
+  .key dt { font-weight: 800; text-align: right; }
+  .empty { font-size: var(--fs-11); color: var(--ink-2); padding: 10px 8px; text-align: left; }
+  .empty b { color: var(--ink); display: block; }
+  .notices { font-size: var(--fs-11); }
+  .notices time { font-size: var(--fs-10); color: var(--ink-2); margin-right: 4px; }
+</style>
+</head>
+<body>
+
+<div class="util">
+  <ul><li>Workspace <b>atlas-research</b></li><li><a href="#">Switch workspace</a></li></ul>
+  <ul><li>Last event 02:14:02</li></ul>
+</div>
+
+<header class="mast">
+  <a class="logo" href="#">Evals<small>atlas-research</small></a>
+  <form class="search" role="search" onsubmit="return false">
+    <label class="sr" for="q">Search</label>
+    <input id="q" type="search" placeholder="Search runs, models, datasets">
+    <button type="submit">Search</button>
+  </form>
+  <span class="kbd-hint">Press <kbd>/</kbd> to search</span>
+</header>
+
+<nav class="gtabs" aria-label="Sections">
+  <a href="#" aria-current="page">Runs<span class="count">8 tonight</span></a>
+  <a href="#">Datasets<span class="count loading">counting</span></a>
+  <a href="#">Models<span class="count">4</span></a>
+  <a href="#">Baselines<span class="count">1</span></a>
+  <a href="#">Settings</a>
+</nav>
+
+<div class="page">
+
+  <!-- left: service menu -->
+  <aside class="side">
+    <section class="mod">
+      <header class="mod-h"><h2>Models</h2><a class="more" href="#">All »</a></header>
+      <div class="mod-b">
+        <ul class="blist">
+          <li><a href="#">summarize-v3</a> <span class="c">2 runs</span></li>
+          <li><a href="#">router-small</a> <span class="c">2 runs</span></li>
+          <li><a href="#">extract-json</a> <span class="c">2 runs</span></li>
+          <li><a href="#">chat-core-8b</a> <span class="c">2 runs</span></li>
+        </ul>
+      </div>
+    </section>
+    <section class="mod">
+      <header class="mod-h"><h2>Datasets</h2><a class="more" href="#">All »</a></header>
+      <div class="mod-b">
+        <ul class="blist">
+          <li><a href="#">news-digest-2k</a></li>
+          <li><a href="#">multilingual-legal-contracts-longform-eval-2026-q3</a></li>
+          <li><a href="#">intent-routing-v7</a></li>
+          <li><a href="#">adversarial-prompts</a></li>
+          <li><a href="#">invoices-ocr</a></li>
+          <li><a href="#">receipts-small</a></li>
+          <li><a href="#">helpfulness-pairwise</a></li>
+          <li><a href="#">safety-refusals</a></li>
+        </ul>
+      </div>
+      <p class="mod-f">Total <span class="loading">loading</span></p>
+    </section>
+    <section class="mod">
+      <header class="mod-h"><h2>Baselines</h2></header>
+      <div class="mod-b">
+        <ul class="blist"><li><a href="#">summarize-v2 @ r-2203</a> <span class="c">0.853</span></li></ul>
+      </div>
+    </section>
+    <section class="mod">
+      <header class="mod-h"><h2>Triggered by</h2></header>
+      <div class="mod-b">
+        <ul class="blist">
+          <li><a href="#">schedule</a> <span class="c">4 runs</span></li>
+          <li><a href="#">CI</a> <span class="c">2 runs</span></li>
+          <li><a href="#">M. Okafor</a> <span class="c">1 run</span></li>
+          <li><a href="#">L. Brandt</a> <span class="c">1 run</span></li>
+        </ul>
+      </div>
+    </section>
+  </aside>
+
+  <!-- top priority: what needs attention -->
+  <section class="mod alert alert-row" aria-labelledby="alert-h">
+    <header class="mod-h"><h2 id="alert-h">Needs attention: 2 of 8 runs</h2><a class="more" href="#r-2291">Jump to r-2291 »</a></header>
+    <ul class="alerts">
+      <li>
+        <p class="hl"><span class="tag solid-bad">Regression</span> <a href="#r-2291">summarize-v3 scored 0.812 on news-digest-2k, 0.041 below its baseline</a></p>
+        <p>r-2291 passed, but the drop is twice the &plusmn;0.020 noise band. Faithfulness fell most: 0.861 against 0.902 on the baseline, summarize-v2 @ r-2203 (0.853).</p>
+      </li>
+      <li>
+        <p class="hl"><span class="tag bad">Failed</span> <a href="#r-2287">extract-json failed on invoices-ocr after 0m 41s</a></p>
+        <p><span class="err">KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation</span></p>
+        <p>A failure, not a regression. Fix the extractor's output schema, then rerun r-2287.</p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- main column: runs -->
+  <div class="main">
+    <section class="mod" id="runs">
+      <header class="mod-h"><h2>Tonight's runs <span class="sub">23:00 to 02:14, newest first</span></h2><a class="more" href="#">All runs »</a></header>
+      <div class="mtabs" role="tablist" aria-label="Filter runs">
+        <button role="tab" aria-selected="true" data-f="all">All<span class="n">8</span></button>
+        <button role="tab" aria-selected="false" data-f="passed">Passed<span class="n">5</span></button>
+        <button role="tab" aria-selected="false" data-f="failed">Failed<span class="n bad">1</span></button>
+        <button role="tab" aria-selected="false" data-f="running">Running<span class="n">1</span></button>
+        <button role="tab" aria-selected="false" data-f="queued">Queued<span class="n">1</span></button>
+      </div>
+      <table class="dt runs">
+        <thead><tr><th>Run</th><th>Model</th><th>Dataset</th><th class="num">Score</th><th class="num">&Delta; base</th><th>Status</th><th class="num">Duration</th><th>By</th><th class="num">Start</th></tr></thead>
+        <tbody>
+          <tr class="sel" id="r-2291" data-s="passed"><td><a href="#">r-2291</a></td><td>summarize-v3</td><td>news-digest-2k</td><td class="num b">0.812</td><td class="num d-neg" title="Regression: beyond the &plusmn;0.020 noise band">&#9660;&minus;0.041</td><td><span class="tag ok">Passed</span></td><td class="num dur">14m 02s</td><td>schedule</td><td class="num when">02:00</td></tr>
+          <tr data-s="passed"><td><a href="#">r-2290</a></td><td>summarize-v3</td><td>multilingual-legal-contracts-longform-eval-2026-q3</td><td class="num">0.774</td><td class="num">+0.006</td><td><span class="tag ok">Passed</span></td><td class="num dur">41m 55s</td><td>M. Okafor</td><td class="num when">01:12</td></tr>
+          <tr data-s="passed"><td><a href="#">r-2289</a></td><td>router-small</td><td>intent-routing-v7</td><td class="num">0.931</td><td class="num">+0.012</td><td><span class="tag ok">Passed</span></td><td class="num dur">3m 48s</td><td>schedule</td><td class="num when">01:00</td></tr>
+          <tr data-s="running"><td><a href="#">r-2288</a></td><td>router-small</td><td>adversarial-prompts</td><td class="num muted" title="Not computed: still running">&mdash;</td><td class="num muted" title="Not computed: still running">&mdash;</td><td><span class="tag run meter" style="--p:62%" title="62% of samples scored">Running 62%</span></td><td class="num dur">9m 10s so far</td><td>CI #4812</td><td class="num when">00:51</td></tr>
+          <tr data-s="failed" id="r-2287"><td><a href="#">r-2287</a></td><td>extract-json</td><td>invoices-ocr</td><td class="num">0.000</td><td class="num">&minus;0.884</td><td><span class="tag bad">Failed</span></td><td class="num dur">0m 41s</td><td>CI #4809</td><td class="num when">00:40</td></tr>
+          <tr data-s="failed" class="errrow"><td></td><td colspan="8"><code>KeyError: 'line_items'</code> 212 of 212 samples failed schema validation. <a href="#">Rerun r-2287</a> after fixing the schema.</td></tr>
+          <tr data-s="passed"><td><a href="#">r-2286</a></td><td>extract-json</td><td>receipts-small</td><td class="num">0.902</td><td class="num">+0.000</td><td><span class="tag ok">Passed</span></td><td class="num dur">2m 15s</td><td>L. Brandt</td><td class="num when">23:58</td></tr>
+          <tr data-s="passed"><td><a href="#">r-2285</a></td><td>chat-core-8b</td><td>helpfulness-pairwise</td><td class="num">0.668</td><td class="num">+0.021</td><td><span class="tag ok">Passed</span></td><td class="num dur">1h 06m</td><td>schedule</td><td class="num when">23:00</td></tr>
+          <tr data-s="queued"><td><a href="#">r-2284</a></td><td>chat-core-8b</td><td>safety-refusals</td><td class="num muted" title="Not computed: queued">&mdash;</td><td class="num muted" title="Not computed: queued">&mdash;</td><td><span class="tag idle">Queued</span></td><td class="num dur muted">&mdash;</td><td>schedule</td><td class="num when muted">&mdash;</td></tr>
+        </tbody>
+      </table>
+      <p class="mod-f"><b>&mdash;</b> not computed yet (queued or running). <b>0.000</b> computed, scored zero. &Delta; is score minus baseline; within &plusmn;0.020 is noise.</p>
+    </section>
+    <section class="mod chart">
+      <header class="mod-h"><h2>Score, last 12 runs <span class="sub">summarize-v3, news-digest-2k</span></h2><a class="more" href="#">History »</a></header>
+      <div class="mod-b">
+        <svg viewBox="0 0 622 188.0" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the 0.833 to 0.873 noise band.">
+          <rect x="36" y="22.0" width="526" height="80.0" fill="#E8F0FB"/>
+          <g stroke="#E6E9EE" stroke-width="1"><line x1="36" x2="562" y1="8.0" y2="8.0"/><line x1="36" x2="562" y1="28.0" y2="28.0"/><line x1="36" x2="562" y1="48.0" y2="48.0"/><line x1="36" x2="562" y1="68.0" y2="68.0"/><line x1="36" x2="562" y1="88.0" y2="88.0"/><line x1="36" x2="562" y1="108.0" y2="108.0"/><line x1="36" x2="562" y1="128.0" y2="128.0"/><line x1="36" x2="562" y1="148.0" y2="148.0"/></g>
+          <line x1="36" x2="562" y1="168.0" y2="168.0" stroke="#AEB5C0"/>
+          <g stroke="#2A5DB0" stroke-width="1" stroke-dasharray="3 2"><line x1="36" x2="562" y1="22.0" y2="22.0"/><line x1="36" x2="562" y1="102.0" y2="102.0"/></g>
+          <line x1="36" x2="562" y1="62.0" y2="62.0" stroke="#7A818C" stroke-width="1" stroke-dasharray="1 2"/>
+          <g text-anchor="end"><text x="32" y="11.0">0.88</text><text x="32" y="51.0">0.86</text><text x="32" y="91.0">0.84</text><text x="32" y="131.0">0.82</text><text x="32" y="171.0">0.80</text></g>
+          <g><text x="566" y="25.0">0.873</text><text x="566" y="65.0">base 0.853</text><text x="566" y="105.0">0.833</text></g>
+          <polyline fill="none" stroke="#2A5DB0" stroke-width="1.5" points="48,76.0 94,66.0 140,70.0 186,58.0 232,62.0 278,68.0 324,54.0 370,64.0 416,72.0 462,66.0 508,62.0"/>
+          <polyline fill="none" stroke="#E60012" stroke-width="1.5" points="508,62.0 554,144.0"/>
+          <g fill="#2A5DB0"><rect x="46" y="74.0" width="4" height="4"/><rect x="92" y="64.0" width="4" height="4"/><rect x="138" y="68.0" width="4" height="4"/><rect x="184" y="56.0" width="4" height="4"/><rect x="230" y="60.0" width="4" height="4"/><rect x="276" y="66.0" width="4" height="4"/><rect x="322" y="52.0" width="4" height="4"/><rect x="368" y="62.0" width="4" height="4"/><rect x="414" y="70.0" width="4" height="4"/><rect x="460" y="64.0" width="4" height="4"/><rect x="506" y="60.0" width="4" height="4"/></g>
+          <rect x="551" y="141.0" width="6" height="6" fill="#E60012"/>
+          <text x="546" y="148.0" text-anchor="end" style="fill:#E60012;font-weight:800">r-2291 0.812, below the band</text>
+          <text x="48" y="182.0" text-anchor="middle">12 runs ago</text><text x="554" y="182.0" text-anchor="middle">latest</text>
+        </svg>
+        <p class="legend"><span><i style="background:#E8F0FB;border-top:1px dashed #2A5DB0;border-bottom:1px dashed #2A5DB0"></i>noise band 0.833&ndash;0.873</span><span><i style="background:#E60012;height:6px;width:6px"></i>outside the band</span></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- selected run -->
+
+  <div class="run">
+    <section class="mod" aria-labelledby="sel-h">
+      <header class="mod-h"><h2 id="sel-h">Selected run: r-2291</h2><a class="more" href="#">Run page »</a></header>
+      <div class="mod-b">
+        <div class="runhead">
+          <h3>summarize-v3 on news-digest-2k</h3>
+          <p class="fig">0.812<small>Score</small></p>
+          <p class="fig bad">&minus;0.041<small>&Delta; vs baseline</small></p>
+          <p class="note"><span class="tag solid-bad">Regression</span><br>outside &plusmn;0.020 band</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Status</dt><dd>Passed</dd></div>
+          <div><dt>Duration</dt><dd>14m 02s</dd></div>
+          <div><dt>Triggered by</dt><dd>schedule</dd></div>
+          <div><dt>Started</dt><dd>02:00</dd></div>
+        </dl>
+        <p class="base">Baseline: <a href="#">summarize-v2 @ r-2203</a> (0.853)</p>
+        <table class="dt metrics">
+          <thead><tr><th>Metric</th><th class="num">Score</th><th class="num">Baseline</th><th class="num">&Delta;</th></tr></thead>
+          <tbody>
+            <tr><td>ROUGE-L</td><td class="num">0.412</td><td class="num">0.447</td><td class="num">&minus;0.035</td></tr>
+            <tr><td class="b">Faithfulness</td><td class="num b">0.861</td><td class="num">0.902</td><td class="num d-neg">&minus;0.041</td></tr>
+            <tr><td>Coverage</td><td class="num">0.790</td><td class="num">0.801</td><td class="num">&minus;0.011</td></tr>
+            <tr><td>Length ratio</td><td class="num">1.18</td><td class="num">1.02</td><td class="num">+0.16</td></tr>
+          </tbody>
+        </table>
+        <div class="actions">
+          <button class="btn primary" type="button">Rerun</button>
+          <button class="btn" type="button">Compare with baseline</button>
+          <button class="btn" type="button" disabled aria-describedby="why">Cancel</button>
+        </div>
+        <p class="why" id="why">Cancel is unavailable: r-2291 finished at 02:14:02.</p>
+      </div>
+    </section>
+    <section class="mod">
+      <header class="mod-h"><h2>Log tail <span class="sub">r-2291, last 5 lines</span></h2><a class="more v" href="#">Full log »</a></header>
+      <div class="mod-b">
+<pre class="log">02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+<span class="w">02:13:55  warn  length_ratio above 1.15 on 38% of samples</span>
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</pre>
+      </div>
+    </section>
+    <section class="mod grey">
+      <header class="mod-h"><h2>Pinned comparisons</h2></header>
+      <p class="empty"><b>None yet.</b> Compare a run with its baseline, then pin the result to keep it here.</p>
+    </section>
+
+
+  </div>
+
+
+  <aside class="right">
+    <section class="mod rank">
+        <header class="mod-h"><h2>Score ranking</h2><a class="more" href="#">Full table »</a></header>
+        <div class="mod-b">
+          <ol class="ranking">
+            <li><span class="rk">1</span><span class="who"><b><a href="#">r-2289</a></b>router-small</span><span class="sc num">0.931</span></li>
+            <li><span class="rk">2</span><span class="who"><b><a href="#">r-2286</a></b>extract-json</span><span class="sc num">0.902</span></li>
+            <li><span class="rk">3</span><span class="who"><b><a href="#">r-2291</a></b>summarize-v3</span><span class="sc num">0.812</span></li>
+            <li><span class="rk">4</span><span class="who"><b><a href="#">r-2290</a></b>summarize-v3</span><span class="sc num">0.774</span></li>
+            <li><span class="rk">5</span><span class="who"><b><a href="#">r-2285</a></b>chat-core-8b</span><span class="sc num">0.668</span></li>
+            <li><span class="rk">6</span><span class="who"><b><a href="#">r-2287</a></b>extract-json</span><span class="sc num bad" title="Failed run">0.000</span></li>
+          </ol>
+          <p class="unranked">Not ranked, no score yet: r-2288 (running), r-2284 (queued).</p>
+        </div>
+      </section>
+    <section class="mod green">
+          <header class="mod-h"><h2>Workspace notices</h2></header>
+          <div class="mod-b">
+            <ul class="blist notices">
+              <li><time>00:51</time>r-2288 is 62% through adversarial-prompts, 9m 10s so far.</li>
+              <li><time>&mdash;</time>r-2284 on safety-refusals is queued by schedule. No start time yet.</li>
+            </ul>
+          </div>
+        </section>
+    <section class="mod grey">
+      <header class="mod-h"><h2>How to read this page</h2></header>
+      <div class="mod-b">
+        <dl class="key">
+          <div><dt>&mdash;</dt><dd>Not computed. The run is queued or still running.</dd></div>
+          <div><dt>0.000</dt><dd>Computed, and the score is zero (r-2287).</dd></div>
+          <div><dt>&Delta;</dt><dd>Score minus the model's baseline.</dd></div>
+          <div><dt>&plusmn;0.020</dt><dd>Noise band. A drop beyond it is a regression.</dd></div>
+          <div><dt class="bad">Red</dt><dd>Only a regression or a failure.</dd></div>
+        </dl>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<script>
+  document.querySelectorAll('.mtabs [role=tab]').forEach(function (t) {
+    t.addEventListener('click', function () {
+      var f = t.dataset.f;
+      t.parentNode.querySelectorAll('[role=tab]').forEach(function (o) { o.setAttribute('aria-selected', o === t); });
+      document.querySelectorAll('.runs tbody tr').forEach(function (r) { r.hidden = f !== 'all' && r.dataset.s !== f; });
+    });
+  });
+</script>
+</body>
+</html>

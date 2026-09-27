@@ -1,0 +1,105 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--folder);
+  color: var(--typed);
+  font-family: var(--font-print);
+  font-size: var(--t-body);
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+h1, h2, h3, p, ol, ul, dl, dd { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: inherit; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* printed vs typed */
+.t { font-family: var(--font-typed); color: var(--typed); font-size: var(--t-typed); letter-spacing: 0; }
+.lbl { color: var(--form); font-size: var(--t-label); font-weight: 500; line-height: 1.15; }
+.lbl b, .ln { font-weight: 800; color: var(--form); }
+.fine { color: var(--form); font-size: var(--t-fine); line-height: 1.3; }
+
+/* folder divider tabs = navigation */
+.tabs { display: flex; align-items: flex-end; gap: 2px; }
+.tabs a {
+  display: block; text-decoration: none;
+  padding: 7px 18px 6px; min-width: 96px;
+  background: var(--folder-2); color: var(--folder-ink);
+  font-weight: 600; font-size: 13px;
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+}
+.tabs a:hover { background: #CDB075; }
+.tabs a[aria-current] { background: var(--paper); color: var(--form); font-weight: 800; padding-top: 9px; }
+
+/* the sheet, with its carbon copy behind */
+.sheet { position: relative; background: var(--paper); border: 1px solid #BFB08A; }
+.sheet::before {
+  content: ""; position: absolute; z-index: -1;
+  inset: 9px -10px -10px 9px;
+  background: var(--carbon); border: 1px solid var(--carbon-edge);
+}
+
+/* part band: reversed part code, then title */
+.part { display: flex; align-items: stretch; background: var(--form); padding: 3px; }
+.part .code { background: var(--paper); color: var(--form); font-weight: 800; font-size: 12px; padding: 1px 8px; display: flex; align-items: center; letter-spacing: .02em; white-space: nowrap; }
+.part h2 { white-space: nowrap; font-size: var(--t-part); font-weight: 700; color: var(--paper); padding: 1px 10px; display: flex; align-items: center; gap: 8px; }
+.part h2 span { font-weight: 400; font-size: 11px; color: #D3E6D9; }
+
+/* field boxes */
+.fields { display: grid; border-left: var(--rule) solid var(--form); }
+.f { border-right: var(--rule) solid var(--form); border-bottom: var(--rule) solid var(--form); padding: 3px 7px 5px; min-width: 0; position: relative; }
+.f > .lbl { display: block; margin-bottom: 3px; }
+.f > .t { display: block; overflow-wrap: anywhere; }
+
+/* comb boxes for IDs and counted digits */
+.comb { display: inline-flex; border-bottom: var(--rule) solid var(--form); vertical-align: bottom; }
+.comb i {
+  padding: 0;
+  font-style: normal; font-family: var(--font-typed); color: var(--typed);
+  width: 1.3em; text-align: center; line-height: 1.5;
+  background: linear-gradient(var(--form), var(--form)) left bottom / 1px 45% no-repeat;
+}
+.comb i:last-child { box-shadow: 1px 0 0 0 transparent; background:
+  linear-gradient(var(--form), var(--form)) left bottom / 1px 45% no-repeat,
+  linear-gradient(var(--form), var(--form)) right bottom / 1px 45% no-repeat; }
+
+/* checkbox squares */
+.cb { display: inline-grid; place-items: center; width: 14px; height: 14px; border: var(--rule) solid var(--form); background: var(--paper); font-family: var(--font-typed); font-weight: 700; font-size: 12px; line-height: 1; color: var(--typed); vertical-align: middle; }
+
+/* rubber stamps */
+.stamp {
+  display: inline-block; color: var(--stamp);
+  border: 2.5px solid currentColor; border-radius: 3px;
+  box-shadow: inset 0 0 0 2px var(--paper), inset 0 0 0 3.5px currentColor;
+  padding: 5px 10px 4px; text-align: center;
+  font-weight: 800; text-transform: uppercase; letter-spacing: .09em; line-height: 1.05;
+  transform: rotate(-6deg); mix-blend-mode: multiply; filter: url(#ink);
+  pointer-events: none; opacity: .92;
+}
+.stamp small { display: block; font-weight: 600; letter-spacing: .04em; font-size: 9.5px; text-transform: none; margin-top: 2px; }
+.stamp.red { color: var(--reject); }
+
+/* form buttons: a box to mark plus the action */
+.act { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 8px; border: var(--rule-heavy) solid var(--form); background: var(--paper); color: var(--form); font-weight: 700; font-size: 13px; cursor: pointer; }
+.act .cb { border-color: currentColor; }
+.act:hover { background: var(--screen); }
+.act.primary { background: var(--form); color: var(--paper); }
+.act.primary .cb { background: var(--form); border-color: var(--paper); }
+.act.primary:hover { background: #174A2E; }
+.act:active { transform: translateY(1px); }
+.act[disabled] { cursor: not-allowed; color: #8FA597; border-color: #B9C9BE; border-style: dashed; background: transparent; }
+.act[disabled] .cb { border-color: #B9C9BE; background: linear-gradient(to top right, transparent calc(50% - .7px), #8FA597 calc(50% - .7px), #8FA597 calc(50% + .7px), transparent calc(50% + .7px)); }
+.act[disabled] .x { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+
+/* inputs are field boxes too */
+.find { display: flex; align-items: stretch; border: var(--rule) solid var(--form); background: var(--paper); }
+.find label { padding: 4px 8px; background: var(--screen); color: var(--form); font-size: var(--t-label); font-weight: 700; display: flex; align-items: center; border-right: var(--rule) solid var(--form); }
+.find input { border: 0; background: transparent; font-family: var(--font-typed); font-size: 12.5px; padding: 4px 8px; min-width: 0; flex: 1; }
+.find input::placeholder { color: #7C8A80; }
+.find input:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.find kbd { font-family: var(--font-typed); font-size: 11px; color: var(--form); display: flex; align-items: center; gap: 5px; padding: 0 8px; border-left: var(--rule) solid var(--form); }
+.find kbd span { border: 1px solid var(--form); padding: 0 5px; }
+
+.barcode { display: block; fill: var(--typed); }
+.vstrip { writing-mode: vertical-rl; transform: rotate(180deg); color: var(--form); font-size: 10px; font-weight: 600; letter-spacing: .02em; white-space: nowrap; }

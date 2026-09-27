@@ -1,0 +1,65 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Code+Pro:wght@400;500;600&display=swap");
+
+:root {
+  --font-cell: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --font-formula: "Source Code Pro", Consolas, "Courier New", monospace;
+
+  /* type: one cell size, headers smaller, a few cells set larger on purpose */
+  --fs-hdr: 11px;      /* column letters, row numbers */
+  --fs-small: 12px;    /* notes, status bar, formula refs */
+  --fs-cell: 13px;     /* every ordinary cell */
+  --fs-title: 15px;    /* a cell formatted as a title */
+  --fs-big: 22px;      /* a cell formatted as a key figure */
+  --lh: 1.3;
+
+  /* the grid */
+  --row: 22px;
+  --rowhdr: 36px;
+  --colhdr: 20px;
+  --cell: #FFFFFF;
+  --grid: #E1E4E8;
+  --hdr: #F3F4F6;
+  --hdr-line: #C9CDD3;
+  --hdr-ink: #5F6670;
+  --chrome: #F8F9FA;
+
+  /* ink */
+  --ink: #1F2328;
+  --ink-2: #4B535D;
+  --ink-3: #656D77;
+
+  /* selection and app chrome: the one brand colour */
+  --green: #1E7145;
+  --green-dark: #155333;
+  --green-hdr: #D5EADD;
+  --green-tint: rgba(30, 113, 69, 0.08);
+
+  /* conditional-format presets (fill / text) */
+  --good-fill: #C6EFCE;
+  --good-ink: #006100;
+  --bad-fill: #FFC7CE;
+  --bad-ink: #9C0006;
+  --warn-fill: #FFEB9C;
+  --warn-ink: #7A4600;
+
+  /* charts and data bars */
+  --series: #4472C4;
+  --databar: #A9C1E8;
+  --band: #E7EDF6;
+  --ref-2: #C55A11;
+
+  /* notes: pale note paper, red corner flag only on problem cells */
+  --note: #FFFBD9;
+  --note-line: #B3A95E;
+  --flag: #C9211E;
+
+  /* rarity chips (data validation) */
+  --unc-fill: #E3ECF7;
+  --unc-ink: #1F4E79;
+  --rare: #2F5597;
+  --mythic: #6A2C91;
+  --mythic-fill: #F1E8F7;
+
+  --radius-chip: 9px;
+  --radius-btn: 2px;
+}

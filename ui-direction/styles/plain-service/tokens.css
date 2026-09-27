@@ -1,0 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap");
+
+:root {
+  --font-body: "Atkinson Hyperlegible", Arial, sans-serif;
+  --font-code: "Atkinson Hyperlegible Mono", "Cascadia Mono", Consolas, monospace;
+
+  --white: #FFFFFF;
+  --text: #0B0C0C;
+  --secondary: #505A5F;
+  --border: #B1B4B6;
+  --input: #0B0C0C;
+  --panel: #F3F2F1;
+  --link: #1D70B8;
+  --link-hover: #003078;
+  --visited: #4C2C92;
+  --focus: #FFDD00;
+  --error: #D4351C;
+  --button: #00703C;
+  --button-shadow: #002D18;
+  --button-hover: #005A30;
+  --secondary-button: #F3F2F1;
+  --secondary-shadow: #929191;
+
+  /* tags: tinted background, dark text */
+  --tag-green-bg: #CCE2D8;  --tag-green: #005A30;
+  --tag-red-bg: #F4CDC6;    --tag-red: #942514;
+  --tag-blue-bg: #BBD4EA;   --tag-blue: #0C2D4A;
+  --tag-grey-bg: #E5E6E7;   --tag-grey: #282D30;
+
+  --t-small: 16px;
+  --t-body: 19px;
+  --t-lead: 24px;
+  --t-h3: 24px;
+  --t-h2: 27px;
+  --t-h1: 40px;
+  --t-h1-mobile: 32px;
+
+  --s1: 5px;
+  --s2: 10px;
+  --s3: 15px;
+  --s4: 20px;
+  --s6: 30px;
+  --s8: 40px;
+  --s9: 50px;
+  --gutter: 30px;
+  --page-width: 1280px;
+  --border-width: 1px;
+  --input-border: 2px;
+  --thick: 5px;
+}

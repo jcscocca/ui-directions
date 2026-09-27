@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Evals: last night's runs, atlas-research</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ribbon);
+    font-family: var(--font-typed);
+    font-size: var(--t-typed);
+    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
+    min-width: 1360px;
+  }
+  h1, h2, h3, p, ul, ol, dl, dd { margin: 0; padding: 0; }
+  a { color: inherit; }
+  :focus-visible { outline: 2.5px solid var(--ribbon); outline-offset: 3px; background-color: var(--riso-yellow); }
+
+  /* a piece of paper: the backing tilts, the text stays level */
+  .piece { position: relative; isolation: isolate; }
+  .piece::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: var(--stock);
+    box-shadow: 0 0 0 1px var(--edge), var(--lift);
+    transform: rotate(var(--tilt, 0deg));
+  }
+  .tape {
+    position: absolute; z-index: 3; width: 84px; height: 22px;
+    background: var(--tape); mix-blend-mode: multiply;
+    clip-path: polygon(0 8%, 6% 0, 12% 10%, 18% 0, 82% 0, 88% 12%, 94% 0, 100% 10%, 100% 90%, 94% 100%, 88% 88%, 82% 100%, 18% 100%, 12% 90%, 6% 100%, 0 92%);
+  }
+  .marker { font-family: var(--font-marker); color: var(--marker); font-weight: 400; }
+  .cut { font-family: var(--font-cut); font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; }
+  /* misregistration: blue drum plus the pink drum landing 2px off */
+  .misreg { position: relative; display: inline-block; color: var(--riso-blue); white-space: nowrap; }
+  .misreg::after {
+    content: attr(data-ink); position: absolute; left: 2px; top: 1px; white-space: nowrap;
+    color: var(--riso-pink); mix-blend-mode: multiply; pointer-events: none;
+  }
+
+  .sheet { width: 1440px; height: 900px; padding: 16px 28px 18px; position: relative; overflow: hidden; }
+  /* a riso ground printed on the page before anything was pasted */
+  .ground {
+    position: absolute; z-index: 0; pointer-events: none; mix-blend-mode: multiply;
+  }
+  .ground.pink { left: 610px; top: 58px; width: 520px; height: 340px; background: radial-gradient(circle, var(--riso-pink) 1.1px, transparent 1.5px) 0 0 / 6px 6px; opacity: .55; transform: rotate(2deg); }
+  .ground.blue { right: -40px; bottom: -30px; width: 560px; height: 360px; background: var(--halftone); background-size: var(--halftone-size); opacity: .35; transform: rotate(-3deg); }
+
+  /* ---------- masthead ---------- */
+  .mast { position: relative; z-index: 2; display: flex; align-items: center; gap: 22px; height: 64px; }
+  .logo { display: flex; gap: 3px; text-decoration: none; }
+  .logo span {
+    font-family: var(--font-cut); font-size: 38px; line-height: 1; padding: 3px 5px 4px;
+    display: inline-block;
+  }
+  .logo span:nth-child(1) { background: var(--riso-blue); color: var(--stock); transform: rotate(-4deg); }
+  .logo span:nth-child(2) { background: var(--stock); color: var(--ribbon); box-shadow: 0 0 0 1px var(--edge); transform: rotate(3deg) translateY(3px); }
+  .logo span:nth-child(3) { background: var(--riso-yellow); color: var(--ribbon); transform: rotate(-2deg); }
+  .logo span:nth-child(4) { background: var(--stock); color: var(--riso-blue); box-shadow: 0 0 0 1px var(--edge); transform: rotate(5deg) translateY(-2px); }
+  .logo span:nth-child(5) { background: var(--ribbon); color: var(--stock); transform: rotate(-3deg) translateY(2px); }
+  .ws { font-size: 12.5px; line-height: 1.3; }
+  .ws b { font-weight: 700; }
+  .stickers { display: flex; gap: 10px; margin-left: 18px; }
+  .stickers a {
+    font-family: var(--font-cut); font-size: var(--t-sticker); letter-spacing: 0.03em; text-transform: uppercase;
+    text-decoration: none; color: var(--riso-blue); background: var(--stock);
+    padding: 7px 14px 6px; border-radius: 999px;
+    box-shadow: 0 0 0 1.5px var(--riso-blue), 0 0 0 5px var(--stock), 0 0 0 6px var(--edge);
+  }
+  .stickers a:nth-child(2) { transform: rotate(-3deg); }
+  .stickers a:nth-child(3) { transform: rotate(2deg); }
+  .stickers a:nth-child(4) { transform: rotate(-1.5deg); }
+  .stickers a:nth-child(5) { transform: rotate(3deg); }
+  .stickers a[aria-current] {
+    background: var(--riso-yellow); color: var(--ribbon); transform: rotate(-4deg) scale(1.08);
+    box-shadow: 0 0 0 1.5px var(--ribbon), 0 0 0 5px var(--stock), 0 0 0 6px var(--edge);
+  }
+  .stickers a:hover { background: var(--riso-yellow); color: var(--ribbon); }
+  .search { margin-left: auto; display: flex; align-items: center; gap: 8px; --tilt: 0.8deg; padding: 8px 10px 8px 12px; }
+  .search label { font-weight: 700; }
+  .search input {
+    font: inherit; color: var(--ribbon); width: 250px; border: 0; border-bottom: 1.5px dotted var(--ribbon);
+    background: transparent; padding: 2px 0;
+  }
+  .search input::placeholder { color: var(--ribbon-faded); }
+  .search input:focus-visible { outline: none; background: var(--riso-yellow); border-bottom: 2px solid var(--ribbon); }
+  kbd {
+    font-family: var(--font-typed); font-weight: 700; font-size: 13px; display: inline-block; min-width: 24px; text-align: center;
+    border: 1.5px solid var(--ribbon); border-radius: 50%; padding: 1px 6px; transform: rotate(-6deg);
+  }
+
+  /* ---------- board ---------- */
+  .board {
+    position: relative; z-index: 1; margin-top: 14px;
+    display: grid; grid-template-columns: 872px 1fr; grid-template-rows: 350px auto; column-gap: 34px;
+  }
+
+  /* the finding: cut headline over a halftone print */
+  .finding { grid-column: 1; grid-row: 1; position: relative; }
+  .headline { position: absolute; z-index: 4; left: 18px; top: 0; display: flex; align-items: flex-end; gap: 8px; }
+  .headline .slip { font-size: var(--t-head); line-height: 0.92; padding: 6px 10px 2px; }
+  .headline .slip.a { background: var(--stock); box-shadow: 0 0 0 1px var(--edge), var(--lift); transform: rotate(-1.4deg); }
+  .headline .slip.b { background: var(--riso-yellow); transform: rotate(1.2deg) translateY(6px); }
+  .headline .slip.b .misreg { color: var(--ribbon); }
+  .standfirst { position: absolute; z-index: 4; left: 706px; top: 0; width: 178px; font-size: 12.5px; line-height: 1.35; padding: 8px 10px; --tilt: 2deg; }
+  .print { position: absolute; left: 0; top: 48px; width: 872px; height: 300px; --tilt: var(--tilt-s); }
+  .print::before {
+    background: var(--halftone), var(--stock); background-size: var(--halftone-size), auto;
+    clip-path: polygon(0 1%, 38% 0, 71% 1.5%, 100% 0, 99.6% 60%, 100% 100%, 55% 99%, 0 100%, 0.4% 40%);
+    box-shadow: none;
+    opacity: 1;
+  }
+  .print::after { /* knock the halftone back so the line reads */
+    content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(255,255,255,.8); transform: rotate(var(--tilt));
+    clip-path: polygon(0 1%, 38% 0, 71% 1.5%, 100% 0, 99.6% 60%, 100% 100%, 55% 99%, 0 100%, 0.4% 40%);
+  }
+  .print svg { position: absolute; left: 0; top: 0; }
+  .print .cap { position: absolute; left: 60px; bottom: 9px; width: 780px; font-size: 11.5px; line-height: 1.35; }
+  .print .tape.t1 { right: -24px; top: -6px; transform: rotate(28deg); }
+  .print .tape.t2 { left: -30px; top: 30px; transform: rotate(-58deg); }
+
+  /* ---------- runs: a typed sheet ---------- */
+  .runs { grid-column: 1; grid-row: 2; margin-top: 12px; padding: 16px 20px 12px; --tilt: 0.45deg; }
+  .runs .tape.t1 { left: 36px; top: -12px; transform: rotate(-6deg); }
+  .runs .tape.t2 { right: 40px; top: -10px; transform: rotate(5deg); }
+  .runs-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+  .runs-head h2 { font-family: var(--font-cut); font-weight: 400; font-size: 24px; line-height: 1; text-transform: uppercase; letter-spacing: 0.01em; background: var(--riso-blue); color: var(--stock); padding: 3px 8px 2px; transform: rotate(-1deg); }
+  .runs-head p { font-size: 12.5px; }
+  .runs-head .count { margin-left: auto; font-weight: 700; }
+  table { border-collapse: collapse; width: 100%; font-size: 12px; }
+  th { font-weight: 700; text-align: left; padding: 3px 5px 4px; border-bottom: 1.5px dashed var(--ribbon); white-space: nowrap; }
+  td { padding: 4px 5px; vertical-align: top; height: 26px; white-space: nowrap; }
+  th.n, td.n { text-align: right; }
+  td.st, th.st { padding-left: 12px; }
+  td.ds { min-width: 224px; width: 224px; white-space: normal; overflow-wrap: anywhere; }
+  tbody tr:hover td { background: rgba(0, 120, 191, .08); }
+  tr.sel td { background: var(--riso-yellow); }
+  tr.sel td:first-child { border-radius: 3px 0 0 6px; }
+  tr.sel td:last-child { border-radius: 0 6px 3px 0; }
+  .runid a { font-weight: 700; text-decoration: none; }
+  .runid a:hover { text-decoration: underline; }
+  .none { color: var(--ribbon-faded); }
+  .delta-reg { position: relative; font-weight: 700; color: var(--marker); }
+  .delta-reg svg { position: absolute; left: -9px; top: -7px; overflow: visible; pointer-events: none; }
+  .stamp {
+    display: inline-block; font-family: var(--font-cut); font-size: 14px; letter-spacing: 0.08em; line-height: 1;
+    color: var(--marker); border: 2px solid var(--marker); padding: 2px 5px 1px; transform: rotate(-4deg);
+  }
+  .run-bar { display: inline-block; width: 36px; height: 9px; border: 1.2px solid var(--ribbon); vertical-align: -1px; margin: 0 4px; position: relative; }
+  .run-bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: var(--halftone); background-size: 3px 3px; background-color: rgba(0,120,191,.35); }
+  .queued { color: var(--ribbon-faded); }
+  tr.err td { white-space: normal; height: auto; padding-top: 0; padding-bottom: 7px; }
+  .errline { font-size: 12px; }
+  .errline code { font-family: var(--font-typed); color: var(--marker); font-weight: 700; }
+  .foot { margin-top: 8px; padding-top: 7px; border-top: 1.5px dashed var(--ribbon); display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; font-size: var(--t-foot); }
+  .foot b { font-weight: 700; }
+
+  /* ---------- right column: the selected run ---------- */
+  .detail { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; gap: 14px; }
+  .card { --tilt: var(--tilt-m); padding: 12px 22px 12px 24px; }
+  .card::before {
+    background:
+      linear-gradient(var(--riso-pink), var(--riso-pink)) 0 58px / 100% 2px no-repeat,
+      repeating-linear-gradient(to bottom, transparent 0 23px, rgba(0,120,191,.28) 23px 24px) 0 84px / 100% calc(100% - 96px) no-repeat,
+      var(--stock);
+  }
+  .card .tape.t1 { left: 50%; top: -12px; transform: translateX(-50%) rotate(-3deg); width: 96px; }
+  .card-top { height: 50px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .card-top .id { font-weight: 700; font-size: 12.5px; }
+  .card-top h3 { font-family: var(--font-cut); font-weight: 400; font-size: 25px; line-height: 1.05; }
+  .card .line { height: 24px; line-height: 24px; font-size: 12.5px; }
+  .card .baseline { margin-top: 10px; }
+  .readout { display: flex; align-items: flex-end; gap: 22px; height: 96px; padding-bottom: 4px; }
+  .readout .big { font-family: var(--font-cut); font-size: var(--t-readout); line-height: .9; color: var(--riso-blue); }
+  .readout .big.minus { color: var(--marker); }
+  .readout .lbl { display: block; font-family: var(--font-typed); font-size: 11.5px; color: var(--ribbon); margin-bottom: 4px; line-height: 1; }
+  .readout .note { font-size: 19px; line-height: 1.05; transform: rotate(-4deg); margin-bottom: 8px; }
+  .metrics { width: 100%; font-size: 12.5px; }
+  .metrics th, .metrics td { height: 24px; line-height: 24px; padding: 0 4px; border: 0; vertical-align: bottom; }
+  .metrics th { font-weight: 700; }
+  .metrics td.neg { font-weight: 700; }
+
+  .dymo { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding-left: 6px; }
+  .dymo button {
+    font-family: var(--font-cut); font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase;
+    border: 0; color: var(--stock); background: var(--riso-blue); padding: 8px 16px 7px; cursor: pointer;
+    text-shadow: 0 1px 0 rgba(0,0,0,.25), 0 -1px 0 rgba(255,255,255,.3);
+    clip-path: polygon(0 12%, 4px 0, calc(100% - 4px) 0, 100% 12%, 100% 88%, calc(100% - 4px) 100%, 4px 100%, 0 88%);
+  }
+  .dymo button.b1 { transform: rotate(-1.5deg); }
+  .dymo button.b2 { background: var(--ribbon); transform: rotate(1deg); }
+  .dymo button:hover:not(:disabled) { filter: brightness(0.86); }
+  .dymo button:active:not(:disabled) { transform: translateY(1px); }
+  .dymo button:focus-visible { outline: 3px solid var(--riso-yellow); outline-offset: 2px; clip-path: none; }
+  .dymo button:disabled {
+    background: transparent; color: var(--ribbon-faded); text-shadow: none; cursor: not-allowed;
+    clip-path: none; outline: 1.5px dashed var(--ribbon-faded); outline-offset: -1.5px; transform: rotate(-.5deg);
+  }
+  .dymo .why { flex-basis: 100%; font-size: 11.5px; }
+
+  .lower { display: flex; gap: 20px; align-items: flex-start; }
+  .receipt { width: 286px; flex: none; padding: 20px 16px 22px; --tilt: -1.3deg; font-size: 11.5px; line-height: 1.35; }
+  .receipt::before {
+    background: #FDFDFB;
+    clip-path: polygon(0 1.5%, 4% 0, 8% 1.6%, 13% 0.2%, 18% 1.8%, 24% 0, 30% 1.4%, 36% 0.3%, 43% 1.9%, 50% 0, 57% 1.5%, 63% 0.2%, 70% 1.8%, 76% 0.1%, 83% 1.6%, 89% 0, 95% 1.7%, 100% 0.4%, 100% 98.3%, 95% 100%, 90% 98.1%, 84% 99.8%, 78% 98.3%, 71% 100%, 65% 98%, 58% 99.7%, 51% 98.2%, 45% 100%, 38% 98.4%, 31% 99.9%, 25% 98%, 18% 99.8%, 12% 98.3%, 6% 100%, 0 98.6%);
+    box-shadow: none;
+    filter: drop-shadow(0 0 0.6px rgba(27,42,74,.45));
+  }
+  .receipt .rh { text-align: center; font-weight: 700; letter-spacing: 0.06em; }
+  .receipt .rs { text-align: center; }
+  .receipt .rule { border-top: 1.5px dashed var(--ribbon); margin: 8px 0; }
+  .receipt ol { list-style: none; }
+  .receipt li { display: grid; grid-template-columns: 62px 36px 1fr; margin-bottom: 4px; }
+  .receipt li .lv { font-weight: 700; }
+  .receipt li.warn .msg { background: linear-gradient(transparent 55%, rgba(255,232,0,.9) 55%); }
+  .receipt .end { text-align: center; color: var(--ribbon-faded); }
+
+  .asides { display: flex; flex-direction: column; gap: 18px; padding-top: 6px; flex: 1; }
+  .glue {
+    border: 2px dashed var(--ribbon-faded); border-radius: 6px 14px 8px 12px; padding: 10px 12px 12px; transform: rotate(1.2deg);
+  }
+  .glue h3 { font-family: var(--font-typed); font-weight: 700; font-size: 12.5px; }
+  .glue p.marker { font-size: 16px; line-height: 1.2; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="ground pink" aria-hidden="true"></div>
+  <div class="ground blue" aria-hidden="true"></div>
+
+  <header class="mast">
+    <a class="logo" href="#" aria-label="Evals"><span>E</span><span>V</span><span>A</span><span>L</span><span>S</span></a>
+    <p class="ws"><b>atlas-research</b><br>runs from 23:00 to 02:00</p>
+    <nav class="stickers" aria-label="Sections">
+      <a href="#" aria-current="page">Runs</a>
+      <a href="#">Datasets</a>
+      <a href="#">Models</a>
+      <a href="#">Baselines</a>
+      <a href="#">Settings</a>
+    </nav>
+    <form class="search piece" role="search" onsubmit="return false">
+      <label for="q">search</label>
+      <input id="q" type="search" placeholder="Search runs, models, datasets">
+      <kbd title="Press / to search">/</kbd>
+    </form>
+  </header>
+
+  <main class="board">
+    <section class="finding" aria-labelledby="finding-h">
+      <h1 class="headline" id="finding-h">
+        <span class="slip a cut"><span class="misreg" data-ink="summarize-v3">summarize-v3</span></span>
+        <span class="slip b cut"><span class="misreg" data-ink="slipped 0.041">slipped 0.041</span></span>
+      </h1>
+      <p class="standfirst piece">r-2291 scored 0.812 against a 0.853 baseline. The noise band is &plusmn;0.020, so this drop is real.</p>
+
+      <figure class="print piece" style="margin:0">
+        <span class="tape t1" aria-hidden="true"></span>
+        <span class="tape t2" aria-hidden="true"></span>
+        <svg width="872" height="276" viewBox="0 0 872 276" role="img" aria-label="Score of summarize-v3 on news-digest-2k over the last 12 runs. Eleven runs sit between 0.846 and 0.857, inside the noise band 0.833 to 0.873. The newest, r-2291, falls to 0.812.">
+          <rect x="60" y="77.4" width="690" height="88.0" fill="#FFE800" style="mix-blend-mode:multiply" opacity=".85"/>
+          <line x1="60" y1="121.4" x2="750" y2="121.4" stroke="#1B2A4A" stroke-width="1.3" stroke-dasharray="7 5"/>
+          <g font-family="Courier Prime, monospace" font-size="11.5" fill="#1B2A4A">
+            <text x="52" y="66.0" text-anchor="end">0.88</text>
+            <text x="52" y="154.0" text-anchor="end">0.84</text>
+            <text x="52" y="242.0" text-anchor="end">0.80</text>
+            <text x="758" y="81.4">0.873</text>
+            <text x="758" y="125.4">baseline 0.853</text>
+            <text x="758" y="169.4">0.833</text>
+            <text x="74" y="256.0" text-anchor="middle">12 runs ago</text>
+            <text x="734" y="256.0" text-anchor="middle" font-weight="700">r-2291</text>
+          </g>
+          <line x1="60" y1="62.0" x2="60" y2="238.0" stroke="#1B2A4A" stroke-width="1.2"/>
+          <line x1="60" y1="238.0" x2="750" y2="238.0" stroke="#1B2A4A" stroke-width="1.2"/>
+          <polyline fill="none" stroke="#0078BF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="74,136.8 134,125.8 194,130.2 254,117.0 314,121.4 374,128.0 434,112.6 494,123.6 554,132.4 614,125.8 674,121.4 734,211.6"/>
+          <g fill="#0078BF"><circle cx="74" cy="136.8" r="4"/><circle cx="134" cy="125.8" r="4"/><circle cx="194" cy="130.2" r="4"/><circle cx="254" cy="117.0" r="4"/><circle cx="314" cy="121.4" r="4"/><circle cx="374" cy="128.0" r="4"/><circle cx="434" cy="112.6" r="4"/><circle cx="494" cy="123.6" r="4"/><circle cx="554" cy="132.4" r="4"/><circle cx="614" cy="125.8" r="4"/><circle cx="674" cy="121.4" r="4"/></g>
+          <circle cx="735.5" cy="212.6" r="6.5" fill="#FF48B0" style="mix-blend-mode:multiply"/>
+          <circle cx="734" cy="211.6" r="4" fill="#0078BF" style="mix-blend-mode:multiply"/>
+          <path d="M712 199.6 C 715 182.6, 751 181.6, 759 199.6 C 768 219.6, 748 233.6, 730 231.6 C 710 229.6, 702 213.6, 714 196.6" fill="none" stroke="#FF48B0" stroke-width="3.2" stroke-linecap="round"/>
+          <path d="M700 219.6 C 674 225.6, 654 221.6, 638 213.6" fill="none" stroke="#C8126F" stroke-width="2" stroke-linecap="round"/>
+          <path d="M645 208.6 L 637 213.6 L 646 218.6" fill="none" stroke="#C8126F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <g font-family="Permanent Marker, cursive" fill="#C8126F" transform="rotate(-3 534 211.6)">
+            <text x="374" y="199.6" font-size="20">out of the band!</text>
+            <text x="374" y="223.6" font-size="15">regression, not noise. rerun to confirm</text>
+          </g>
+        </svg>
+        <figcaption class="cap"><b>Score over the last 12 runs</b> of summarize-v3 on news-digest-2k, oldest first. Yellow band: baseline 0.853 &plusmn;0.020, the noise band. Dashed line: baseline.</figcaption>
+      </figure>
+    </section>
+
+    <section class="runs piece" aria-labelledby="runs-h">
+      <span class="tape t1" aria-hidden="true"></span>
+      <span class="tape t2" aria-hidden="true"></span>
+      <div class="runs-head">
+        <h2 id="runs-h">Last night's runs</h2>
+        <p>newest first</p>
+        <p class="count">8 runs: 5 passed, 1 failed, 1 running, 1 queued</p>
+      </div>
+      <table>
+        <thead>
+          <tr><th>run</th><th>model</th><th>dataset</th><th class="n">score</th><th class="n">&Delta; base</th><th class="st">status</th><th>duration</th><th>by</th><th class="n">start</th></tr>
+        </thead>
+        <tbody>
+          <tr class="sel" aria-selected="true">
+            <td class="runid"><a href="#">r-2291</a></td><td>summarize-v3</td><td class="ds">news-digest-2k</td>
+            <td class="n">0.812</td>
+            <td class="n"><span class="delta-reg">&minus;0.041<svg width="66" height="30" viewBox="0 0 66 30" aria-hidden="true"><path d="M8 6 C 22 0, 58 1, 62 13 C 65 25, 36 29, 14 26 C 1 24, 0 13, 12 5" fill="none" stroke="#FF48B0" stroke-width="2.4" stroke-linecap="round"/></svg></span></td>
+            <td class="st">passed</td><td>14m 02s</td><td>schedule</td><td class="n">02:00</td>
+          </tr>
+          <tr>
+            <td class="runid"><a href="#">r-2290</a></td><td>summarize-v3</td><td class="ds">multilingual-legal-contracts-longform-eval-2026-q3</td>
+            <td class="n">0.774</td><td class="n">+0.006</td><td class="st">passed</td><td>41m 55s</td><td>M. Okafor</td><td class="n">01:12</td>
+          </tr>
+          <tr>
+            <td class="runid"><a href="#">r-2289</a></td><td>router-small</td><td class="ds">intent-routing-v7</td>
+            <td class="n">0.931</td><td class="n">+0.012</td><td class="st">passed</td><td>3m 48s</td><td>schedule</td><td class="n">01:00</td>
+          </tr>
+          <tr>
+            <td class="runid"><a href="#">r-2288</a></td><td>router-small</td><td class="ds">adversarial-prompts</td>
+            <td class="n none">&mdash;</td><td class="n none">&mdash;</td>
+            <td class="st">running<span class="run-bar" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="r-2288 progress"><i></i></span>62%</td>
+            <td>9m 10s so far</td><td>CI #4812</td><td class="n">00:51</td>
+          </tr>
+          <tr>
+            <td class="runid"><a href="#">r-2287</a></td><td>extract-json</td><td class="ds">invoices-ocr</td>
+            <td class="n">0.000</td><td class="n">&minus;0.884</td><td class="st"><span class="stamp">Failed</span></td><td>0m 41s</td><td>CI #4809</td><td class="n">00:40</td>
+          </tr>
+          <tr class="err">
+            <td></td>
+            <td colspan="8" class="errline"><code>KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation.</code> Fix the extractor's output schema, then rerun. Failed, not a regression.</td>
+          </tr>
+          <tr>
+            <td class="runid"><a href="#">r-2286</a></td><td>extract-json</td><td class="ds">receipts-small</td>
+            <td class="n">0.902</td><td class="n">+0.000</td><td class="st">passed</td><td>2m 15s</td><td>L. Brandt</td><td class="n">23:58</td>
+          </tr>
+          <tr>
+            <td class="runid"><a href="#">r-2285</a></td><td>chat-core-8b</td><td class="ds">helpfulness-pairwise</td>
+            <td class="n">0.668</td><td class="n">+0.021</td><td class="st">passed</td><td>1h 06m</td><td>schedule</td><td class="n">23:00</td>
+          </tr>
+          <tr>
+            <td class="runid"><a href="#">r-2284</a></td><td>chat-core-8b</td><td class="ds">safety-refusals</td>
+            <td class="n none">&mdash;</td><td class="n none">&mdash;</td><td class="st queued">queued</td><td class="none">&mdash;</td><td>schedule</td><td class="n none">&mdash;</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="foot">
+        <p><b>&mdash;</b> not computed: the run is queued or still running. <b>0.000</b> is a real score of zero (r-2287).</p>
+        <p><b>&Delta; base</b> is score minus the model's baseline. Outside &plusmn;0.020 it gets circled.</p>
+      </div>
+    </section>
+
+    <aside class="detail" aria-labelledby="detail-h">
+      <article class="card piece">
+        <span class="tape t1" aria-hidden="true"></span>
+        <div class="card-top">
+          <p class="id">r-2291, selected</p>
+          <h3 id="detail-h">summarize-v3 on news-digest-2k</h3>
+        </div>
+        <p class="line baseline">baseline: summarize-v2 @ r-2203 (0.853)</p>
+        <div class="readout">
+          <p><span class="lbl">score</span><span class="big">0.812</span></p>
+          <p><span class="lbl">&Delta; vs baseline</span><span class="big minus">&minus;0.041</span></p>
+          <p class="note marker">twice the<br>noise band</p>
+        </div>
+        <p class="line">passed in 14m 02s. triggered by schedule at 02:00.</p>
+        <table class="metrics">
+          <thead><tr><th>metric</th><th class="n">score</th><th class="n">baseline</th><th class="n">&Delta;</th></tr></thead>
+          <tbody>
+            <tr><td>ROUGE-L</td><td class="n">0.412</td><td class="n">0.447</td><td class="n neg">&minus;0.035</td></tr>
+            <tr><td>Faithfulness</td><td class="n">0.861</td><td class="n">0.902</td><td class="n neg">&minus;0.041</td></tr>
+            <tr><td>Coverage</td><td class="n">0.790</td><td class="n">0.801</td><td class="n">&minus;0.011</td></tr>
+            <tr><td>Length ratio</td><td class="n">1.18</td><td class="n">1.02</td><td class="n neg">+0.16</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <div class="dymo">
+        <button class="b1" type="button">Rerun evaluation</button>
+        <button class="b2" type="button">Compare with baseline</button>
+        <button type="button" disabled aria-describedby="why">Cancel run</button>
+        <p class="why" id="why">Can't cancel: r-2291 already finished at 02:14:02.</p>
+      </div>
+
+      <div class="lower">
+        <section class="receipt piece" aria-label="Log tail for r-2291">
+          <p class="rh">LOG TAIL</p>
+          <p class="rs">run r-2291, last 5 lines</p>
+          <div class="rule"></div>
+          <ol>
+            <li><span>02:13:48</span><span class="lv">eval</span><span class="msg">1996/2000 samples scored</span></li>
+            <li><span>02:13:55</span><span class="lv">eval</span><span class="msg">2000/2000 samples scored</span></li>
+            <li class="warn"><span>02:13:55</span><span class="lv">warn</span><span class="msg">length_ratio above 1.15 on 38% of samples</span></li>
+            <li><span>02:14:01</span><span class="lv">agg</span><span class="msg">faithfulness=0.861 (baseline 0.902)</span></li>
+            <li><span>02:14:02</span><span class="lv">done</span><span class="msg">run r-2291 finished in 14m 02s</span></li>
+          </ol>
+          <div class="rule"></div>
+          <p class="end">end of tail</p>
+        </section>
+        <div class="asides">
+          <section class="glue" aria-labelledby="pin-h">
+            <h3 id="pin-h">Pinned comparisons</h3>
+            <p class="marker">none yet. compare with baseline, then pin it here.</p>
+          </section>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+</body>
+</html>

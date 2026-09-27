@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap");
+
+:root {
+  --font-display: "Cormorant", "Cormorant Garamond", Garamond, serif;
+  --font-ui: "Jost", "Futura", "Century Gothic", sans-serif;
+  --font-code: "DM Mono", ui-monospace, monospace;
+
+  --ink: #0F1B2D;          /* the room: page background */
+  --midnight: #172640;     /* the stage: selected / raised surface */
+  --midnight-2: #1E3150;   /* hover on midnight */
+  --gold: #C9A45C;         /* hairlines, ornaments, labels, primary button */
+  --gold-dim: #8A7447;     /* secondary rules, disabled outlines */
+  --ivory: #EFE8D8;        /* text */
+  --ivory-dim: #B4AFA2;    /* secondary text */
+  --garnet: #B0414B;       /* failure / regression marks (rules, dots) */
+  --garnet-text: #E08A92;  /* failure / regression text on ink */
+
+  --hair: 1px;
+  --frame-outer: 14px;
+  --frame-gap: 5px;
+
+  --t-caps: 11px;
+  --t-small: 12.5px;
+  --t-ui: 14px;
+  --t-body: 17px;
+  --t-title: 30px;
+  --t-mast: 56px;
+  --t-score: 132px;
+
+  --track-caps: 0.22em;
+  --u: 4px;
+}

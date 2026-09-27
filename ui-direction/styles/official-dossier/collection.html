@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Form WB-3: Specimen Register, Saltmarsh Reach</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { min-width: 1360px; min-height: 900px; position: relative; overflow-x: hidden; }
+  .top { position: absolute; top: 0; left: 26px; right: 32px; height: 42px; display: flex; align-items: flex-end; justify-content: space-between; }
+  .top .find { width: 430px; margin-bottom: 7px; }
+  .sheet { position: absolute; top: 42px; left: 26px; right: 32px; bottom: 18px; display: grid; grid-template-columns: 28px 1fr; }
+  .side { border-right: var(--rule) solid var(--form); display: flex; justify-content: space-between; align-items: center; flex-direction: column; padding: 12px 0; }
+  .main { padding: 8px 14px 10px; min-width: 0; display: grid; grid-template-rows: auto 1fr; gap: 8px; }
+
+  .head { display: grid; grid-template-columns: 200px 1fr 430px; border-bottom: var(--rule-heavy) solid var(--form); padding-bottom: 6px; }
+  .formno { border-right: var(--rule) solid var(--form); padding-right: 12px; color: var(--form); }
+  .formno .n { display: flex; align-items: baseline; gap: 6px; line-height: 1; }
+  .formno .n span { font-size: 11px; font-weight: 600; }
+  .formno .n strong { font-size: var(--t-formno); font-weight: 900; letter-spacing: -.01em; }
+  .formno p { font-size: var(--t-fine); margin-top: 4px; }
+  .title { padding: 0 16px; }
+  .title h1 { font-size: var(--t-title); font-weight: 800; color: var(--form); line-height: 1.1; }
+  .title p { font-size: 11.5px; color: var(--form); margin-top: 5px; }
+  .totals { border-left: var(--rule) solid var(--form); padding-left: 12px; display: grid; grid-template-columns: auto auto auto; gap: 4px 14px; align-content: start; }
+  .totals .lbl { display: block; margin-bottom: 2px; }
+  .totals .comb i { font-size: 17px; width: 1.3em; }
+  .totals .pct { font-family: var(--font-typed); font-size: 12px; margin-left: 6px; }
+  .totals .of { color: var(--form); font-size: 11px; margin: 0 4px; }
+  .totals .barcode { width: 150px; height: 18px; grid-column: 1 / -1; margin-top: 2px; }
+
+  .body { display: grid; grid-template-columns: 1fr 470px; gap: 16px; min-height: 0; }
+  .left { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+
+  /* filters as checkbox fields */
+  .filters { display: grid; grid-template-columns: 1.05fr 1fr; border-left: var(--rule) solid var(--form); }
+  .filters .f { display: flex; align-items: center; gap: 12px; padding: 4px 8px 5px; }
+  .filters .f > .lbl { margin: 0; width: 64px; flex: none; }
+  .opts { display: flex; flex-wrap: wrap; gap: 3px 12px; }
+  .opt { display: inline-flex; align-items: center; gap: 5px; background: none; border: 0; padding: 1px 0; cursor: pointer; font-size: 12.5px; color: var(--typed); font-weight: 500; }
+  .opt .cb { width: 13px; height: 13px; font-size: 11px; }
+  .opt.radio .cb { border-radius: 50%; }
+  .opt:hover .cb { background: var(--screen); }
+
+  /* the register: printed records sharing their rules */
+  .cls { display: inline-flex; align-items: center; gap: 5px; color: var(--form); line-height: 1; }
+  .cls small { font-size: 9.5px; font-weight: 500; }
+  .clsl { display: inline-grid; place-items: center; width: 18px; height: 18px; border: var(--rule) solid var(--form); background: var(--paper); font-weight: 800; font-size: 11px; color: var(--form); }
+  .uncommon .clsl { border-width: 2px; }
+  .rare .clsl { background: var(--form); color: var(--paper); }
+  .rare small { font-weight: 700; }
+  .mythic .clsl { background: var(--stamp); border-color: var(--stamp); color: var(--paper); }
+  .mythic small { font-weight: 800; color: var(--stamp); }
+  .ledgers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  table.ledger { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .ledger th { background: var(--screen); color: var(--form); font-size: var(--t-label); font-weight: 500; text-align: left; padding: 3px 5px; border: var(--rule) solid var(--form); vertical-align: bottom; line-height: 1.15; }
+  .ledger th b { font-weight: 800; }
+  .ledger th .cs { display: flex; gap: 5px; font-weight: 800; margin-top: 1px; }
+  .ledger th .cs span { width: 14px; text-align: center; }
+  .ledger th.qt { text-align: right; }
+  .ledger th.off { background: repeating-linear-gradient(-45deg, var(--screen) 0 4px, var(--paper) 4px 7px); font-weight: 700; }
+  .ledger td { border: var(--rule) solid var(--form); padding: 4px 5px; vertical-align: middle; height: 69px; min-width: 0; }
+  .ledger td.no { vertical-align: top; padding-top: 6px; }
+  .ledger td.no .comb i { font-size: 12.5px; width: 1.15em; line-height: 1.3; }
+  .ledger td.nm .t { display: block; overflow-wrap: anywhere; }
+  .ledger td.nm .n { font-weight: 700; font-size: 12.5px; line-height: 1.2; }
+  .ledger td.nm .ty { font-size: 11.5px; color: var(--typed-2); margin-top: 2px; }
+  .ledger td.st { white-space: nowrap; }
+  .ledger td.st .cb + .cb { margin-left: 5px; }
+  .ledger td.st small { display: block; white-space: normal; font-size: 9px; color: var(--form); font-weight: 600; line-height: 1.1; margin-top: 3px; }
+  .ledger td.qt { text-align: right; font-size: 12.5px; }
+  .ledger td.off { background: repeating-linear-gradient(-45deg, transparent 0 6px, #EDF3EE 6px 7px); position: relative; padding: 2px 4px; }
+  .ledger td.cl { text-align: center; }
+  .ledger .cls { margin: 0; }
+  .sr { position: absolute; left: -9999px; }
+
+  .photo { position: relative; width: 50px; height: 50px; border: var(--rule) solid var(--form-2); background:
+    linear-gradient(135deg, var(--form-2) 5px, transparent 5px) top left / 8px 8px no-repeat,
+    linear-gradient(225deg, var(--form-2) 5px, transparent 5px) top right / 8px 8px no-repeat,
+    linear-gradient(45deg, var(--form-2) 5px, transparent 5px) bottom left / 8px 8px no-repeat,
+    linear-gradient(315deg, var(--form-2) 5px, transparent 5px) bottom right / 8px 8px no-repeat,
+    var(--paper); display: grid; place-items: center; overflow: hidden; }
+  .photo img { width: 44px; height: 44px; display: block; position: relative; }
+  .seen .photo img { filter: brightness(0); opacity: .55; }
+  .seen .photo { background-color: var(--screen); }
+  .photo .nophoto { position: absolute; inset: 4px; border: var(--rule) dashed var(--form-2); display: grid; place-items: center; text-align: center; font-size: 8.5px; font-weight: 600; color: var(--form); line-height: 1.15; padding: 1px; }
+
+  .ledger tr.sel td { background: var(--screen); }
+  .ledger tr.sel td:first-child { box-shadow: inset 4px 0 0 var(--form); }
+  .ledger tr.sel td.off { background: var(--form); }
+  .opentag { color: var(--paper); font-size: 10px; font-weight: 800; line-height: 1.15; display: block; }
+  .offnote { font-size: 9.5px; color: var(--form); font-weight: 600; line-height: 1.2; display: block; }
+  .stamp.mythic { font-size: 11px; padding: 4px 4px 3px; transform: rotate(-9deg); margin-left: -2px; }
+  .unknown td.no { background: var(--paper); }
+  .ledger tbody tr { cursor: pointer; }
+  .ledger tbody tr:not(.sel):hover td:not(.off) { background: var(--screen-2); }
+
+  .key { font-size: var(--t-fine); color: var(--form); display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+  .key b { font-weight: 800; }
+  .key .cls { margin: 0; }
+
+  /* case file */
+  .case { position: relative; min-width: 0; }
+  .case .fields { grid-template-columns: 1fr 1fr; }
+  .case .span2 { grid-column: span 2; }
+  .who { display: flex; align-items: center; gap: 12px; padding: 6px 0 6px; border-bottom: var(--rule) solid var(--form); }
+  .who .t.name { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+  .who .comb i { font-size: 16px; }
+  .top2 { display: grid; grid-template-columns: 186px 1fr; gap: 0; border-bottom: var(--rule) solid var(--form); }
+  .print { position: relative; margin: 14px 18px 12px 6px; }
+  .print .ph { background: #FFFFFF; border: 1px solid #C9CFC9; padding: 8px 8px 22px; transform: rotate(-2.5deg); }
+  .print .ph div { background: #EAF0F1; display: grid; place-items: center; height: 136px; }
+  .print .ph img { width: 132px; height: 132px; display: block; }
+  .print .ph span { position: absolute; bottom: 5px; left: 10px; font-family: var(--font-typed); font-size: 10.5px; color: var(--typed-2); }
+  .print .clip { position: absolute; top: -12px; left: 26px; z-index: 2; }
+  .top2 .fields { border-left: var(--rule) solid var(--form); grid-template-columns: 1fr 1fr; }
+  .top2 .f { border-right: 0; }
+  .top2 .f:nth-child(odd):not(.span2) { border-right: var(--rule) solid var(--form); }
+  .cbrow { display: flex; flex-wrap: wrap; gap: 3px 8px; font-size: 12px; font-family: var(--font-typed); }
+  .cbrow span { display: inline-flex; align-items: center; gap: 4px; }
+  .cbrow .cb { width: 13px; height: 13px; font-size: 10.5px; }
+  .desc p { font-family: var(--font-typed); font-size: 12.5px; line-height: 20px; background: repeating-linear-gradient(transparent 0 19px, #9DBBA8 19px 20px); padding: 0 2px; }
+  .stats { display: grid; grid-template-columns: 70px 44px 1fr; align-items: center; gap: 7px 10px; margin-top: 3px; }
+  .stats .nm { font-size: 11.5px; color: var(--typed); font-weight: 600; }
+  .stats .comb i { font-size: 12.5px; line-height: 1.3; }
+  .gauge { position: relative; height: 11px; border: var(--rule) solid var(--form);
+    background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), #9DBBA8 calc(10% - 1px) 10%); }
+  .gauge span { position: absolute; inset: 0 auto 0 0; background: var(--form); }
+  .scaleno { grid-column: 3; display: flex; justify-content: space-between; font-size: 8.5px; color: var(--form); }
+  .evo { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .evo .box { width: 130px; border: var(--rule) solid var(--form); padding: 3px 5px; display: grid; grid-template-columns: 40px 1fr; gap: 0 6px; align-items: center; min-height: 54px; }
+  .evo .box img { width: 40px; height: 40px; }
+  .evo .box .t { font-size: 11px; line-height: 1.2; }
+  .evo .box.cur { border-width: 2.5px; }
+  .evo .box.cur .t b { font-weight: 700; }
+  .evo .box.void { border-style: dashed; grid-template-columns: 1fr; }
+  .evo svg { flex: none; }
+  .drops { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .drops th { font-size: 9.5px; color: var(--form); font-weight: 500; text-align: left; padding: 0 4px 2px 0; }
+  .drops td { font-family: var(--font-typed); border-top: var(--rule) solid #9DBBA8; padding: 2px 4px 2px 0; }
+  .drops .num { text-align: right; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 0 4px; }
+  .reason { font-size: 10.5px; color: var(--form); }
+  .reason b { font-weight: 800; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="ink" x="-5%" y="-10%" width="110%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="1" seed="9" result="m"/>
+    <feColorMatrix in="m" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -3 0 0 0 2.6" result="mask"/>
+    <feComposite in="d" in2="mask" operator="in"/>
+  </filter>
+</svg>
+
+<header class="top">
+  <nav class="tabs" aria-label="Sections">
+    <a href="#" aria-current="page">Index</a>
+    <a href="#">Team</a>
+    <a href="#">Map</a>
+    <a href="#">Items</a>
+  </nav>
+  <form class="find" role="search" onsubmit="return false">
+    <label for="q">Find</label>
+    <input id="q" type="search" placeholder="Search by name, number or type">
+  </form>
+</header>
+
+<div class="sheet">
+  <aside class="side" aria-hidden="true">
+    <span class="vstrip">Form WB-3 (Rev. 08-2026)</span>
+    <span class="vstrip">Wildbook, Saltmarsh Reach. Keep with the field kit</span>
+    <span class="vstrip">16 records</span>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div class="formno">
+        <div class="n"><span>Form</span><strong>WB-3</strong></div>
+        <p><b>Wildbook</b>, region <span class="t" style="font-size:11px">Saltmarsh Reach</span></p>
+      </div>
+      <div class="title">
+        <h1>Specimen Register</h1>
+        <p>One record per index number, 001 to 016. Blank records have not been seen yet. The open case file is on the right.</p>
+      </div>
+      <div class="totals">
+        <div><span class="lbl"><b>0a</b> Caught</span><span class="comb"><i>1</i><i>0</i></span><span class="of">of</span><span class="comb"><i>1</i><i>6</i></span><span class="pct">62%</span></div>
+        <div><span class="lbl"><b>0b</b> Seen, not caught</span><span class="comb"><i>3</i></span></div>
+        <div><span class="lbl"><b>0c</b> Never seen</span><span class="comb"><i>3</i></span></div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="left">
+        <section aria-labelledby="pa">
+          <div class="part"><span class="code">Part A</span><h2 id="pa">Filter and sort <span>mark any boxes</span></h2></div>
+          <div class="filters">
+            <div class="f"><span class="lbl"><b>1a</b> Status</span><div class="opts">
+              <button class="opt" aria-pressed="true"><span class="cb">X</span>All</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Caught</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Seen</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Unknown</button></div></div>
+            <div class="f"><span class="lbl"><b>1b</b> Sort by</span><div class="opts">
+              <button class="opt radio" aria-pressed="true"><span class="cb">X</span>Number</button>
+              <button class="opt radio" aria-pressed="false"><span class="cb"></span>Name</button>
+              <button class="opt radio" aria-pressed="false"><span class="cb"></span>Rarity</button></div></div>
+            <div class="f"><span class="lbl"><b>1c</b> Type</span><div class="opts">
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Tide</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Moss</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Ember</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Gale</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Stone</button></div></div>
+            <div class="f"><span class="lbl"><b>1d</b> Rarity</span><div class="opts">
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Common</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Uncommon</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Rare</button>
+              <button class="opt" aria-pressed="false"><span class="cb"></span>Mythic</button></div></div>
+          </div>
+        </section>
+
+        <section aria-labelledby="pb">
+          <div class="part"><span class="code">Part B</span><h2 id="pb">Register <span>by number. Status C caught, S seen. Qty is how many you have caught.</span></h2></div>
+          <div class="ledgers">
+<table class="ledger"><colgroup><col style="width:46px"><col style="width:60px"><col><col style="width:38px"><col style="width:58px"><col style="width:34px"><col style="width:66px"></colgroup><thead><tr><th>No.</th><th>Photo</th><th><b>(a)</b> Name<br><b>(b)</b> Type</th><th><b>(c)</b> Class</th><th><b>(d)</b> Status<span class="cs"><span>C</span><span>S</span></span></th><th class="qt"><b>(e)</b> Qty</th><th class="off">For office use</th></tr></thead><tbody>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>0</i><i>1</i></span></td><td class="ph"><div class="photo"><img src="../../art/reedling.svg" alt="Reedling"></div></td><td class="nm"><span class="t n">Reedling</span><span class="t ty">Moss</span></td><td class="cl"><span class="cls common"><span class="clsl" title="Common">C</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">14</td><td class="off"></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>0</i><i>2</i></span></td><td class="ph"><div class="photo"><img src="../../art/bogwhistle.svg" alt="Bogwhistle"></div></td><td class="nm"><span class="t n">Bogwhistle</span><span class="t ty">Moss / Gale</span></td><td class="cl"><span class="cls uncommon"><span class="clsl" title="Uncommon">U</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">3</td><td class="off"></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>0</i><i>3</i></span></td><td class="ph"><div class="photo"><img src="../../art/cindermoth.svg" alt="Cindermoth"></div></td><td class="nm"><span class="t n">Cindermoth</span><span class="t ty">Ember</span></td><td class="cl"><span class="cls common"><span class="clsl" title="Common">C</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">9</td><td class="off"></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>0</i><i>4</i></span></td><td class="ph"><div class="photo"><img src="../../art/pebblepup.svg" alt="Pebblepup"></div></td><td class="nm"><span class="t n">Pebblepup</span><span class="t ty">Stone</span></td><td class="cl"><span class="cls common"><span class="clsl" title="Common">C</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">22</td><td class="off"></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>0</i><i>5</i></span></td><td class="ph"><div class="photo"><img src="../../art/saltcrab.svg" alt="Saltcrab"></div></td><td class="nm"><span class="t n">Saltcrab</span><span class="t ty">Tide / Stone</span></td><td class="cl"><span class="cls common"><span class="clsl" title="Common">C</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">6</td><td class="off"></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>0</i><i>6</i></span></td><td class="ph"><div class="photo"><img src="../../art/glimmerfry.svg" alt="Glimmerfry"></div></td><td class="nm"><span class="t n">Glimmerfry</span><span class="t ty">Tide</span></td><td class="cl"><span class="cls uncommon"><span class="clsl" title="Uncommon">U</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">5</td><td class="off"></td></tr>
+<tr class="caught sel"><td class="no"><span class="comb"><i>0</i><i>0</i><i>7</i></span></td><td class="ph"><div class="photo"><img src="../../art/lanternfin.svg" alt="Lanternfin"></div></td><td class="nm"><span class="t n">Lanternfin</span><span class="t ty">Tide / Ember</span></td><td class="cl"><span class="cls rare"><span class="clsl" title="Rare">R</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">3</td><td class="off"><span class="opentag">Case file open</span></td></tr>
+<tr class="unknown"><td class="no"><span class="comb"><i>0</i><i>0</i><i>8</i></span></td><td class="ph"><div class="photo"></div></td><td class="nm"></td><td class="cl"></td><td class="st"><span class="cb"></span><span class="cb"></span></td><td class="qt"></td><td class="off"><span class="sr">No. 008, never seen</span></td></tr>
+</tbody></table>
+<table class="ledger"><colgroup><col style="width:46px"><col style="width:60px"><col><col style="width:38px"><col style="width:58px"><col style="width:34px"><col style="width:66px"></colgroup><thead><tr><th>No.</th><th>Photo</th><th><b>(a)</b> Name<br><b>(b)</b> Type</th><th><b>(c)</b> Class</th><th><b>(d)</b> Status<span class="cs"><span>C</span><span>S</span></span></th><th class="qt"><b>(e)</b> Qty</th><th class="off">For office use</th></tr></thead><tbody>
+<tr class="seen"><td class="no"><span class="comb"><i>0</i><i>0</i><i>9</i></span></td><td class="ph"><div class="photo"><img src="../../art/mistheron.svg" alt="Mistheron (silhouette, not caught)"></div></td><td class="nm"><span class="t n">Mistheron</span><span class="t ty">Gale</span></td><td class="cl"><span class="cls uncommon"><span class="clsl" title="Uncommon">U</span></span></td><td class="st"><span class="cb"></span><span class="cb">X</span><small>seen, not caught</small></td><td class="qt t">0</td><td class="off"></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>1</i><i>0</i></span></td><td class="ph"><div class="photo"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler"></div></td><td class="nm"><span class="t n">Greater Spotted Marsh Wobbler</span><span class="t ty">Moss / Tide</span></td><td class="cl"><span class="cls uncommon"><span class="clsl" title="Uncommon">U</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">1</td><td class="off"></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>1</i><i>1</i></span></td><td class="ph"><div class="photo"><span class="nophoto">Photo not supplied</span><img src="../../art/emberkit.svg" alt="Emberkit" onerror="this.remove()"></div></td><td class="nm"><span class="t n">Emberkit</span><span class="t ty">Ember</span></td><td class="cl"><span class="cls common"><span class="clsl" title="Common">C</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">7</td><td class="off"><span class="offnote">Photo failed to load. Re-file.</span></td></tr>
+<tr class="seen"><td class="no"><span class="comb"><i>0</i><i>1</i><i>2</i></span></td><td class="ph"><div class="photo"><img src="../../art/stormgull.svg" alt="Stormgull (silhouette, not caught)"></div></td><td class="nm"><span class="t n">Stormgull</span><span class="t ty">Gale / Tide</span></td><td class="cl"><span class="cls rare"><span class="clsl" title="Rare">R</span></span></td><td class="st"><span class="cb"></span><span class="cb">X</span><small>seen, not caught</small></td><td class="qt t">0</td><td class="off"></td></tr>
+<tr class="unknown"><td class="no"><span class="comb"><i>0</i><i>1</i><i>3</i></span></td><td class="ph"><div class="photo"></div></td><td class="nm"></td><td class="cl"></td><td class="st"><span class="cb"></span><span class="cb"></span></td><td class="qt"></td><td class="off"><span class="sr">No. 013, never seen</span></td></tr>
+<tr class="caught"><td class="no"><span class="comb"><i>0</i><i>1</i><i>4</i></span></td><td class="ph"><div class="photo"><img src="../../art/cragback.svg" alt="Cragback"></div></td><td class="nm"><span class="t n">Cragback</span><span class="t ty">Stone</span></td><td class="cl"><span class="cls rare"><span class="clsl" title="Rare">R</span></span></td><td class="st"><span class="cb">X</span><span class="cb"></span></td><td class="qt t">2</td><td class="off"></td></tr>
+<tr class="seen"><td class="no"><span class="comb"><i>0</i><i>1</i><i>5</i></span></td><td class="ph"><div class="photo"><img src="../../art/duskmote.svg" alt="Duskmote (silhouette, not caught)"></div></td><td class="nm"><span class="t n">Duskmote</span><span class="t ty">Gale / Ember</span></td><td class="cl"><span class="cls mythic"><span class="clsl" title="Mythic">M</span></span></td><td class="st"><span class="cb"></span><span class="cb">X</span><small>seen, not caught</small></td><td class="qt t">0</td><td class="off"><span class="stamp mythic">Mythic</span></td></tr>
+<tr class="unknown"><td class="no"><span class="comb"><i>0</i><i>1</i><i>6</i></span></td><td class="ph"><div class="photo"></div></td><td class="nm"></td><td class="cl"></td><td class="st"><span class="cb"></span><span class="cb"></span></td><td class="qt"></td><td class="off"><span class="sr">No. 016, never seen</span></td></tr>
+</tbody></table>
+</div>
+
+        </section>
+        <div class="key">
+          <span><b>Class key.</b></span>
+          <span class="cls common"><span class="clsl">C</span><small>Common</small></span>
+          <span class="cls uncommon"><span class="clsl">U</span><small>Uncommon</small></span>
+          <span class="cls rare"><span class="clsl">R</span><small>Rare</small></span>
+          <span class="cls mythic"><span class="clsl">M</span><small>Mythic, also stamped</small></span>
+          <span>Blank record: never seen, number only.</span>
+          <span>No. 011: photo on file failed to load.</span>
+        </div>
+      </div>
+
+      <section class="case" aria-labelledby="pc">
+        <div class="part"><span class="code">Part C</span><h2 id="pc">Case file, record 007</h2></div>
+        <div class="who"><span class="lbl"><b>2</b> No.</span><span class="comb"><i>0</i><i>0</i><i>7</i></span><span class="t name">Lanternfin</span><span class="cls rare" style="margin-left:auto"><small style="font-size:12px">Class</small><span class="clsl">R</span><small style="font-size:12px">Rare</small></span></div>
+        <div class="top2">
+          <div class="print">
+            <svg class="clip" width="16" height="44" viewBox="0 0 16 44" aria-hidden="true"><path d="M5 40V7a3.5 3.5 0 0 1 7 0v29a6 6 0 0 1-12 0V11" fill="none" stroke="#7E8680" stroke-width="1.8"/></svg>
+            <div class="ph"><div><img src="../../art/lanternfin.svg" alt="Lanternfin"></div><span>007, photo 1</span></div>
+          </div>
+          <div class="fields">
+            <div class="f span2"><span class="lbl"><b>2a</b> Type, mark all that apply</span>
+              <span class="cbrow"><span><span class="cb">X</span>Tide</span><span><span class="cb"></span>Moss</span><span><span class="cb">X</span>Ember</span><span><span class="cb"></span>Gale</span><span><span class="cb"></span>Stone</span></span></div>
+            <div class="f span2"><span class="lbl"><b>2b</b> Habitat</span><span class="t">Tidal caves, night only</span></div>
+            <div class="f"><span class="lbl"><b>2c</b> First caught</span><span class="t">12 Aug</span></div>
+            <div class="f"><span class="lbl"><b>2d</b> Caught</span><span class="comb"><i>3</i></span></div>
+            <div class="f span2 desc"><span class="lbl"><b>2e</b> Description</span><p>Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</p></div>
+          </div>
+        </div>
+        <div class="fields" style="border-left:0">
+          <div class="f span2" style="border-right:0"><span class="lbl"><b>2f</b> Stats, out of 100</span>
+            <div class="stats">
+              <span class="nm">HP</span><span class="comb"><i>6</i><i>2</i></span><span class="gauge"><span style="width:62%"></span></span>
+              <span class="nm">Attack</span><span class="comb"><i>4</i><i>8</i></span><span class="gauge"><span style="width:48%"></span></span>
+              <span class="nm">Defense</span><span class="comb"><i>5</i><i>5</i></span><span class="gauge"><span style="width:55%"></span></span>
+              <span class="nm">Speed</span><span class="comb"><i>8</i><i>1</i></span><span class="gauge"><span style="width:81%"></span></span>
+              <span class="scaleno"><span>0</span><span>50</span><span>100</span></span>
+            </div>
+          </div>
+          <div class="f span2" style="border-right:0"><span class="lbl"><b>2g</b> Evolution line</span>
+            <div class="evo">
+              <div class="box"><img src="../../art/glimmerfry.svg" alt=""><span class="t">006<br>Glimmerfry</span></div>
+              <svg width="18" height="10" viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4" fill="none" stroke="var(--form)" stroke-width="1.4"/></svg>
+              <div class="box cur"><img src="../../art/lanternfin.svg" alt=""><span class="t">007<br><b>Lanternfin</b></span></div>
+              <svg width="18" height="10" viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4" fill="none" stroke="var(--form)" stroke-width="1.4"/></svg>
+              <div class="box void" aria-label="008, not seen yet"><span class="t">008</span></div>
+            </div>
+          </div>
+          <div class="f span2" style="border-right:0"><span class="lbl"><b>2h</b> Drops</span>
+            <table class="drops">
+              <thead><tr><th>Item</th><th>Class</th><th class="num">Chance</th></tr></thead>
+              <tbody>
+                <tr><td>Lantern scale</td><td>common</td><td class="num">not listed</td></tr>
+                <tr><td>Deep pearl</td><td>rare</td><td class="num">4%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="act primary" type="button"><span class="cb"></span>Show on map</button>
+          <button class="act" type="button"><span class="cb"></span>Mark as favourite</button>
+          <button class="act" type="button" disabled aria-describedby="why"><span class="cb"></span><span class="x">Add to team</span></button>
+        </div>
+        <p class="reason" id="why"><b>3c</b> Team is full (6 of 6). Remove one to add Lanternfin.</p>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
+</html>

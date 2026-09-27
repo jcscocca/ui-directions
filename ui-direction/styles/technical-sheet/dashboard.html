@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Evals: runs, atlas-research</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-letter);
+    font-size: var(--t-body);
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+    min-width: 1280px;
+    min-height: 820px;
+  }
+  h1, h2, h3, p { margin: 0; }
+  code, .mono, pre, td.num, .val { font-family: var(--font-value); }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* ---------- sheet frame + zone coordinates ---------- */
+  .sheet { position: absolute; inset: 10px; border: var(--w-border) solid var(--cyan); }
+  .zones { position: absolute; display: grid; color: var(--cyan); font-size: 12px; font-weight: 600; }
+  .zones span { display: flex; align-items: center; justify-content: center; }
+  .zones.top, .zones.bottom { left: 18px; right: 18px; height: 18px; grid-template-columns: repeat(6, 1fr); }
+  .zones.top { top: 0; } .zones.bottom { bottom: 0; }
+  .zones.top span + span, .zones.bottom span + span { border-left: var(--w-hair) solid var(--cyan); }
+  .zones.left, .zones.right { top: 18px; bottom: 18px; width: 18px; grid-template-rows: repeat(6, 1fr); }
+  .zones.left { left: 0; } .zones.right { right: 0; }
+  .zones.left span + span, .zones.right span + span { border-top: var(--w-hair) solid var(--cyan); }
+  .cmark { position: absolute; background: var(--cyan); }
+  .cmark.t, .cmark.b { left: calc(50% - 1px); width: 2px; height: 26px; }
+  .cmark.t { top: 0; } .cmark.b { bottom: 0; }
+  .cmark.l, .cmark.r { top: calc(50% - 1px); height: 2px; width: 26px; }
+  .cmark.l { left: 0; } .cmark.r { right: 0; }
+
+  .drawing {
+    position: absolute; inset: 18px;
+    border: var(--w-visible) solid var(--cyan);
+    padding: 12px 16px 14px;
+    display: grid;
+    grid-template-columns: 848px 48px minmax(0, 1fr);
+    grid-template-rows: 40px auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "index index index"
+      "bom   gut   detail"
+      "lower gut   detail"
+      "lower gut   tb";
+    row-gap: 14px;
+  }
+
+  /* ---------- shared drafting type ---------- */
+  .view-title {
+    font-size: var(--t-sub); font-weight: 600; text-transform: uppercase; letter-spacing: .03em;
+    color: var(--cyan); line-height: 1; display: inline-block;
+    padding-bottom: 3px; border-bottom: var(--w-visible) solid var(--cyan);
+  }
+  .view-sub { font-size: var(--t-small); color: var(--muted); margin-top: 4px; }
+  .lbl { font-size: var(--t-label); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--cyan); }
+  .red { color: var(--redline-text); }
+  .dash { color: var(--muted); }
+
+  /* ---------- sheet index (navigation) ---------- */
+  .index { grid-area: index; display: flex; border: var(--w-visible) solid var(--cyan); }
+  .index > * { border-right: var(--w-hair) solid var(--line-thin); }
+  .index-label { display: flex; flex-direction: column; justify-content: center; padding: 0 12px; }
+  .index-label b { font-size: 20px; font-weight: 700; color: var(--ink); line-height: 1; letter-spacing: .01em; }
+  .index a {
+    display: flex; align-items: center; gap: 8px; padding: 0 16px 0 10px;
+    text-decoration: none; font-size: 16px; font-weight: 500; color: var(--ink);
+  }
+  .index a .no {
+    font-family: var(--font-value); font-size: 11px; color: var(--cyan);
+    width: 20px; height: 20px; border: var(--w-hair) solid var(--cyan); display: grid; place-items: center;
+  }
+  .index a:hover { background: var(--tint); }
+  .index a[aria-current] { background: var(--cyan); color: var(--paper); font-weight: 600; }
+  .index a[aria-current] .no { color: var(--paper); border-color: var(--paper); }
+  .index a:focus-visible { outline-offset: -4px; outline-color: var(--ink); }
+  .index a[aria-current]:focus-visible { outline-color: var(--paper); }
+  .find { flex: 1; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-right: 0 !important; }
+  .find input {
+    flex: 1; height: 26px; border: 0; border-bottom: var(--w-hair) solid var(--cyan); background: transparent;
+    font: 400 15px var(--font-letter); color: var(--ink); padding: 0 2px;
+  }
+  .find input::placeholder { color: var(--muted); }
+  .find input:focus-visible { outline: none; border-bottom: 2px solid var(--ink); background: var(--tint); }
+  kbd {
+    font-family: var(--font-value); font-size: 12px; min-width: 20px; height: 20px; display: inline-grid; place-items: center;
+    border: var(--w-hair) solid var(--cyan); color: var(--cyan);
+  }
+  .find .hint { font-size: var(--t-small); color: var(--muted); display: flex; gap: 6px; align-items: center; }
+
+  /* ---------- parts list ---------- */
+  .bom { grid-area: bom; }
+  .bom header { display: flex; align-items: baseline; justify-content: space-between; height: 30px; }
+  table { border-collapse: collapse; }
+  .parts { width: 848px; table-layout: fixed; border: var(--w-visible) solid var(--cyan); }
+  .parts th {
+    height: 26px; padding: 0 8px; text-align: left; vertical-align: middle;
+    font-size: var(--t-label); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--cyan);
+    border: var(--w-hair) solid var(--line-thin); border-bottom: var(--w-visible) solid var(--cyan);
+  }
+  .parts td {
+    height: var(--row); padding: 3px 8px; border: var(--w-hair) solid var(--line-thin);
+    vertical-align: middle; font-size: var(--t-body);
+  }
+  .parts th.num, .parts td.num { text-align: right; }
+  .parts td.num, .parts td.id { font-family: var(--font-value); font-size: 13px; }
+  .parts td.item { text-align: center; font-family: var(--font-value); font-size: 12px; color: var(--cyan); }
+  .parts td.ds { overflow-wrap: anywhere; line-height: 1.12; }
+  .parts td.id a { text-decoration: none; }
+  .parts td.id a:hover { text-decoration: underline; }
+  .parts tbody tr:hover td { background: var(--tint); }
+  .parts tr.sel td { background: var(--tint); }
+  .parts tr.sel td.item { position: relative; }
+  .boundary {
+    position: absolute; left: -7px; top: -5px; width: 862px; height: calc(100% + 10px);
+    border: var(--w-visible) solid var(--cyan); border-radius: 21px; pointer-events: none;
+  }
+  .leader { position: absolute; left: 850px; top: calc(50% - 16px); overflow: visible; pointer-events: none; }
+  .status { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .status.failed { color: var(--redline-text); font-weight: 600; }
+  .status.queued { border: var(--w-hair) dashed var(--muted); padding: 0 6px; color: var(--muted); }
+  .runbar {
+    width: 46px; height: 8px; border: var(--w-hair) solid var(--cyan); position: relative;
+    background: linear-gradient(90deg, transparent 0 calc(25% - .5px), var(--line-thin) 0 calc(25% + .5px), transparent 0 calc(50% - .5px), var(--line-thin) 0 calc(50% + .5px), transparent 0 calc(75% - .5px), var(--line-thin) 0 calc(75% + .5px), transparent 0);
+  }
+  .runbar i {
+    position: absolute; inset: 0 auto 0 0; width: 62%;
+    background: repeating-linear-gradient(135deg, var(--cyan) 0 1.2px, transparent 1.2px 3.5px);
+    border-right: var(--w-visible) solid var(--cyan);
+  }
+  .parts tr.err td { height: 24px; padding: 2px 8px 4px; font-family: var(--font-value); font-size: 12px; color: var(--redline-text); border-top: 0; }
+  .parts tr.err td .fix { font-family: var(--font-letter); font-size: var(--t-small); color: var(--ink); margin-left: 10px; }
+  .parts tr.failrow td { border-bottom: 0; }
+  .regress { color: var(--redline-text); font-weight: 600; }
+  .parts tfoot td { height: 28px; border-top: var(--w-visible) solid var(--cyan); padding: 0 8px; }
+  .totals { display: flex; gap: 22px; align-items: baseline; }
+  .totals span { font-size: var(--t-small); }
+  .totals b { font-family: var(--font-value); font-weight: 500; font-size: 13px; margin-left: 4px; }
+
+  /* ---------- lower-left: score history + notes ---------- */
+  .lower { grid-area: lower; display: grid; grid-template-columns: 560px 1fr; column-gap: 26px; align-content: start; }
+  .chart { margin-top: 8px; display: block; }
+  .chart text { font-family: var(--font-letter); }
+  .chart .ax { font-size: 11px; fill: var(--muted); }
+  .chart .axm { font-family: var(--font-value); font-size: 10.5px; fill: var(--muted); }
+  .chart .dim { font-family: var(--font-value); font-size: 11px; fill: var(--cyan); }
+  .chart .note { font-size: 14px; font-style: italic; font-weight: 500; fill: var(--redline-text); }
+  .notes { padding-top: 2px; }
+  .notes ol { margin: 10px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.32; }
+  .notes li { margin-bottom: 7px; padding-left: 2px; }
+  .notes li::marker { font-family: var(--font-value); font-size: 11px; color: var(--cyan); }
+  .notes code { font-size: 12.5px; }
+
+  /* ---------- detail view ---------- */
+  .detail {
+    grid-area: detail; border: var(--w-visible) solid var(--cyan); padding: 14px 14px 12px;
+    display: flex; flex-direction: column; gap: 12px; min-height: 0;
+  }
+  .detail > header { display: flex; gap: 10px; align-items: flex-start; }
+  .balloon {
+    width: 26px; height: 26px; border-radius: 50%; border: var(--w-visible) solid var(--cyan); color: var(--cyan);
+    display: grid; place-items: center; font: 500 13px var(--font-value); flex: none; background: var(--paper);
+  }
+  .part-name { font-size: var(--t-title); font-weight: 600; line-height: 1.05; }
+  .baseline { font-size: 14px; color: var(--muted); margin-top: 3px; }
+  .baseline code { font-size: 12.5px; color: var(--ink); }
+  .readout { display: grid; grid-template-columns: auto 1fr; gap: 0 28px; align-items: end; }
+  .readout .big { font-family: var(--font-value); font-weight: 300; font-size: var(--t-display); line-height: .95; letter-spacing: -.02em; display: block; }
+  .readout .big.red { color: var(--redline-text); font-weight: 400; }
+  .readout .why { grid-column: 1 / -1; font-size: 14px; line-height: 1.3; color: var(--ink); margin-top: 8px; }
+  .readout .why b { color: var(--redline-text); font-weight: 600; }
+  .readout .why .meta { color: var(--muted); }
+  .view-title .rid { font-family: var(--font-value); font-size: 15px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+  .metrics { width: 100%; }
+  .metrics th { font-size: var(--t-label); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--cyan); text-align: right; padding: 0 8px 4px; border-bottom: var(--w-visible) solid var(--cyan); }
+  .metrics th:first-child, .metrics td:first-child { text-align: left; padding-left: 0; }
+  .metrics td { height: 27px; padding: 0 8px; border-bottom: var(--w-hair) solid var(--line-thin); text-align: right; font-family: var(--font-value); font-size: 13px; }
+  .metrics td:first-child { font-family: var(--font-letter); font-size: var(--t-body); }
+  .metrics td:last-child { padding-right: 0; }
+  .metrics th:last-child { padding-right: 0; }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    font: 600 15px var(--font-letter); text-transform: uppercase; letter-spacing: .04em;
+    height: 34px; padding: 0 14px; border: var(--w-visible) solid var(--cyan); background: transparent; color: var(--cyan);
+    cursor: pointer; border-radius: 0;
+  }
+  .btn:hover { background: var(--tint); }
+  .btn.primary { background: var(--cyan); color: var(--paper); }
+  .btn.primary:hover { background: var(--ink); border-color: var(--ink); }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .btn:disabled {
+    background: transparent; color: var(--line-thin); border: var(--w-hair) dashed var(--line-thin); cursor: not-allowed;
+  }
+  .reason { font-size: var(--t-small); color: var(--muted); margin-top: -6px; }
+
+  .log h3, .pinned h3 { font-size: var(--t-label); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--cyan); margin-bottom: 4px; }
+  .log pre { margin: 0; font-size: 11.5px; line-height: 1.55; border-left: var(--w-visible) solid var(--cyan); padding-left: 10px; white-space: pre-wrap; }
+  .log .lv { color: var(--cyan); }
+  .pinned { margin-top: 16px; }
+  .pinned table { width: 100%; }
+  .pinned th { font-size: var(--t-label); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--cyan); text-align: left; padding: 3px 6px; border: var(--w-hair) solid var(--line-thin); }
+  .pinned td { padding: 5px 6px; border: var(--w-hair) solid var(--line-thin); font-size: 14px; color: var(--muted); }
+
+  /* ---------- title block ---------- */
+  .tb {
+    grid-area: tb; margin-top: 14px; border: var(--w-border) solid var(--cyan);
+    display: grid; grid-template-columns: 1.5fr .75fr .75fr; grid-template-rows: auto auto auto;
+  }
+  .tb > div { border: var(--w-hair) solid var(--cyan); padding: 4px 8px 5px; display: flex; flex-direction: column; justify-content: space-between; min-height: 38px; }
+  .tb .lbl { font-size: 10px; }
+  .tb .v { font-size: 16px; font-weight: 500; line-height: 1.1; }
+  .tb .v.mono { font-family: var(--font-value); font-size: 13px; }
+  .tb .product { grid-row: span 2; flex-direction: row; align-items: center; gap: 12px; justify-content: flex-start; }
+  .tb .product b { font-size: 38px; font-weight: 700; line-height: .9; letter-spacing: .01em; color: var(--ink); }
+  .tb .product .ws { font-family: var(--font-value); font-size: 12.5px; color: var(--ink); display: block; margin-top: 4px; }
+  .tb .wide { grid-column: span 2; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="zones top" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span></div>
+  <div class="zones bottom" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span></div>
+  <div class="zones left" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+  <div class="zones right" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+  <i class="cmark t"></i><i class="cmark b"></i><i class="cmark l"></i><i class="cmark r"></i>
+
+  <main class="drawing">
+    <nav class="index" aria-label="Sheet index">
+      <div class="index-label"><span class="lbl">Sheet index</span></div>
+      <a href="#" aria-current="page"><span class="no">1</span>Runs</a>
+      <a href="#"><span class="no">2</span>Datasets</a>
+      <a href="#"><span class="no">3</span>Models</a>
+      <a href="#"><span class="no">4</span>Baselines</a>
+      <a href="#"><span class="no">5</span>Settings</a>
+      <div class="find">
+        <label class="lbl" for="q">Find</label>
+        <input id="q" type="search" placeholder="Search runs, models, datasets" autocomplete="off">
+        <span class="hint">press <kbd>/</kbd></span>
+      </div>
+    </nav>
+
+    <section class="bom" aria-labelledby="bom-t">
+      <header>
+        <h1 id="bom-t" class="view-title">Parts list: last night's runs</h1>
+        <span class="view-sub">8 items, started 23:00 to 02:00. Newest first.</span>
+      </header>
+      <table class="parts">
+        <colgroup>
+          <col style="width:40px"><col style="width:64px"><col style="width:98px"><col style="width:168px">
+          <col style="width:60px"><col style="width:66px"><col style="width:138px"><col style="width:90px">
+          <col style="width:72px"><col style="width:52px">
+        </colgroup>
+        <thead>
+          <tr><th>Item</th><th>Run</th><th>Model</th><th>Dataset</th><th class="num">Score</th><th class="num">Δ base</th><th>Status</th><th>Duration</th><th>Trigger</th><th class="num">Start</th></tr>
+        </thead>
+        <tbody>
+          <tr class="sel" aria-selected="true">
+            <td class="item">1<span class="boundary" aria-hidden="true"></span>
+              <svg class="leader" width="50" height="32" viewBox="0 0 50 32" aria-hidden="true">
+                <circle cx="4" cy="16" r="2.4" fill="#0E5A6B"/>
+                <line x1="4" y1="16" x2="12" y2="16" stroke="#0E5A6B" stroke-width="1"/>
+                <circle cx="23" cy="16" r="11" fill="#EEF3F4" stroke="#0E5A6B" stroke-width="1.5"/>
+                <text x="23" y="20.5" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#0E5A6B">1</text>
+                <line x1="34" y1="16" x2="40" y2="16" stroke="#0E5A6B" stroke-width="1"/>
+                <path d="M46.5 16 L38 12.8 L38 19.2 Z" fill="#0E5A6B"/>
+              </svg>
+            </td>
+            <td class="id"><a href="#detail">r-2291</a></td><td>summarize-v3</td><td class="ds">news-digest-2k</td>
+            <td class="num">0.812</td><td class="num regress">−0.041</td>
+            <td><span class="status">Passed</span></td><td>14m 02s</td><td>schedule</td><td class="num mono">02:00</td>
+          </tr>
+          <tr>
+            <td class="item">2</td><td class="id"><a href="#">r-2290</a></td><td>summarize-v3</td>
+            <td class="ds" title="multilingual-legal-contracts-longform-eval-2026-q3">multilingual-legal-contracts-longform-eval-2026-q3</td>
+            <td class="num">0.774</td><td class="num">+0.006</td>
+            <td><span class="status">Passed</span></td><td>41m 55s</td><td>M. Okafor</td><td class="num">01:12</td>
+          </tr>
+          <tr>
+            <td class="item">3</td><td class="id"><a href="#">r-2289</a></td><td>router-small</td><td class="ds">intent-routing-v7</td>
+            <td class="num">0.931</td><td class="num">+0.012</td>
+            <td><span class="status">Passed</span></td><td>3m 48s</td><td>schedule</td><td class="num">01:00</td>
+          </tr>
+          <tr>
+            <td class="item">4</td><td class="id"><a href="#">r-2288</a></td><td>router-small</td><td class="ds">adversarial-prompts</td>
+            <td class="num dash" title="Not computed yet">—</td><td class="num dash" title="Not computed yet">—</td>
+            <td><span class="status">Running <span class="runbar" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="r-2288 progress"><i></i></span><span class="mono" style="font-size:12px">62%</span></span></td>
+            <td>9m 10s so far</td><td>CI #4812</td><td class="num">00:51</td>
+          </tr>
+          <tr class="failrow">
+            <td class="item">5</td><td class="id"><a href="#">r-2287</a></td><td>extract-json</td><td class="ds">invoices-ocr</td>
+            <td class="num">0.000</td><td class="num">−0.884</td>
+            <td><span class="status failed">Failed</span></td><td>0m 41s</td><td>CI #4809</td><td class="num">00:40</td>
+          </tr>
+          <tr class="err">
+            <td></td><td colspan="9">KeyError: 'line_items' — 212 of 212 samples failed schema validation<span class="fix">Fix the extractor's output schema, then rerun. Not a regression.</span></td>
+          </tr>
+          <tr>
+            <td class="item">6</td><td class="id"><a href="#">r-2286</a></td><td>extract-json</td><td class="ds">receipts-small</td>
+            <td class="num">0.902</td><td class="num">+0.000</td>
+            <td><span class="status">Passed</span></td><td>2m 15s</td><td>L. Brandt</td><td class="num">23:58</td>
+          </tr>
+          <tr>
+            <td class="item">7</td><td class="id"><a href="#">r-2285</a></td><td>chat-core-8b</td><td class="ds">helpfulness-pairwise</td>
+            <td class="num">0.668</td><td class="num">+0.021</td>
+            <td><span class="status">Passed</span></td><td>1h 06m</td><td>schedule</td><td class="num">23:00</td>
+          </tr>
+          <tr>
+            <td class="item">8</td><td class="id"><a href="#">r-2284</a></td><td>chat-core-8b</td><td class="ds">safety-refusals</td>
+            <td class="num dash" title="Not computed">—</td><td class="num dash" title="Not computed">—</td>
+            <td><span class="status queued">Queued</span></td><td class="dash">—</td><td>schedule</td><td class="num dash">—</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="10"><div class="totals">
+            <span class="lbl">Qty</span>
+            <span>Runs<b>8</b></span><span>Passed<b>5</b></span><span class="red">Failed<b>1</b></span><span>Running<b>1</b></span><span>Queued<b>1</b></span>
+          </div></td></tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <section class="lower" aria-label="Score history and notes">
+      <div>
+        <h2 class="view-title">View A: score history, item 1</h2>
+        <p class="view-sub">summarize-v3 on news-digest-2k, last 12 runs, oldest at left</p>
+        <svg class="chart" width="560" height="282" viewBox="0 0 560 282" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the 0.833 to 0.873 noise band.">
+          <defs>
+            <pattern id="gp" width="12" height="12" patternUnits="userSpaceOnUse" x="36" y="16">
+              <path d="M12 0 H0 V12" fill="none" stroke="#D2E0E3" stroke-width="1"/>
+            </pattern>
+            <pattern id="gpm" width="60" height="60" patternUnits="userSpaceOnUse" x="36" y="16">
+              <path d="M60 0 H0 V60" fill="none" stroke="#B4CCD1" stroke-width="1"/>
+            </pattern>
+            <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#0E5A6B" stroke-width="0.8" stroke-opacity=".35"/>
+            </pattern>
+            <marker id="ar" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="6" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+              <path d="M0 0 L10 3 L0 6 Z" fill="#0E5A6B"/>
+            </marker>
+            <marker id="arr" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="10" markerHeight="6" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+              <path d="M0 0 L10 3 L0 6 Z" fill="#C8452C"/>
+            </marker>
+          </defs>
+          <rect x="36" y="16" width="420" height="240" fill="url(#gp)"/>
+          <rect x="36" y="16" width="420" height="240" fill="url(#gpm)" stroke="#0E5A6B" stroke-width="1"/>
+          <rect x="36" y="37" width="420" height="120" fill="url(#hatch)"/>
+          <line x1="36" y1="37" x2="456" y2="37" stroke="#0E5A6B" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="36" y1="157" x2="456" y2="157" stroke="#0E5A6B" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="36" y1="97" x2="456" y2="97" stroke="#0E5A6B" stroke-width="1" stroke-dasharray="16 3 3 3"/>
+          <text x="42" y="92" class="ax" style="fill:#0E5A6B">baseline 0.853 (r-2203)</text>
+
+          <g class="axm" text-anchor="end">
+            <text x="30" y="20">0.880</text><text x="30" y="80">0.860</text><text x="30" y="140">0.840</text><text x="30" y="200">0.820</text><text x="30" y="260">0.800</text>
+          </g>
+          <g stroke="#0E5A6B" stroke-width="1">
+            <line x1="48" y1="256" x2="48" y2="262"/><line x1="84" y1="256" x2="84" y2="260"/><line x1="120" y1="256" x2="120" y2="260"/><line x1="156" y1="256" x2="156" y2="260"/><line x1="192" y1="256" x2="192" y2="260"/><line x1="228" y1="256" x2="228" y2="260"/><line x1="264" y1="256" x2="264" y2="260"/><line x1="300" y1="256" x2="300" y2="260"/><line x1="336" y1="256" x2="336" y2="260"/><line x1="372" y1="256" x2="372" y2="260"/><line x1="408" y1="256" x2="408" y2="260"/><line x1="444" y1="256" x2="444" y2="262"/>
+          </g>
+          <text x="48" y="276" class="ax" text-anchor="middle">12 runs ago</text>
+          <text x="444" y="276" class="axm" text-anchor="middle" style="fill:#13262B">r-2291</text>
+
+          <polyline fill="none" stroke="#0E5A6B" stroke-width="1.5" points="48,118 84,103 120,109 156,91 192,97 228,106 264,85 300,100 336,112 372,103 408,97 444,220"/>
+          <g fill="#EEF3F4" stroke="#0E5A6B" stroke-width="1.5">
+            <circle cx="48" cy="118" r="3"/><circle cx="84" cy="103" r="3"/><circle cx="120" cy="109" r="3"/><circle cx="156" cy="91" r="3"/><circle cx="192" cy="97" r="3"/><circle cx="228" cy="106" r="3"/><circle cx="264" cy="85" r="3"/><circle cx="300" cy="100" r="3"/><circle cx="336" cy="112" r="3"/><circle cx="372" cy="103" r="3"/><circle cx="408" cy="97" r="3"/>
+          </g>
+          <circle cx="444" cy="220" r="3.4" fill="#C8452C"/>
+
+          <!-- band dimension -->
+          <g stroke="#0E5A6B" stroke-width="1" fill="none">
+            <line x1="459" y1="37" x2="484" y2="37"/><line x1="459" y1="157" x2="484" y2="157"/>
+            <line x1="479" y1="37" x2="479" y2="157" marker-start="url(#ar)" marker-end="url(#ar)"/>
+          </g>
+          <text class="dim" transform="translate(475 97) rotate(-90)" text-anchor="middle">±0.020 band</text>
+
+          <!-- delta dimension (redline) -->
+          <g stroke="#C8452C" stroke-width="1" fill="none">
+            <line x1="459" y1="97" x2="516" y2="97"/><line x1="452" y1="220" x2="516" y2="220"/>
+            <line x1="511" y1="97" x2="511" y2="220" marker-start="url(#arr)" marker-end="url(#arr)"/>
+          </g>
+          <text class="dim" transform="translate(507 158) rotate(-90)" text-anchor="middle" style="fill:#B23A22">Δ −0.041</text>
+
+          <!-- hand markup -->
+          <path d="M431 211 C 433 201, 452 199, 459 209 C 465 218, 460 232, 446 234 C 433 235, 426 225, 430 214 C 431 210, 436 206, 441 205" fill="none" stroke="#C8452C" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M428 222 C 400 226, 360 232, 322 232" fill="none" stroke="#C8452C" stroke-width="1.2" stroke-linecap="round"/>
+          <text x="316" y="228" class="note" text-anchor="end">0.021 under the band.</text>
+          <text x="316" y="245" class="note" text-anchor="end">Regression, not noise. Rerun to confirm.</text>
+        </svg>
+      </div>
+      <div class="notes">
+        <h2 class="view-title">Notes</h2>
+        <ol>
+          <li><code>—</code> means not computed: the run is queued or still running. <code>0.000</code> is a computed score of zero, as in r-2287.</li>
+          <li>Noise band is baseline ±0.020. For item 1 that is 0.833 to 0.873.</li>
+          <li>Δ base is score minus the model's baseline run.</li>
+          <li>Redline marks only a regression beyond the band or a failed run.</li>
+        </ol>
+        <section class="pinned" aria-label="Pinned comparisons">
+          <table>
+            <thead><tr><th style="width:40px">No.</th><th>Pinned comparisons</th></tr></thead>
+            <tbody><tr><td></td><td>None yet. Compare with baseline, then pin the result to keep it here.</td></tr></tbody>
+          </table>
+        </section>
+      </div>
+    </section>
+
+    <section class="detail" id="detail" aria-labelledby="det-t">
+      <header>
+        <span class="balloon" aria-hidden="true">1</span>
+        <div>
+          <h2 id="det-t" class="view-title">Detail of item 1: <span class="rid">r-2291</span></h2>
+          <p class="part-name" style="margin-top:8px">summarize-v3 on news-digest-2k</p>
+          <p class="baseline">Baseline <code>summarize-v2 @ r-2203 (0.853)</code></p>
+        </div>
+      </header>
+      <div class="readout">
+        <div><span class="lbl">Score</span><span class="big">0.812</span></div>
+        <div><span class="lbl">Δ vs baseline</span><span class="big red">−0.041</span></div>
+        <p class="why"><b>Regression:</b> twice the ±0.020 noise band.<br><span class="meta">Passed in 14m 02s. Triggered by schedule at 02:00.</span></p>
+      </div>
+      <table class="metrics">
+        <thead><tr><th>Metric</th><th>Score</th><th>Baseline</th><th>Δ</th></tr></thead>
+        <tbody>
+          <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td>−0.035</td></tr>
+          <tr><td>Faithfulness</td><td>0.861</td><td>0.902</td><td>−0.041</td></tr>
+          <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td>−0.011</td></tr>
+          <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td>+0.16</td></tr>
+        </tbody>
+      </table>
+      <div class="actions">
+        <button class="btn primary" type="button">Rerun evaluation</button>
+        <button class="btn" type="button">Compare with baseline</button>
+        <button class="btn" type="button" disabled aria-describedby="cancel-why">Cancel run</button>
+      </div>
+      <p class="reason" id="cancel-why">Cancel is unavailable: r-2291 finished at 02:14:02.</p>
+      <section class="log" aria-label="Log tail">
+        <h3>Log tail</h3>
+<pre>02:13:48  <span class="lv">eval</span>  1996/2000 samples scored
+02:13:55  <span class="lv">eval</span>  2000/2000 samples scored
+02:13:55  <span class="lv">warn</span>  length_ratio above 1.15 on 38% of samples
+02:14:01  <span class="lv">agg </span>  faithfulness=0.861 (baseline 0.902)
+02:14:02  <span class="lv">done</span>  run r-2291 finished in 14m 02s</pre>
+      </section>
+    </section>
+
+    <section class="tb" aria-label="Title block">
+      <div class="product">
+        <svg width="34" height="20" viewBox="0 0 34 20" aria-label="Third-angle projection"><g fill="none" stroke="#0E5A6B" stroke-width="1.2"><path d="M1 6 L14 2 L14 18 L1 14 Z"/><circle cx="26" cy="10" r="7"/><circle cx="26" cy="10" r="3"/></g></svg>
+        <div><b>Evals</b><span class="ws">atlas-research</span></div>
+      </div>
+      <div><span class="lbl">Sheet</span><span class="v">1 of 5</span></div>
+      <div><span class="lbl">Rev</span><span class="v mono">r-2291</span></div>
+      <div class="wide"><span class="lbl">Updated</span><span class="v mono">02:14:02</span></div>
+      <div><span class="lbl">Title</span><span class="v">Runs, last night</span></div>
+      <div class="wide"><span class="lbl">Checked by</span><span class="v" style="color:var(--muted)">Not yet reviewed</span></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

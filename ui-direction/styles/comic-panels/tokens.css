@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:ital,wght@0,400;0,700;1,400;1,700&family=Grandstander:wght@600;800&family=Victor+Mono:wght@400;600&display=swap");
+
+:root {
+  /* type: Bangers shouts, Comic Neue letters, Grandstander counts, Victor Mono is the machine */
+  --font-shout: "Bangers", "Impact", sans-serif;
+  --font-letter: "Comic Neue", "Comic Sans MS", "Chalkboard SE", sans-serif;
+  --font-num: "Grandstander", "Comic Neue", sans-serif;
+  --font-code: "Victor Mono", "Consolas", monospace;
+
+  /* process inks on white paper */
+  --paper: #FFFFFF;
+  --ink: #111111;
+  --cyan: #00AEEF;
+  --magenta: #EC008C;
+  --yellow: #FFF200;
+  /* darker cuts for text that must pass AA */
+  --magenta-text: #B8006D;
+  --grey: #6B6B6B;
+  --grey-dot: #B5B5B5;
+
+  /* panel construction */
+  --border: 3px;
+  --border-heavy: 5px;
+  --gutter: 12px;
+
+  /* Ben-Day dots: a 45-degree lattice of two offset dot grids */
+  --dots-size: 9px 9px;
+  --dots-pos: 0 0, 4.5px 4.5px;
+
+  /* scale */
+  --t-xs: 12px;
+  --t-s: 14px;
+  --t-m: 16px;
+  --t-l: 20px;
+  --t-xl: 28px;
+  --t-2xl: 44px;
+  --t-3xl: 96px;
+}
+
+.dots-cyan {
+  background-image:
+    radial-gradient(circle, var(--cyan) 1.9px, transparent 2.3px),
+    radial-gradient(circle, var(--cyan) 1.9px, transparent 2.3px);
+  background-size: var(--dots-size);
+  background-position: var(--dots-pos);
+}
+.dots-cyan-lt {
+  background-image:
+    radial-gradient(circle, rgb(0 174 239 / .5) 1.4px, transparent 1.8px),
+    radial-gradient(circle, rgb(0 174 239 / .5) 1.4px, transparent 1.8px);
+  background-size: var(--dots-size);
+  background-position: var(--dots-pos);
+}
+.dots-magenta {
+  background-image:
+    radial-gradient(circle, rgb(236 0 140 / .42) 1.5px, transparent 1.9px),
+    radial-gradient(circle, rgb(236 0 140 / .42) 1.5px, transparent 1.9px);
+  background-size: var(--dots-size);
+  background-position: var(--dots-pos);
+}
+.dots-grey {
+  background-image:
+    radial-gradient(circle, var(--grey-dot) 1.5px, transparent 1.9px),
+    radial-gradient(circle, var(--grey-dot) 1.5px, transparent 1.9px);
+  background-size: var(--dots-size);
+  background-position: var(--dots-pos);
+}

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Form SH-1: Daily Reading Return, Shelf</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { padding: 8px 16px 64px 8px; overflow-x: hidden; }
+  .sheet { padding: 8px 10px 14px; }
+  .head { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; border-bottom: var(--rule-heavy) solid var(--form); padding-bottom: 6px; position: relative; }
+  .formno { color: var(--form); border-right: var(--rule) solid var(--form); padding-right: 10px; }
+  .formno .n { display: flex; align-items: baseline; gap: 4px; line-height: 1; }
+  .formno .n span { font-size: 10px; font-weight: 600; }
+  .formno .n strong { font-size: 26px; font-weight: 900; }
+  .formno p { font-size: var(--t-fine); margin-top: 3px; }
+  .head h1 { color: var(--form); font-size: 18px; font-weight: 800; line-height: 1.1; }
+  .head .date { display: flex; align-items: center; gap: 6px; margin-top: 5px; }
+  .head .date .t { font-size: 13px; font-weight: 700; }
+  .head .barcode { position: absolute; right: 0; bottom: 8px; width: 70px; height: 14px; }
+
+  section { margin-top: 10px; }
+  .fields { grid-template-columns: 1fr 1fr; }
+  .span2 { grid-column: span 2; }
+  .book { display: grid; grid-template-columns: 104px 1fr; border-left: var(--rule) solid var(--form); }
+  .exhibit { border-right: var(--rule) solid var(--form); border-bottom: var(--rule) solid var(--form); padding: 10px 8px 6px; position: relative; background: var(--screen-2); }
+  .cover { width: 86px; height: 128px; background: #2E3A55; color: #F2EFE6; padding: 8px 7px; display: flex; flex-direction: column; justify-content: space-between; transform: rotate(-2deg); }
+  .cover b { font-family: var(--font-print); font-weight: 800; font-size: 11px; line-height: 1.1; }
+  .cover i { font-style: normal; font-size: 8px; font-weight: 600; letter-spacing: .04em; }
+  .cover svg { align-self: center; }
+  .clip { position: absolute; top: -4px; left: 18px; }
+  .exhibit .lbl { display: block; margin-top: 6px; text-align: center; }
+  .bookf { display: grid; grid-template-columns: 1fr; }
+  .bookf .f .t.ttl { font-size: 14px; font-weight: 700; line-height: 1.2; }
+  .pg { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-family: var(--font-typed); }
+  .pg .of { font-size: 11px; color: var(--form); font-family: var(--font-print); }
+  .scale { border-left: var(--rule) solid var(--form); border-right: var(--rule) solid var(--form); border-bottom: var(--rule) solid var(--form); padding: 5px 8px 6px; }
+  .bar { position: relative; height: 12px; border: var(--rule) solid var(--form); margin-top: 3px;
+    background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), #9DBBA8 calc(10% - 1px) 10%); }
+  .bar span { position: absolute; inset: 0 auto 0 0; width: 61%; background: var(--form); }
+  .ticks { display: flex; justify-content: space-between; font-size: 8.5px; color: var(--form); margin-top: 2px; }
+
+  .three { grid-template-columns: 1fr 1fr 1fr; }
+  .three .comb i { font-size: 18px; width: 1.25em; }
+  .tally { border-left: var(--rule) solid var(--form); border-right: var(--rule) solid var(--form); border-bottom: var(--rule) solid var(--form); padding: 5px 8px 8px; position: relative; }
+  .tally .boxes { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-top: 4px; max-width: 228px; }
+  .tally .cb { width: 100%; height: 18px; font-size: 12px; }
+  .pending { position: absolute; right: 10px; bottom: 10px; font-size: 13px; transform: rotate(-8deg); }
+  .streak .row { display: flex; align-items: center; gap: 8px; }
+  .streak .comb i { font-size: 16px; }
+
+  .submit { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .submit .act { justify-content: center; padding: 9px; font-size: 15px; width: 100%; }
+  .submit p { font-size: var(--t-fine); color: var(--form); }
+
+  .queue li { display: grid; grid-template-columns: 20px 1fr 62px; border-bottom: var(--rule) solid var(--form); }
+  .queue li > * { padding: 5px 0; }
+  .queue .ln { font-size: 11.5px; padding-top: 7px; }
+  .queue .t { overflow-wrap: anywhere; font-size: 12.5px; }
+  .queue .t b { font-weight: 700; display: block; }
+  .queue .t span { color: var(--typed-2); font-size: 12px; }
+  .queue .pp { text-align: right; border-left: var(--rule) solid var(--form); padding-right: 6px; font-family: var(--font-typed); font-size: 12.5px; }
+  .queue .h { font-size: var(--t-label); color: var(--form); background: var(--screen); }
+  .queue .h > * { padding: 3px 0; }
+  .queue .h .pp { font-family: var(--font-print); font-size: var(--t-label); }
+
+  .remark { padding: 4px 0 0; }
+  .remark p { font-family: var(--font-typed); font-size: 13px; line-height: 22px; padding: 0 4px;
+    background: repeating-linear-gradient(transparent 0 21px, #9DBBA8 21px 22px); }
+  .remark .src { display: flex; justify-content: space-between; margin-top: 4px; }
+
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; height: 50px; background: var(--folder); padding: 0 16px 0 8px; }
+  .nav .tabs { align-items: flex-start; height: 100%; border-top: var(--rule) solid #BFB08A; }
+  .nav .tabs a { flex: 1; min-width: 0; text-align: center; padding: 8px 4px 10px; font-size: 13px; clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 9px 100%); }
+  .nav .tabs a[aria-current] { padding-top: 8px; margin-top: -1px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="ink" x="-5%" y="-10%" width="110%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="1" seed="9" result="m"/>
+    <feColorMatrix in="m" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -3 0 0 0 2.6" result="mask"/>
+    <feComposite in="d" in2="mask" operator="in"/>
+  </filter>
+</svg>
+
+<main class="sheet">
+  <div class="head">
+    <div class="formno">
+      <div class="n"><span>Form</span><strong>SH-1</strong></div>
+      <p><b>Shelf</b>, one per day</p>
+    </div>
+    <div>
+      <h1>Daily Reading Return</h1>
+      <div class="date"><span class="lbl"><b>0</b> Date</span><span class="t">Thu 24 Sep</span></div>
+    </div>
+    <svg class="barcode" viewBox="0 0 180 30" preserveAspectRatio="none" aria-hidden="true"><rect x="0" width="1" height="30"/><rect x="2" width="2" height="30"/><rect x="5" width="1" height="30"/><rect x="9" width="1" height="30"/><rect x="12" width="2" height="30"/><rect x="15" width="2" height="30"/><rect x="18" width="1" height="30"/><rect x="20" width="2" height="30"/><rect x="24" width="1" height="30"/><rect x="26" width="1" height="30"/><rect x="30" width="2" height="30"/><rect x="33" width="2" height="30"/><rect x="36" width="1" height="30"/><rect x="40" width="1" height="30"/><rect x="44" width="2" height="30"/><rect x="48" width="1" height="30"/><rect x="50" width="1" height="30"/><rect x="54" width="1" height="30"/><rect x="57" width="2" height="30"/><rect x="60" width="2" height="30"/><rect x="63" width="2" height="30"/><rect x="67" width="2" height="30"/><rect x="70" width="1" height="30"/><rect x="74" width="2" height="30"/><rect x="77" width="1" height="30"/><rect x="79" width="2" height="30"/><rect x="82" width="2" height="30"/><rect x="85" width="2" height="30"/><rect x="88" width="2" height="30"/><rect x="93" width="2" height="30"/><rect x="97" width="2" height="30"/><rect x="102" width="2" height="30"/><rect x="106" width="1" height="30"/><rect x="108" width="1" height="30"/><rect x="110" width="1" height="30"/><rect x="114" width="1" height="30"/><rect x="118" width="2" height="30"/><rect x="122" width="3" height="30"/><rect x="127" width="1" height="30"/><rect x="131" width="1" height="30"/><rect x="133" width="2" height="30"/><rect x="137" width="1" height="30"/><rect x="140" width="1" height="30"/><rect x="143" width="2" height="30"/><rect x="146" width="3" height="30"/><rect x="150" width="2" height="30"/><rect x="155" width="1" height="30"/><rect x="158" width="3" height="30"/><rect x="163" width="2" height="30"/><rect x="167" width="2" height="30"/><rect x="171" width="1" height="30"/><rect x="173" width="1" height="30"/><rect x="176" width="3" height="30"/></svg>
+  </div>
+
+  <section aria-labelledby="pa">
+    <div class="part"><span class="code">Part A</span><h2 id="pa">Currently reading</h2></div>
+    <div class="book">
+      <div class="exhibit">
+        <svg class="clip" width="14" height="34" viewBox="0 0 14 34" aria-hidden="true"><path d="M4 30V6a3 3 0 0 1 6 0v22a5 5 0 0 1-10 0V9" fill="none" stroke="#7E8680" stroke-width="1.6"/></svg>
+        <div class="cover" role="img" aria-label="Cover: The Left Hand of Darkness, Ursula K. Le Guin">
+          <b>The Left Hand of Darkness</b>
+          <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="#F2EFE6" stroke-width="1.5"/><path d="M17 2a15 15 0 0 1 0 30z" fill="#F2EFE6"/></svg>
+          <i>URSULA K. LE GUIN</i>
+        </div>
+        <span class="lbl"><b>1</b> Exhibit</span>
+      </div>
+      <div class="bookf">
+        <div class="f"><span class="lbl"><b>1a</b> Title</span><span class="t ttl">The Left Hand of Darkness</span></div>
+        <div class="f"><span class="lbl"><b>1b</b> Author</span><span class="t">Ursula K. Le Guin</span></div>
+        <div class="f"><span class="lbl"><b>1c</b> Page reached</span>
+          <span class="pg"><span class="comb"><i>1</i><i>8</i><i>4</i></span><span class="of">of</span><span class="comb"><i>3</i><i>0</i><i>4</i></span><span class="t" style="font-size:12px">61%</span></span></div>
+        <div class="f"><span class="lbl"><b>1d</b> Last read</span><span class="t">yesterday</span></div>
+      </div>
+    </div>
+    <div class="scale">
+      <span class="lbl"><b>1e</b> Progress, pages 1 to 304</span>
+      <div class="bar" role="img" aria-label="61 percent read"><span></span></div>
+      <div class="ticks"><span>0</span><span>50%</span><span>100%</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="pb">
+    <div class="part"><span class="code">Part B</span><h2 id="pb">Today's pages</h2></div>
+    <div class="fields three">
+      <div class="f"><span class="lbl"><b>2a</b> Read today</span><span class="comb"><i>0</i><i>8</i></span></div>
+      <div class="f"><span class="lbl"><b>2b</b> Goal</span><span class="comb"><i>2</i><i>0</i></span></div>
+      <div class="f"><span class="lbl"><b>2c</b> Still to read</span><span class="comb"><i>1</i><i>2</i></span></div>
+    </div>
+    <div class="tally">
+      <span class="lbl"><b>2d</b> One box per page of today's goal</span>
+      <div class="boxes" role="img" aria-label="8 of 20 pages read">
+        <span class="cb">X</span><span class="cb">X</span><span class="cb">X</span><span class="cb">X</span><span class="cb">X</span><span class="cb">X</span><span class="cb">X</span><span class="cb">X</span><span class="cb"></span><span class="cb"></span>
+        <span class="cb"></span><span class="cb"></span><span class="cb"></span><span class="cb"></span><span class="cb"></span><span class="cb"></span><span class="cb"></span><span class="cb"></span><span class="cb"></span><span class="cb"></span>
+      </div>
+      <span class="stamp pending">Not met<small>12 to go</small></span>
+    </div>
+    <div class="fields">
+      <div class="f span2 streak"><span class="lbl"><b>2e</b> Streak, days in a row</span><span class="row"><span class="comb"><i>1</i><i>1</i></span><span class="t" style="font-size:12px">days, including yesterday</span></span></div>
+    </div>
+    <div class="submit">
+      <button class="act primary" type="button"><span class="cb"></span>Log pages</button>
+      <p>Enter the pages you read since your last return. Line 2a updates.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="pc">
+    <div class="part"><span class="code">Part C</span><h2 id="pc">Up next <span>3 books, in order</span></h2></div>
+    <ol class="queue">
+      <li class="h"><span></span><span>Title and author</span><span class="pp">Pages</span></li>
+      <li><span class="ln">3</span><span class="t"><b>Piranesi</b><span>Susanna Clarke</span></span><span class="pp">272</span></li>
+      <li><span class="ln">4</span><span class="t"><b>The Remains of the Day</b><span>Kazuo Ishiguro</span></span><span class="pp">245</span></li>
+      <li><span class="ln">5</span><span class="t"><b>A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</b><span>J. Placeholder-Smythe</span></span><span class="pp">1,104</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="pd">
+    <div class="part"><span class="code">Part D</span><h2 id="pd">Saved highlight</h2></div>
+    <div class="remark">
+      <p>“Light is the left hand of darkness and darkness the right hand of light.”</p>
+      <div class="src"><span class="lbl"><b>6</b> From Exhibit 1, The Left Hand of Darkness</span><span class="t" style="font-size:12px">p. 222</span></div>
+    </div>
+  </section>
+</main>
+
+<nav class="nav" aria-label="Sections">
+  <div class="tabs">
+    <a href="#" aria-current="page">Today</a>
+    <a href="#">Library</a>
+    <a href="#">Highlights</a>
+    <a href="#">Stats</a>
+  </div>
+</nav>
+</body>
+</html>

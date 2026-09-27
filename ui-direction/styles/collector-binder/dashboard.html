@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals: last night's runs</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { height: 100vh; min-height: 900px; overflow: hidden; }
+  .binder {
+    height: 100%; padding: 12px 20px 16px;
+    display: grid; grid-template-columns: 600px 44px 722px 34px; grid-template-rows: 58px 1fr; row-gap: 10px;
+  }
+
+  /* top strip on the vinyl */
+  .strip { grid-column: 1 / -1; display: flex; align-items: center; gap: 22px; color: var(--vinyl-ink); }
+  .tally { display: flex; align-items: center; gap: 20px; }
+  .tally ul { padding-top: 6px; }
+  .tally .big { font-family: var(--font-card); font-weight: 700; font-size: var(--t-34); color: var(--card); line-height: 1; }
+  .tally .big small { font-size: var(--t-18); font-weight: 500; color: var(--vinyl-ink); }
+  .tally ul { display: flex; gap: 12px; font-size: var(--t-13); }
+  .tally li b { color: var(--card); font-weight: 700; }
+  .tally li.bad b { color: #F2B2A8; }
+  .strip .search { margin-left: auto; width: 330px; }
+
+  /* left page: the 9-pocket sheet */
+  .page.left { padding: 14px 28px 12px 14px; display: flex; flex-direction: column; }
+  .sheet { flex: 1; display: grid; grid-template-columns: repeat(3, 180px); grid-template-rows: repeat(3, 1fr); gap: 10px; }
+  .legend { display: flex; gap: 18px; align-items: baseline; padding-top: 9px; font-size: var(--t-12); color: var(--ink-2); }
+  .legend b { font-family: var(--font-card); color: var(--ink); font-size: var(--t-15); margin-right: 4px; }
+  .legend .sheet-no { margin-left: auto; }
+
+  .pk .card { padding: 6px; gap: 4px; }
+  .pk a.card { text-decoration: none; }
+  .pk a.card:hover { border-color: var(--ink-2); }
+  .c-head { display: flex; justify-content: space-between; align-items: center; padding: 1px 2px 0; }
+  .c-head .card-name { font-size: var(--t-18); }
+  .set { width: 16px; height: 16px; color: var(--gold); flex: none; }
+  .c-art { height: 82px; background: #EDF1EF; padding: 6px 9px; display: flex; flex-direction: column; justify-content: center; }
+  .c-art .score { font-family: var(--font-card); font-weight: 600; font-size: 42px; line-height: 1; }
+  .c-art .delta { font-family: var(--font-card); font-size: var(--t-13); font-weight: 600; color: var(--ink-2); margin-top: 3px; }
+  .c-type { display: flex; justify-content: space-between; gap: 6px; font-size: var(--t-12); font-weight: 600; padding: 0 2px; border-bottom: 1px solid var(--card-edge); padding-bottom: 3px; }
+  .c-type .st { font-weight: 500; color: var(--ink-2); }
+  .c-text { font-size: var(--t-12); line-height: 1.3; padding: 0 2px; overflow-wrap: anywhere; }
+  .c-foot { margin-top: auto; display: flex; justify-content: space-between; gap: 6px; font-size: var(--t-10); color: var(--ink-2); padding: 3px 2px 0; border-top: 1px solid var(--card-edge); }
+
+  .pk.sel .card { transform: translateY(-9px); border: 2px solid var(--ink); box-shadow: 0 3px 0 var(--gold); }
+  .pk.sel .c-art .delta, .reg { color: var(--red); }
+  .pk.sel .flag { color: var(--red); font-weight: 700; }
+
+  .pk.failed .c-art { background: #F6E4E0; }
+  .pk.failed .score, .pk.failed .delta { color: var(--red); }
+  .pk.failed .c-type .st { color: var(--red); font-weight: 700; }
+  .pk.failed .err { font-family: var(--font-code); font-size: 10px; line-height: 1.3; overflow-wrap: anywhere; }
+
+  /* running: the card is only part-way into its pocket */
+  .pk.running { overflow: hidden; }
+  .pk.running .card { position: absolute; left: 5px; right: 5px; top: 38%; height: calc(100% - 10px); }
+  .pk.running .c-art { height: 58px; }
+  .pk.running .c-art .score { font-size: var(--t-34); }
+  .pk.running .fill-note { font-size: var(--t-12); color: var(--ink); padding: 14px 4px 0; }
+  .pk.running .fill-note b { font-family: var(--font-card); font-size: var(--t-18); display: block; }
+
+  /* queued and pinned: nothing in the pocket, only what is printed on the page */
+  .pk.empty { display: flex; flex-direction: column; padding: 12px 10px 10px; }
+  .pk.empty .slot-no { font-size: var(--t-24); line-height: 1; }
+  .pk.empty h3 { font-family: var(--font-card); font-size: var(--t-15); font-weight: 600; margin-top: 8px; color: var(--ink); }
+  .pk.empty p { font-size: var(--t-12); color: var(--ink-2); margin-top: 4px; }
+  .pk.queued .slip { margin-top: auto; border: 1.5px dashed var(--print); border-radius: 6px; padding: 8px; font-size: var(--t-12); color: var(--ink-2); }
+  .pk.queued .slip b { font-family: var(--font-card); font-size: var(--t-24); color: var(--ink-2); display: block; line-height: 1; }
+
+  /* right page: the pulled card and its notes */
+  .page.right { padding: 26px 22px 20px 44px; display: grid; grid-template-columns: 412px 1fr; column-gap: 30px; }
+  .big { height: auto; padding: 12px; gap: 8px; align-self: start; }
+  .bc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding: 2px 3px 0; }
+  .bc-head .card-name { font-size: var(--t-24); }
+  .bc-head .set { width: 22px; height: 22px; margin-top: 3px; }
+  .bc-art { background: #EDF1EF; padding: 6px 6px 4px; }
+  .bc-art svg { display: block; width: 100%; height: auto; }
+  .bc-art figcaption { font-size: var(--t-10); color: var(--ink-2); padding: 2px 4px 0; }
+  .bc-type { display: flex; justify-content: space-between; font-size: var(--t-13); font-weight: 600; padding: 0 3px 5px; border-bottom: 1px solid var(--card-edge); }
+  .stats { width: 100%; border-collapse: collapse; font-size: var(--t-13); }
+  .stats th { font-weight: 500; font-size: var(--t-12); color: var(--ink-2); text-align: right; padding: 0 4px 3px; }
+  .stats th:first-child, .stats td:first-child { text-align: left; }
+  .stats td { padding: 3px 4px; text-align: right; font-family: var(--font-card); font-size: var(--t-15); border-top: 1px solid var(--card-edge); }
+  .stats td:first-child { font-family: var(--font-ui); font-size: var(--t-13); font-weight: 600; }
+  .stats tr.worst td { font-weight: 700; }
+  .log { background: #F1EFE6; border-radius: 3px; padding: 7px 9px; font-family: var(--font-code); font-size: 11px; line-height: 1.5; white-space: pre; overflow: hidden; }
+  .log .w { color: #7A5A12; font-weight: 500; }
+  .bc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; padding: 4px 3px 0; border-top: 1px solid var(--card-edge); }
+  .bc-foot .col { font-size: var(--t-12); color: var(--ink-2); }
+  .bc-foot .col b { font-family: var(--font-card); font-size: var(--t-15); color: var(--ink); }
+  .pt { border: 1.5px solid var(--ink); border-radius: 5px; padding: 3px 10px 4px; text-align: right; background: var(--card); }
+  .pt b { font-family: var(--font-card); font-size: 30px; font-weight: 700; line-height: 1; display: block; }
+  .pt span { font-family: var(--font-card); font-size: var(--t-13); font-weight: 700; color: var(--red); }
+
+  .notes { display: flex; flex-direction: column; gap: 16px; padding-top: 4px; }
+  .notes .from { font-size: var(--t-12); color: var(--ink-2); }
+  .notes h2 { font-family: var(--font-card); font-weight: 700; font-size: var(--t-24); line-height: 1.1; margin-top: 4px; }
+  .notes p { font-size: var(--t-13); line-height: 1.45; }
+  .notes .base { font-size: var(--t-12); color: var(--ink-2); border-left: 3px solid var(--gold); padding-left: 9px; }
+  .notes .base b { color: var(--ink); font-family: var(--font-card); font-size: var(--t-15); }
+  .actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .actions .why { font-size: var(--t-12); color: var(--ink-2); }
+  .aside-fail { margin-top: auto; font-size: var(--t-12); color: var(--ink-2); border-top: 1px solid var(--seam); padding-top: 10px; }
+  .aside-fail b { color: var(--red); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="s-sum" viewBox="0 0 16 16"><path d="M2 4h12M2 8h9M2 12h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="s-route" viewBox="0 0 16 16"><path d="M8 14.5V8M8 8L3 2.5M8 8l5-5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="s-json" viewBox="0 0 16 16"><path d="M6 2C4 2 4.5 4 4.5 5.5S4 8 2.5 8C4 8 4.5 9 4.5 10.5S4 14 6 14M10 2c2 0 1.5 2 1.5 3.5S12 8 13.5 8C12 8 11.5 9 11.5 10.5S12 14 10 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="s-chat" viewBox="0 0 16 16"><path d="M2 2.5h12v8.5H7.5L4 14v-3H2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/></symbol>
+</svg>
+
+<div class="binder">
+  <header class="strip">
+    <div class="spine-label"><b>Evals</b><span>atlas-research</span></div>
+    <div class="tally">
+      <p class="big">5<small> of 8 passed last night</small></p>
+      <ul aria-label="Last night's runs">
+        <li><b>8</b> runs</li>
+        <li class="bad"><b>1</b> failed</li>
+        <li><b>1</b> running</li>
+        <li><b>1</b> queued</li>
+      </ul>
+    </div>
+    <label class="search"><span class="vh">Search</span><input type="search" placeholder="Search runs, models, datasets"><kbd class="key">/</kbd></label>
+  </header>
+
+  <!-- left page: nine pockets -->
+  <section class="page left" aria-label="Runs, last night">
+    <ol class="sheet">
+      <li class="pocket pk sel">
+        <a class="card" href="#r-2291" aria-current="true">
+          <div class="c-head"><span class="card-name">r-2291</span><svg class="set"><use href="#s-sum"/></svg></div>
+          <div class="c-art frame"><span class="score">0.812</span><span class="delta">−0.041 <span class="flag">regression</span></span></div>
+          <p class="c-type"><span>summarize-v3</span><span class="st">Passed</span></p>
+          <p class="c-text">news-digest-2k</p>
+          <p class="c-foot"><span>schedule, 02:00</span><span>14m 02s</span></p>
+        </a>
+      </li>
+      <li class="pocket pk">
+        <a class="card" href="#r-2290">
+          <div class="c-head"><span class="card-name">r-2290</span><svg class="set"><use href="#s-sum"/></svg></div>
+          <div class="c-art frame"><span class="score">0.774</span><span class="delta">+0.006</span></div>
+          <p class="c-type"><span>summarize-v3</span><span class="st">Passed</span></p>
+          <p class="c-text">multilingual-legal-contracts-longform-eval-2026-q3</p>
+          <p class="c-foot"><span>M. Okafor, 01:12</span><span>41m 55s</span></p>
+        </a>
+      </li>
+      <li class="pocket pk">
+        <a class="card" href="#r-2289">
+          <div class="c-head"><span class="card-name">r-2289</span><svg class="set"><use href="#s-route"/></svg></div>
+          <div class="c-art frame"><span class="score">0.931</span><span class="delta">+0.012</span></div>
+          <p class="c-type"><span>router-small</span><span class="st">Passed</span></p>
+          <p class="c-text">intent-routing-v7</p>
+          <p class="c-foot"><span>schedule, 01:00</span><span>3m 48s</span></p>
+        </a>
+      </li>
+      <li class="pocket pk running">
+        <p class="fill-note"><b>Running, 62%</b>9m 10s so far</p>
+        <a class="card" href="#r-2288">
+          <div class="c-head"><span class="card-name">r-2288</span><svg class="set"><use href="#s-route"/></svg></div>
+          <div class="c-art frame"><span class="score">—</span><span class="delta">Δ —, not computed yet</span></div>
+          <p class="c-type"><span>router-small</span><span class="st">Running</span></p>
+          <p class="c-text">adversarial-prompts</p>
+          <p class="c-foot"><span>CI #4812, 00:51</span></p>
+        </a>
+      </li>
+      <li class="pocket pk failed">
+        <a class="card" href="#r-2287">
+          <div class="c-head"><span class="card-name">r-2287</span><svg class="set"><use href="#s-json"/></svg></div>
+          <div class="c-art frame"><span class="score">0.000</span><span class="delta">−0.884</span></div>
+          <p class="c-type"><span>extract-json</span><span class="st">Failed</span></p>
+          <p class="c-text">invoices-ocr</p>
+          <p class="c-text err">KeyError: 'line_items' — 212 of 212 samples failed schema validation</p>
+          <p class="c-foot"><span>CI #4809, 00:40</span><span>0m 41s</span></p>
+        </a>
+      </li>
+      <li class="pocket pk">
+        <a class="card" href="#r-2286">
+          <div class="c-head"><span class="card-name">r-2286</span><svg class="set"><use href="#s-json"/></svg></div>
+          <div class="c-art frame"><span class="score">0.902</span><span class="delta">+0.000</span></div>
+          <p class="c-type"><span>extract-json</span><span class="st">Passed</span></p>
+          <p class="c-text">receipts-small</p>
+          <p class="c-foot"><span>L. Brandt, 23:58</span><span>2m 15s</span></p>
+        </a>
+      </li>
+      <li class="pocket pk">
+        <a class="card" href="#r-2285">
+          <div class="c-head"><span class="card-name">r-2285</span><svg class="set"><use href="#s-chat"/></svg></div>
+          <div class="c-art frame"><span class="score">0.668</span><span class="delta">+0.021</span></div>
+          <p class="c-type"><span>chat-core-8b</span><span class="st">Passed</span></p>
+          <p class="c-text">helpfulness-pairwise</p>
+          <p class="c-foot"><span>schedule, 23:00</span><span>1h 06m</span></p>
+        </a>
+      </li>
+      <li class="pocket pk empty queued">
+        <span class="slot-no">r-2284</span>
+        <h3>chat-core-8b</h3>
+        <p>safety-refusals, by schedule</p>
+        <div class="slip"><b>—</b>Queued. Not started, no score yet.</div>
+      </li>
+      <li class="pocket pk empty pinned">
+        <span class="slot-no">9</span>
+        <h3>Pinned comparisons</h3>
+        <p>None yet. Compare a run with its baseline to pin it in this pocket.</p>
+      </li>
+    </ol>
+    <p class="legend">
+      <span><b>—</b>not computed yet (running or queued)</span>
+      <span><b>0.000</b>computed, scored zero</span>
+      <span class="sheet-no">Page 1 of 1</span>
+    </p>
+    <div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>
+  </section>
+
+  <div class="gutter" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="ring"></span></div>
+
+  <!-- right page: r-2291 out of its sleeve -->
+  <section class="page right" id="r-2291" aria-label="Selected run r-2291">
+    <article class="card big pulled">
+      <header class="bc-head">
+        <h1 class="card-name">summarize-v3 on <span style="white-space:nowrap">news-digest-2k</span></h1>
+        <svg class="set" aria-label="summarize-v3"><use href="#s-sum"/></svg>
+      </header>
+      <figure class="bc-art frame">
+        <svg viewBox="0 0 360 186" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on r-2291, below the noise band.">
+          <rect x="34" y="25.7" width="312" height="78" fill="#D3E1E3"/>
+          <line x1="34" y1="64.7" x2="346" y2="64.7" stroke="#74828A" stroke-dasharray="3 3"/>
+          <line x1="30" y1="168" x2="350" y2="168" stroke="#B9C9CE"/>
+          <g font-family="Zilla Slab, serif" font-size="11" fill="#4A585D">
+            <text x="2" y="16">0.88</text><text x="2" y="94">0.84</text><text x="2" y="171">0.80</text>
+            <text x="40" y="38">noise band 0.833–0.873</text>
+            <text x="236" y="58">baseline 0.853</text>
+            <text x="34" y="184">oldest</text><text x="346" y="184" text-anchor="end">r-2291</text>
+          </g>
+          <polyline points="34,78.3 62.4,68.6 90.7,72.5 119.1,60.8 147.5,64.7 175.8,70.5 204.2,56.9 232.5,66.6 260.9,74.4 289.3,68.6 317.6,64.7" fill="none" stroke="#1B2428" stroke-width="2"/>
+          <polyline points="317.6,64.7 346,144.6" fill="none" stroke="#B23A2C" stroke-width="2.5"/>
+          <g fill="#1B2428"><circle cx="34.0" cy="78.3" r="2.5"/><circle cx="62.4" cy="68.6" r="2.5"/><circle cx="90.7" cy="72.5" r="2.5"/><circle cx="119.1" cy="60.8" r="2.5"/><circle cx="147.5" cy="64.7" r="2.5"/><circle cx="175.8" cy="70.5" r="2.5"/><circle cx="204.2" cy="56.9" r="2.5"/><circle cx="232.5" cy="66.6" r="2.5"/><circle cx="260.9" cy="74.4" r="2.5"/><circle cx="289.3" cy="68.6" r="2.5"/><circle cx="317.6" cy="64.7" r="2.5"/></g>
+          <circle cx="346" cy="144.6" r="4.5" fill="#B23A2C"/>
+          <text x="336" y="140" text-anchor="end" font-family="Zilla Slab, serif" font-weight="700" font-size="14" fill="#B23A2C">0.812</text>
+        </svg>
+        <figcaption>Score, last 12 runs of summarize-v3 on news-digest-2k, oldest left.</figcaption>
+      </figure>
+      <p class="bc-type"><span>Evaluation run, summarize-v3</span><span class="reg">Passed, regression</span></p>
+      <table class="stats">
+        <thead><tr><th>Metric</th><th>Score</th><th>Baseline</th><th>Δ</th></tr></thead>
+        <tbody>
+          <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td>−0.035</td></tr>
+          <tr class="worst"><td>Faithfulness</td><td>0.861</td><td>0.902</td><td class="reg">−0.041</td></tr>
+          <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td>−0.011</td></tr>
+          <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td>+0.16</td></tr>
+        </tbody>
+      </table>
+      <pre class="log" aria-label="Log tail">02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+<span class="w">02:13:55  warn  length_ratio above 1.15 on 38% of samples</span>
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</pre>
+      <footer class="bc-foot">
+        <p class="col"><b>r-2291</b><br>schedule, started 02:00<br>took 14m 02s</p>
+        <p class="pt"><b>0.812</b><span>−0.041 vs baseline</span></p>
+      </footer>
+    </article>
+
+    <div class="notes">
+      <div>
+        <p class="from">Out of pocket 1, page 1</p>
+        <h2>Regression, not noise</h2>
+      </div>
+      <p>r-2291 scored 0.812, which is 0.041 under its baseline. The noise band is ±0.02 (0.833 to 0.873), so this drop is real. Faithfulness fell the most, and summaries ran long: length ratio 1.18 against 1.02.</p>
+      <p class="base">Baseline<br><b>summarize-v2 @ r-2203 (0.853)</b></p>
+      <div class="actions">
+        <button class="btn primary" type="button">Rerun evaluation</button>
+        <button class="btn" type="button">Compare with baseline</button>
+        <button class="btn" type="button" disabled aria-describedby="why-cancel">Cancel run</button>
+        <p class="why" id="why-cancel">Cancel is off: r-2291 finished at 02:14:02.</p>
+      </div>
+      <p class="aside-fail"><b>r-2287 failed</b> before any sample scored, so it is not a regression. Fix the extractor's line_items schema, then rerun it.</p>
+    </div>
+    <div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>
+  </section>
+
+  <nav class="dividers" aria-label="Sections">
+    <a href="#" aria-current="page">Runs</a>
+    <a href="#">Datasets <small>counting…</small></a>
+    <a href="#">Models</a>
+    <a href="#">Baselines</a>
+    <a href="#">Settings</a>
+  </nav>
+</div>
+</body>
+</html>

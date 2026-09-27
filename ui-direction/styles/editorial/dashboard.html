@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evals: last night's runs</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper); color: var(--ink);
+    font-family: var(--font-text); font-size: var(--t-body); line-height: 1.5;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-optical-sizing: auto;
+  }
+  h1, h2, h3, p, ol, ul, figure, dl, dd { margin: 0; padding: 0; }
+  ol, ul { list-style: none; }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .ui { font-family: var(--font-ui); }
+  code, .code { font-family: var(--font-code); font-size: .82em; }
+
+  .spread { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+  .page { padding: 26px 48px 30px 64px; position: relative; }
+  .page.right { padding: 26px 56px 30px 48px; border-left: 1px solid var(--rule); }
+
+  /* running heads */
+  .runhead { display: flex; align-items: baseline; gap: 28px; font-family: var(--font-ui); font-size: var(--t-ui); height: 28px; }
+  .masthead { font-family: var(--font-text); font-style: italic; font-size: 24px; font-weight: 500; letter-spacing: -.01em; margin-right: 6px; }
+  .runhead nav { display: flex; gap: 20px; }
+  .runhead nav a { color: var(--ink-2); padding-bottom: 3px; border-bottom: 1px solid transparent; }
+  .runhead nav a:hover { border-bottom-color: var(--ink-2); }
+  .runhead nav a[aria-current] { color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--ink); }
+  .right .runhead { justify-content: space-between; }
+  .search { display: flex; align-items: baseline; gap: 10px; }
+  .search input {
+    font: inherit; font-size: var(--t-ui); color: var(--ink); background: transparent;
+    border: 0; border-bottom: 1px solid var(--leader); padding: 2px 0 4px; width: 270px;
+  }
+  .search input::placeholder { color: var(--muted); }
+  .search input:focus { outline: none; border-bottom: 2px solid var(--ink); }
+  kbd { font-family: var(--font-ui); font-size: 11px; border: 1px solid var(--leader); padding: 0 5px; color: var(--ink-2); }
+  .ws { color: var(--ink-2); }
+  .ws b { font-weight: 600; color: var(--ink); }
+
+  /* feature */
+  .kicker { font-family: var(--font-ui); font-size: var(--t-ui); color: var(--ink-2); margin-top: 26px; }
+  h1 {
+    font-size: 48px; line-height: 1.02; font-weight: 400; letter-spacing: -.018em;
+    margin-top: 10px; max-width: 13.2em;
+  }
+  .standfirst { font-size: var(--t-lede); font-style: italic; line-height: 1.38; color: var(--ink-2); margin-top: 16px; max-width: 29em; }
+  .standfirst b { font-style: normal; font-weight: 500; color: var(--ink); }
+
+  .cols { display: grid; grid-template-columns: 340px 1fr; gap: 30px; margin-top: 24px; }
+  figure .label, .tbl caption { font-family: var(--font-ui); font-size: 12px; font-weight: 600; text-align: left; }
+  figcaption { font-size: 14px; line-height: 1.4; font-style: italic; color: var(--ink-2); margin-top: 6px; }
+  figcaption .label { font-style: normal; margin-right: 4px; }
+  .chart { display: block; width: 340px; height: 181px; margin-top: 8px; }
+  .chart text { font-family: var(--font-ui); font-size: 10px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .chart .end { font-family: var(--font-text); font-size: 15px; fill: var(--oxblood); font-weight: 500; }
+  .chart .bandlbl { fill: var(--ink-2); font-style: italic; font-family: var(--font-text); font-size: 11.5px; }
+
+  .tbl { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: var(--t-small); }
+  .tbl caption { padding-bottom: 6px; }
+  .tbl caption span { font-weight: 400; font-family: var(--font-text); font-style: italic; font-size: 14px; color: var(--ink-2); margin-left: 4px; }
+  .tbl th { font-family: var(--font-ui); font-size: 11.5px; font-weight: 500; color: var(--ink-2); text-align: right; padding: 5px 0 5px 10px; border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--rule); }
+  .tbl th:first-child, .tbl td:first-child { text-align: left; padding-left: 0; }
+  .tbl td { text-align: right; padding: 4px 0 4px 10px; border-bottom: 1px solid var(--rule); }
+  .tbl tr:last-child td { border-bottom: 1.5px solid var(--ink); }
+  .neg { color: var(--oxblood); }
+
+  .commentary { font-size: var(--t-body); line-height: 1.55; hyphens: auto; }
+  .commentary p + p { margin-top: .7em; text-indent: 1.2em; }
+  .commentary p:first-child::first-letter {
+    float: left; font-size: 82px; line-height: .8; font-weight: 400; padding: 7px 8px 0 0; color: var(--ink);
+  }
+  .actions { margin-top: 18px; font-family: var(--font-ui); font-size: 14px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 0; }
+  .actions .row { display: flex; align-items: baseline; flex-wrap: wrap; }
+  .actions a, .actions button {
+    font: inherit; color: var(--ink); background: none; border: 0; padding: 0 0 2px; cursor: pointer;
+    border-bottom: 1px solid var(--ink);
+  }
+  .actions a.primary { font-weight: 600; border-bottom-width: 2px; }
+  .actions a:hover { background: var(--wash); }
+  .actions .sep { width: 1px; height: 13px; background: var(--leader); margin: 0 13px; align-self: center; }
+  .actions button:disabled { color: var(--leader); border-bottom: 1px dotted var(--leader); cursor: not-allowed; }
+  .actions .why { font-family: var(--font-text); font-style: italic; font-size: 13.5px; color: var(--ink-2); margin-left: 12px; }
+
+  /* contents */
+  h2 { font-size: 40px; font-weight: 400; line-height: 1; letter-spacing: -.01em; margin-top: 32px; }
+  .tally { font-size: var(--t-small); font-style: italic; color: var(--ink-2); margin-top: 8px; }
+  .toc { margin-top: 16px; border-top: 1.5px solid var(--ink); }
+  .entry {
+    display: grid; grid-template-columns: 50px 1fr 58px var(--margin-note); column-gap: 12px;
+    padding: 9px 0 8px; border-bottom: 1px solid var(--rule); position: relative;
+  }
+  .entry > * { min-width: 0; }
+  .rid { grid-column: 1; grid-row: 1; font-family: var(--font-code); font-size: 12px; color: var(--ink-2); padding-top: 5px; }
+  .ttl { grid-column: 2; grid-row: 1; display: flex; align-items: baseline; font-size: 19px; line-height: 1.22; }
+  .ttl a { overflow-wrap: anywhere; }
+  .ttl a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .ttl i { color: var(--ink-2); }
+  .lead { flex: 1; min-width: 18px; border-bottom: 2px dotted var(--leader); margin: 0 0 5px 6px; }
+  .score { grid-column: 3; grid-row: 1; text-align: right; font-size: 19px; line-height: 1.22; }
+  .meta { grid-column: 2; grid-row: 2; font-family: var(--font-ui); font-size: var(--t-note); color: var(--ink-2); margin-top: 3px; }
+  .delta { grid-column: 3; grid-row: 2; text-align: right; font-family: var(--font-ui); font-size: var(--t-note); margin-top: 3px; color: var(--ink-2); }
+  .delta.neg { color: var(--oxblood); font-weight: 600; }
+  .err { grid-column: 2 / 4; grid-row: 3; font-family: var(--font-code); font-size: 11.5px; line-height: 1.45; color: var(--oxblood); margin-top: 5px; }
+  .prog { grid-column: 2 / 4; grid-row: 3; height: 3px; background: var(--wash); margin-top: 7px; position: relative; }
+  .prog::before { content: ""; position: absolute; inset: 0 38% 0 0; background: var(--ink); }
+  .note {
+    position: absolute; top: 13px; right: 0; width: var(--margin-note);
+    font-size: var(--t-note); line-height: 1.38; color: var(--ink-2);
+    padding-left: 12px; border-left: 1px solid var(--rule);
+  }
+  .note sup, sup.ref { font-family: var(--font-ui); font-size: 9.5px; font-weight: 600; color: var(--ink); margin-right: 2px; }
+  sup.ref { margin: 0 0 0 1px; }
+  .entry.sel::before { content: ""; position: absolute; left: -12px; right: calc(var(--margin-note) + 6px); top: 0; bottom: -1px; background: var(--wash); border-left: 3px solid var(--ink); z-index: -1; }
+  .entry.sel .ttl a { font-style: italic; }
+  .toc { position: relative; z-index: 0; }
+
+  .log { position: relative; margin-top: 18px; padding-right: calc(var(--margin-note) + 12px); }
+  .log h3 { font-size: 15px; font-weight: 400; font-style: italic; color: var(--ink-2); }
+  .log pre { font-family: var(--font-code); font-size: 11.5px; line-height: 1.6; margin: 6px 0 0; color: var(--ink); white-space: pre; }
+  .log pre .w { color: var(--ink); background: var(--wash); }
+  .log .note { top: 2px; }
+</style>
+</head>
+<body>
+<div class="spread">
+
+  <section class="page left" aria-label="Feature: selected run">
+    <header class="runhead">
+      <span class="masthead">Evals</span>
+      <nav aria-label="Sections">
+        <a href="#" aria-current="page">Runs</a>
+        <a href="#">Datasets</a>
+        <a href="#">Models</a>
+        <a href="#">Baselines</a>
+        <a href="#">Settings</a>
+      </nav>
+    </header>
+
+    <p class="kicker">Run r-2291, finished 02:14:02</p>
+    <h1>Summarize-v3 slipped last night, and the drop is bigger than the noise</h1>
+    <p class="standfirst">On news-digest-2k it scored <b>0.812</b>, which is <b>0.041</b> below its baseline, summarize-v2 at r-2203 (0.853), and outside the ±0.02 band that ordinary run-to-run wobble stays inside.</p>
+
+    <div class="actions">
+      <a href="#" class="primary">Rerun evaluation</a>
+      <span class="sep" aria-hidden="true"></span>
+      <a href="#">Compare with baseline</a>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" disabled aria-describedby="why">Cancel run</button>
+      <span class="why" id="why">Run finished; nothing to cancel.</span>
+    </div>
+
+    <div class="cols">
+      <div>
+        <figure>
+          <svg class="chart" viewBox="0 0 330 176" role="img" aria-label="Score of summarize-v3 on news-digest-2k over 12 runs: steady between 0.846 and 0.857, then 0.812 on the latest run, below the noise band of 0.833 to 0.873.">
+            <rect x="36" y="26.8" width="284" height="73" fill="#ECEEE7"/>
+            <text class="bandlbl" x="42" y="94">noise band, 0.833 to 0.873</text>
+            <line x1="36" y1="63.3" x2="320" y2="63.3" stroke="#6B7770" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="40" y="59">baseline 0.853</text>
+            <g>
+              <text x="30" y="17" text-anchor="end">0.88</text>
+              <text x="30" y="53.5" text-anchor="end">0.86</text>
+              <text x="30" y="90" text-anchor="end">0.84</text>
+              <text x="30" y="126.5" text-anchor="end">0.82</text>
+              <text x="30" y="163" text-anchor="end">0.80</text>
+            </g>
+            <line x1="36" y1="160" x2="320" y2="160" stroke="#1C2B25" stroke-width="1"/>
+            <polyline fill="none" stroke="#1C2B25" stroke-width="1.5" stroke-linejoin="round"
+              points="44,76.1 67.3,66.9 90.5,70.6 113.8,59.6 137.1,63.3 160.4,68.8 183.6,56 206.9,65.1 230.2,72.4 253.5,66.9 276.7,63.3"/>
+            <polyline fill="none" stroke="#7A1F2B" stroke-width="1.5" points="276.7,63.3 300,138.1"/>
+            <g fill="#1C2B25">
+              <circle cx="44" cy="76.1" r="2.2"/><circle cx="67.3" cy="66.9" r="2.2"/><circle cx="90.5" cy="70.6" r="2.2"/>
+              <circle cx="113.8" cy="59.6" r="2.2"/><circle cx="137.1" cy="63.3" r="2.2"/><circle cx="160.4" cy="68.8" r="2.2"/>
+              <circle cx="183.6" cy="56" r="2.2"/><circle cx="206.9" cy="65.1" r="2.2"/><circle cx="230.2" cy="72.4" r="2.2"/>
+              <circle cx="253.5" cy="66.9" r="2.2"/><circle cx="276.7" cy="63.3" r="2.2"/>
+            </g>
+            <circle cx="300" cy="138.1" r="3.6" fill="#7A1F2B"/>
+            <text class="end" x="292" y="154" text-anchor="end">0.812</text>
+            <text x="44" y="174" text-anchor="middle">12 runs ago</text>
+            <text x="300" y="174" text-anchor="middle">r-2291</text>
+          </svg>
+          <figcaption><span class="label">Figure 1</span> The last 12 runs, oldest first. Eleven sit inside the band; the newest falls out.</figcaption>
+        </figure>
+
+        <table class="tbl">
+          <caption>Table 1 <span>Where the score went</span></caption>
+          <thead><tr><th scope="col">Metric</th><th scope="col">Score</th><th scope="col">Baseline</th><th scope="col">Δ</th></tr></thead>
+          <tbody>
+            <tr><td>ROUGE-L</td><td>0.412</td><td>0.447</td><td class="neg">−0.035</td></tr>
+            <tr><td>Faithfulness</td><td>0.861</td><td>0.902</td><td class="neg">−0.041</td></tr>
+            <tr><td>Coverage</td><td>0.790</td><td>0.801</td><td>−0.011</td></tr>
+            <tr><td>Length ratio</td><td>1.18</td><td>1.02</td><td>+0.16</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div class="commentary">
+          <p>The scheduled run scored all 2,000 samples by 02:13:55. Faithfulness came in at 0.861 against the baseline's 0.902, the same 0.041 the overall score lost.</p>
+          <p>The log also warns that 38% of summaries ran past 1.15 times the target length. Longer summaries that stray from the source point at the model, not the harness. One run is not a trend; a rerun would settle it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page right" aria-label="Contents: all runs">
+    <header class="runhead">
+      <label class="search"><span class="sr" hidden>Search</span>
+        <input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets">
+        <kbd>/</kbd>
+      </label>
+      <span class="ws">Workspace <b>atlas-research</b></span>
+    </header>
+
+    <h2>Contents</h2>
+    <p class="tally">Eight runs overnight, 23:00 to 02:14. Five passed, one failed, one is running and one is queued.</p>
+
+    <ol class="toc">
+      <li class="entry sel">
+        <span class="rid">r-2291</span>
+        <div class="ttl"><a href="#" aria-current="true">summarize-v3 <i>on</i> news-digest-2k</a><span class="lead"></span></div>
+        <span class="score neg">0.812</span>
+        <p class="meta">Passed in 14m 02s. Scheduled, 02:00.</p>
+        <span class="delta neg">−0.041<sup class="ref">1</sup></span>
+        <p class="note"><sup>1</sup>Δ is score minus baseline. Within ±0.02 is noise; r-2291 is 0.021 beyond it.</p>
+      </li>
+      <li class="entry">
+        <span class="rid">r-2290</span>
+        <div class="ttl"><a href="#">summarize-v3 <i>on</i> multilingual-legal-contracts-longform-eval-2026-q3</a><span class="lead"></span></div>
+        <span class="score">0.774</span>
+        <p class="meta">Passed in 41m 55s. M. Okafor, 01:12.</p>
+        <span class="delta">+0.006</span>
+      </li>
+      <li class="entry">
+        <span class="rid">r-2289</span>
+        <div class="ttl"><a href="#">router-small <i>on</i> intent-routing-v7</a><span class="lead"></span></div>
+        <span class="score">0.931</span>
+        <p class="meta">Passed in 3m 48s. Scheduled, 01:00.</p>
+        <span class="delta">+0.012</span>
+      </li>
+      <li class="entry">
+        <span class="rid">r-2288</span>
+        <div class="ttl"><a href="#">router-small <i>on</i> adversarial-prompts</a><span class="lead"></span></div>
+        <span class="score">—<sup class="ref">2</sup></span>
+        <p class="meta">Running, 62% done, 9m 10s so far. CI #4812, 00:51.</p>
+        <span class="delta">—</span>
+        <div class="prog" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="r-2288 progress"></div>
+        <p class="note"><sup>2</sup>A dash means not computed yet; 0.000 is a real zero.</p>
+      </li>
+      <li class="entry">
+        <span class="rid">r-2287</span>
+        <div class="ttl"><a href="#">extract-json <i>on</i> invoices-ocr</a><span class="lead"></span></div>
+        <span class="score neg">0.000</span>
+        <p class="meta"><b class="neg">Failed</b> after 0m 41s. CI #4809, 00:40.</p>
+        <span class="delta">−0.884</span>
+        <p class="err">KeyError: 'line_items' — 212 of 212 samples failed schema validation</p>
+        <p class="note"><sup>3</sup>Failed, not regressed: no sample passed the schema. Fix the extractor output, then rerun.</p>
+      </li>
+      <li class="entry">
+        <span class="rid">r-2286</span>
+        <div class="ttl"><a href="#">extract-json <i>on</i> receipts-small</a><span class="lead"></span></div>
+        <span class="score">0.902</span>
+        <p class="meta">Passed in 2m 15s. L. Brandt, 23:58.</p>
+        <span class="delta">+0.000</span>
+      </li>
+      <li class="entry">
+        <span class="rid">r-2285</span>
+        <div class="ttl"><a href="#">chat-core-8b <i>on</i> helpfulness-pairwise</a><span class="lead"></span></div>
+        <span class="score">0.668</span>
+        <p class="meta">Passed in 1h 06m. Scheduled, 23:00.</p>
+        <span class="delta">+0.021</span>
+      </li>
+      <li class="entry">
+        <span class="rid">r-2284</span>
+        <div class="ttl"><a href="#">chat-core-8b <i>on</i> safety-refusals</a><span class="lead"></span></div>
+        <span class="score">—</span>
+        <p class="meta">Queued, not started yet. Scheduled.</p>
+        <span class="delta">—</span>
+      </li>
+    </ol>
+
+    <section class="log" aria-label="Log tail for r-2291">
+      <h3>The last five lines of the r-2291 log</h3>
+<pre>02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+<span class="w">02:13:55  warn  length_ratio above 1.15 on 38% of samples</span>
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</pre>
+      <p class="note"><i>Pinned comparisons:</i> none yet. Compare r-2291 with its baseline to pin the first one here.</p>
+    </section>
+  </section>
+
+</div>
+</body>
+</html>

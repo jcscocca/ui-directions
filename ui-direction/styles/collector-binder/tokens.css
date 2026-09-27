@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Red+Hat+Text:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Red+Hat+Mono:wght@400;500&display=swap");
+
+:root {
+  --font-card: "Zilla Slab", Rockwell, "Roboto Slab", Georgia, serif;
+  --font-ui: "Red Hat Text", "Segoe UI", sans-serif;
+  --font-code: "Red Hat Mono", Consolas, monospace;
+
+  /* the binder */
+  --vinyl: #1F4E5A;        /* binder cover, the whole viewport */
+  --vinyl-deep: #163C45;   /* spine, punched holes, pressed tab */
+  --vinyl-ink: #D8E4E6;    /* text printed on vinyl */
+  --ring: #A9B4B7;         /* metal rings */
+  --ring-dark: #74828A;
+
+  /* the page and its sleeves */
+  --page: #DFE8EA;         /* pocket page seen through clear vinyl */
+  --pocket: #E8EEF0;       /* inside a pocket, behind the card */
+  --seam: #B9C9CE;         /* heat-welded pocket seams */
+  --sleeve-edge: #C9D6DA;
+  --print: #677D83;        /* slot numbers printed on the page */
+
+  /* the card */
+  --card: #FBFAF5;         /* card stock: only cards use it */
+  --card-edge: #D9D4C3;
+  --ink: #1B2428;
+  --ink-2: #4A585D;        /* secondary text, still AA on card and page */
+  --gold: #B8892B;         /* set symbols and the rare mark */
+  --red: #B23A2C;          /* failed, regression. Nothing decorative is red */
+
+  /* type tints behind creature art (pale, never text colours) */
+  --t-tide: #D7E7EE;
+  --t-moss: #DFE8D3;
+  --t-ember: #F2E1CF;
+  --t-gale: #E7E7F0;
+  --t-stone: #E6DFD3;
+
+  /* foil: mythic only. A physical material, so the one multi-stop gradient */
+  --foil: linear-gradient(118deg, #BBA6EA 0%, #95D8CE 22%, #EFD57A 42%, #EBA7C3 62%, #A7C3F0 82%, #BBA6EA 100%);
+
+  --r-card: 7px;
+  --r-pocket: 3px;
+  --r-page: 4px;
+
+  --t-10: 10.5px;
+  --t-12: 12px;
+  --t-13: 13px;
+  --t-15: 15px;
+  --t-18: 18px;
+  --t-24: 24px;
+  --t-34: 34px;
+  --t-56: 56px;
+
+  --lift: 0 2px 3px rgba(12, 32, 38, .25), 0 18px 34px rgba(12, 32, 38, .38); /* only a card out of its sleeve */
+}

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evals: runs, atlas-research</title>
+<link rel="stylesheet" href="tokens.css">
+</head>
+<body>
+
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td valign="middle"><h1>Evals</h1></td>
+<td valign="middle" align="right">
+<form action="#" onsubmit="return false">
+<label for="q">Search:</label>
+<input id="q" type="search" size="36" accesskey="/" placeholder="Search runs, models, datasets">
+<input type="submit" value="Search">
+<small>or press <kbd>/</kbd></small>
+</form>
+</td>
+</tr>
+</table>
+
+<p>Workspace <b>atlas-research</b> [<a href="#">switch</a>]. Last event 02:14:02, Thu 24 Sep.<br>
+<b>Runs</b> | <a href="#">Datasets</a> <small>(count loading&hellip;)</small> | <a href="#">Models</a> | <a href="#">Baselines</a> | <a href="#">Settings</a></p>
+
+<hr>
+
+<p><b>Last night: 8 runs.</b> 5 passed, 1 failed, 1 running, 1 queued.
+<b class="bad">One regression:</b> <a href="#r-2291">r-2291</a>, summarize-v3 on news-digest-2k, scored 0.812, which is 0.041 below its baseline and outside the &plusmn;0.020 noise band.
+<a href="#r-2287">r-2287</a> failed on a schema error; that is a failure, not a regression.</p>
+
+<table border="1" cellpadding="3" cellspacing="0" width="100%">
+<tr>
+<th align="left">Run</th>
+<th align="left">Model</th>
+<th align="left">Dataset</th>
+<th align="right">Score</th>
+<th align="right">&Delta; vs baseline</th>
+<th align="left">Status</th>
+<th align="right">Duration</th>
+<th align="left">Triggered by</th>
+<th align="right">Started</th>
+</tr>
+<tr>
+<td><b>r-2291</b> <small>(below)</small></td>
+<td><b>summarize-v3</b></td>
+<td><b>news-digest-2k</b></td>
+<td align="right"><b>0.812</b></td>
+<td align="right"><b class="bad">&minus;0.041</b></td>
+<td><b>Passed</b>, <b class="bad">regressed</b></td>
+<td align="right"><b>14m 02s</b></td>
+<td><b>schedule</b></td>
+<td align="right"><b>02:00</b></td>
+</tr>
+<tr>
+<td><a href="#">r-2290</a></td>
+<td>summarize-v3</td>
+<td>multilingual-legal-contracts-longform-eval-2026-q3</td>
+<td align="right">0.774</td>
+<td align="right">+0.006</td>
+<td>Passed</td>
+<td align="right">41m 55s</td>
+<td>M. Okafor</td>
+<td align="right">01:12</td>
+</tr>
+<tr>
+<td><a href="#">r-2289</a></td>
+<td>router-small</td>
+<td>intent-routing-v7</td>
+<td align="right">0.931</td>
+<td align="right">+0.012</td>
+<td>Passed</td>
+<td align="right">3m 48s</td>
+<td>schedule</td>
+<td align="right">01:00</td>
+</tr>
+<tr>
+<td><a href="#">r-2288</a></td>
+<td>router-small</td>
+<td>adversarial-prompts</td>
+<td align="right">&mdash;</td>
+<td align="right">&mdash;</td>
+<td>Running, 62% <progress value="62" max="100">62%</progress></td>
+<td align="right">9m 10s so far</td>
+<td>CI #4812</td>
+<td align="right">00:51</td>
+</tr>
+<tr>
+<td><a href="#" id="r-2287">r-2287</a></td>
+<td>extract-json</td>
+<td>invoices-ocr</td>
+<td align="right">0.000</td>
+<td align="right">&minus;0.884</td>
+<td><b class="bad">Failed</b></td>
+<td align="right">0m 41s</td>
+<td>CI #4809</td>
+<td align="right">00:40</td>
+</tr>
+<tr>
+<td></td>
+<td colspan="8"><code class="bad">KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation</code><br>
+The extractor's output no longer matches the invoice schema. Fix the schema or the prompt, then <a href="#">rerun r-2287</a>.</td>
+</tr>
+<tr>
+<td><a href="#">r-2286</a></td>
+<td>extract-json</td>
+<td>receipts-small</td>
+<td align="right">0.902</td>
+<td align="right">+0.000</td>
+<td>Passed</td>
+<td align="right">2m 15s</td>
+<td>L. Brandt</td>
+<td align="right">23:58</td>
+</tr>
+<tr>
+<td><a href="#">r-2285</a></td>
+<td>chat-core-8b</td>
+<td>helpfulness-pairwise</td>
+<td align="right">0.668</td>
+<td align="right">+0.021</td>
+<td>Passed</td>
+<td align="right">1h 06m</td>
+<td>schedule</td>
+<td align="right">23:00</td>
+</tr>
+<tr>
+<td><a href="#">r-2284</a></td>
+<td>chat-core-8b</td>
+<td>safety-refusals</td>
+<td align="right">&mdash;</td>
+<td align="right">&mdash;</td>
+<td>Queued</td>
+<td align="right">&mdash;</td>
+<td>schedule</td>
+<td align="right">&mdash;</td>
+</tr>
+</table>
+
+<p id="n1"><b>&mdash;</b> means not computed: the run is queued or still running. <b>0.000</b> is a computed score of zero, as in r-2287.
+&Delta; is score minus the model's baseline; anything within &plusmn;0.020 is noise. Red marks only a regression or a failure.</p>
+
+<hr>
+
+<h2 id="r-2291">r-2291: summarize-v3 on news-digest-2k</h2>
+
+<form action="#" onsubmit="return false">
+<p>Baseline: summarize-v2 @ <a href="#">r-2203</a> (0.853). Passed in 14m 02s, triggered by schedule at 02:00.<br>
+<input type="submit" value="Rerun">
+<input type="submit" value="Compare with baseline">
+<button type="button" disabled>Cancel</button>
+<small>Cancel is disabled: r-2291 finished at 02:14:02.</small></p>
+</form>
+
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr><th align="left">Metrics</th><th align="left">Score, last 12 runs</th><th align="left">Log tail</th></tr>
+<tr>
+<td valign="top" width="27%">
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th align="left">Metric</th><th align="right">Score</th><th align="right">Baseline</th><th align="right">&Delta;</th></tr>
+<tr><td>ROUGE-L</td><td align="right">0.412</td><td align="right">0.447</td><td align="right">&minus;0.035</td></tr>
+<tr><td>Faithfulness</td><td align="right">0.861</td><td align="right">0.902</td><td align="right"><b class="bad">&minus;0.041</b></td></tr>
+<tr><td>Coverage</td><td align="right">0.790</td><td align="right">0.801</td><td align="right">&minus;0.011</td></tr>
+<tr><td>Length ratio</td><td align="right">1.18</td><td align="right">1.02</td><td align="right">+0.16</td></tr>
+</table>
+</td>
+<td valign="top" width="36%">
+<svg width="420" height="192" viewBox="0 0 460 210" role="img" aria-labelledby="chart-cap">
+<g fill="none" stroke="#000">
+<polyline points="48,12 48,182 452,182" stroke-width="1"/>
+<line x1="48" y1="114" x2="452" y2="114" stroke-dasharray="4 3"/>
+<line x1="48" y1="34" x2="452" y2="34" stroke-dasharray="4 3"/>
+<line x1="44" y1="140" x2="48" y2="140"/><line x1="44" y1="100" x2="48" y2="100"/><line x1="44" y1="60" x2="48" y2="60"/><line x1="44" y1="20" x2="48" y2="20"/><line x1="44" y1="180" x2="48" y2="180"/>
+<polyline points="56,88 91,78 126,82 161,70 196,74 231,80 266,66 301,76 336,84 371,78 406,74 441,156" stroke-width="1"/>
+</g>
+<g fill="#000">
+<circle cx="56" cy="88" r="2.5"/><circle cx="91" cy="78" r="2.5"/><circle cx="126" cy="82" r="2.5"/><circle cx="161" cy="70" r="2.5"/><circle cx="196" cy="74" r="2.5"/><circle cx="231" cy="80" r="2.5"/><circle cx="266" cy="66" r="2.5"/><circle cx="301" cy="76" r="2.5"/><circle cx="336" cy="84" r="2.5"/><circle cx="371" cy="78" r="2.5"/><circle cx="406" cy="74" r="2.5"/>
+</g>
+<circle cx="441" cy="156" r="3.5" fill="#CC0000"/>
+<g font-size="12" fill="#000">
+<text x="40" y="184" text-anchor="end">0.800</text>
+<text x="40" y="144" text-anchor="end">0.820</text>
+<text x="40" y="104" text-anchor="end">0.840</text>
+<text x="40" y="64" text-anchor="end">0.860</text>
+<text x="40" y="24" text-anchor="end">0.880</text>
+<text x="54" y="30">band 0.873</text>
+<text x="54" y="128">band 0.833</text>
+<text x="56" y="200">12 runs ago</text>
+<text x="441" y="200" text-anchor="end">r-2291</text>
+<text x="430" y="160" text-anchor="end" fill="#CC0000">0.812</text>
+</g>
+</svg>
+<br><small id="chart-cap">Dashed lines: noise band 0.833&ndash;0.873 around the baseline 0.853. The last point is r-2291, 0.021 below the band.</small>
+</td>
+<td valign="top">
+<pre>02:13:48  eval  1996/2000 samples scored
+02:13:55  eval  2000/2000 samples scored
+02:13:55  warn  length_ratio above 1.15 on 38% of samples
+02:14:01  agg   faithfulness=0.861 (baseline 0.902)
+02:14:02  done  run r-2291 finished in 14m 02s</pre>
+<p><a href="#">Full log</a></p>
+<p><b>Pinned comparisons:</b> <i>none yet.</i><br>Compare with baseline, then pin the result to keep it here.</p>
+</td>
+</tr>
+</table>
+
+<hr>
+<address>Evals for atlas-research. Data as of 02:14:02. <a href="#">Top</a></address>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How many pages did you read today? - Shelf</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  html { background: var(--white); }
+  body {
+    margin: 0; color: var(--text); background: var(--white);
+    font-family: var(--font-body); font-size: var(--t-body); line-height: 1.32;
+    font-variant-numeric: tabular-nums;
+  }
+  h1, h2, p, ol, ul, dl, dd { margin: 0; }
+  .vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  a { color: var(--link); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
+  a:hover { color: var(--link-hover); text-decoration-thickness: 3px; }
+  a:focus-visible {
+    outline: 3px solid transparent; color: var(--text); background: var(--focus);
+    box-shadow: 0 -2px var(--focus), 0 4px var(--text); text-decoration: none;
+  }
+
+  .header { background: var(--text); color: var(--white); border-bottom: 8px solid var(--link); }
+  .header div { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 15px 10px; }
+  .header a { color: var(--white); font-weight: 700; font-size: 26px; line-height: 1; text-decoration: none; }
+  .header a:focus-visible { color: var(--text); }
+  .header time { font-size: 16px; }
+
+  .nav { border-bottom: 1px solid var(--border); background: #F4F8FB; }
+  .nav ul { list-style: none; padding: 0 15px; display: flex; gap: 20px; }
+  .nav li { padding: 11px 0 8px; border-bottom: 4px solid transparent; font-size: 16px; }
+  .nav li[aria-current] { border-bottom-color: var(--link); font-weight: 700; }
+  .nav li[aria-current] a { color: var(--text); text-decoration: none; }
+
+  main { padding: 20px 15px 40px; }
+  h1 { font-size: var(--t-h1-mobile); line-height: 1.1; margin-bottom: 12px; }
+  h1 label { cursor: default; }
+  .hint { color: var(--secondary); margin-bottom: 15px; }
+  .input-row { display: flex; align-items: stretch; margin-bottom: 25px; }
+  input {
+    font: inherit; font-size: 19px; width: 5.5em; height: 44px; padding: 5px 8px; border: var(--input-border) solid var(--input);
+    border-radius: 0; color: var(--text);
+  }
+  input:focus { outline: 3px solid var(--focus); outline-offset: 0; box-shadow: inset 0 0 0 2px var(--text); }
+  .suffix { display: flex; align-items: center; padding: 0 10px; background: var(--panel); border: var(--input-border) solid var(--input); border-left: 0; font-size: 19px; }
+  .button {
+    font: inherit; font-size: 19px; width: 100%; padding: 10px 12px 9px; border: 2px solid transparent; border-radius: 0;
+    color: var(--white); background: var(--button); box-shadow: 0 2px 0 var(--button-shadow); cursor: pointer; margin-bottom: 30px;
+  }
+  .button:hover { background: var(--button-hover); }
+  .button:active { transform: translateY(2px); box-shadow: none; }
+  .button:focus-visible { outline: 3px solid transparent; border-color: var(--focus); color: var(--text); background: var(--focus); box-shadow: inset 0 0 0 1px var(--focus), 0 2px 0 var(--text); }
+
+  h2 { font-size: 24px; line-height: 1.2; margin-bottom: 12px; }
+  section + section { margin-top: 30px; }
+
+  .summary { font-size: 16px; }
+  .summary div { padding: 9px 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 42% 1fr; gap: 10px; }
+  .summary div:first-child { border-top: 1px solid var(--border); }
+  .summary dt { font-weight: 700; }
+  .tag { display: inline-block; margin-top: 4px; font-size: 16px; font-weight: 700; padding: 2px 8px 3px; background: #FFF7BF; color: #594D00; }
+
+  .inset { border-left: 10px solid var(--border); padding: 12px 0 12px 15px; display: grid; grid-template-columns: 62px 1fr; gap: 14px; align-items: start; }
+  .cover {
+    width: 62px; height: 94px; background: var(--text); color: var(--white); padding: 6px 5px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .cover b { font-size: 10.5px; line-height: 1.1; }
+  .cover span { font-size: 8.5px; line-height: 1.1; border-top: 1px solid var(--white); padding-top: 3px; }
+  .inset p + p { margin-top: 8px; }
+  .inset .title { font-weight: 700; overflow-wrap: anywhere; }
+  .progress { font-size: 16px; }
+
+  ol.numbered { padding-left: 22px; }
+  ol.numbered li { margin-bottom: 12px; padding-left: 4px; }
+  ol.numbered a { overflow-wrap: anywhere; }
+  ol.numbered .meta { display: block; font-size: 16px; color: var(--secondary); }
+
+  .quote { font-size: 19px; }
+  .quote-src { font-size: 16px; color: var(--secondary); margin-top: 8px; }
+</style>
+</head>
+<body>
+<header class="header">
+  <div><a href="#">Shelf</a><time datetime="2026-09-24">Thu 24 Sep</time></div>
+</header>
+<nav class="nav" aria-label="Sections">
+  <ul>
+    <li aria-current="page"><a href="#">Today</a></li>
+    <li><a href="#">Library</a></li>
+    <li><a href="#">Highlights</a></li>
+    <li><a href="#">Stats</a></li>
+  </ul>
+</nav>
+
+<main>
+  <form onsubmit="return false">
+    <h1><label for="pages">How many pages did you read today?</label></h1>
+    <p class="hint" id="pages-hint">Your goal is 20. You've logged 8.</p>
+    <div class="input-row">
+      <input id="pages" name="pages" type="text" inputmode="numeric" spellcheck="false" aria-describedby="pages-hint">
+      <span class="suffix" aria-hidden="true">pages</span>
+    </div>
+    <button class="button" type="submit">Log pages</button>
+  </form>
+
+  <section aria-labelledby="book-h">
+    <h2 id="book-h">Currently reading</h2>
+    <div class="inset">
+      <div class="cover" aria-hidden="true"><b>The Left Hand of Darkness</b><span>Ursula K. Le Guin</span></div>
+      <div>
+        <p><span class="title">The Left Hand of Darkness</span> by Ursula K. Le Guin</p>
+        <p class="progress">Page 184 of 304 (61%). Last read yesterday.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="today-h">
+    <h2 id="today-h">Today</h2>
+    <dl class="summary">
+      <div><dt>Goal</dt><dd>8 of 20 pages read<br><strong class="tag">Not met yet: 12 to go</strong></dd></div>
+      <div><dt>Reading streak</dt><dd>11 days</dd></div>
+    </dl>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <h2 id="next-h">Up next</h2>
+    <ol class="numbered">
+      <li><a href="#">Piranesi</a><span class="meta">Susanna Clarke, 272 pages</span></li>
+      <li><a href="#">The Remains of the Day</a><span class="meta">Kazuo Ishiguro, 245 pages</span></li>
+      <li><a href="#">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</a><span class="meta">J. Placeholder-Smythe, 1,104 pages</span></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="hl-h">
+    <h2 id="hl-h">Saved highlight</h2>
+    <p class="quote">&ldquo;Light is the left hand of darkness and darkness the right hand of light.&rdquo;</p>
+    <p class="quote-src">Page 222, The Left Hand of Darkness</p>
+  </section>
+</main>
+</body>
+</html>

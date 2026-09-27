@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evals: runs, game menu</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; width: 1440px; height: 900px; overflow: hidden;
+    background: var(--void); color: var(--text);
+    font-size: var(--t-body); line-height: var(--line);
+  }
+  .screen {
+    position: relative; height: 100%;
+    padding: 30px 16px 16px;
+    display: grid; gap: 28px 16px;
+    grid-template-columns: 940px 1fr;
+    grid-template-rows: minmax(0, 1fr) 180px;
+  }
+  .win { position: relative; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+  .lbl { color: var(--label); }
+  .num { text-align: right; }
+  svg.px { image-rendering: pixelated; shape-rendering: crispEdges; }
+
+  /* ---------- party ---------- */
+  .party { padding: 24px 20px 12px; display: flex; flex-direction: column; min-height: 0; }
+  .search {
+    position: absolute; top: -20px; right: 20px; display: flex; align-items: center; gap: 8px;
+    background: var(--window-deep); border: 3px solid var(--frame); border-radius: 8px;
+    padding: 2px 5px 2px 10px; width: 380px;
+  }
+  .search input { flex: 1; font: inherit; color: var(--text); background: none; border: 0; outline: none; padding: 2px 0; }
+  .search input::placeholder { color: var(--label); }
+  .search:focus-within { border-color: var(--gold); }
+  .key { border: 2px solid var(--frame); border-radius: 4px; padding: 0 7px; line-height: 20px; color: var(--gold); }
+
+  .runs-grid, .run-line { display: grid; grid-template-columns: 32px 60px minmax(0, 1fr) 50px 108px 58px 98px; column-gap: 10px; align-items: center; }
+  .cols { padding-left: 184px; margin-bottom: 4px; }
+  .cols span { color: var(--label); }
+  .member { display: grid; grid-template-columns: 172px 1fr; column-gap: 12px; padding: 4px 0; border-top: 2px solid var(--window-deep); }
+  .member:first-of-type { border-top: 0; }
+  .who { display: grid; grid-template-columns: 56px 1fr; grid-template-rows: auto auto; column-gap: 8px; align-content: start; }
+  .portrait {
+    width: 56px; height: 56px; grid-row: span 2;
+    background: var(--window-deep); border: 2px solid var(--frame); border-radius: 6px;
+    display: grid; place-items: center;
+  }
+  .portrait svg { width: 40px; height: 40px; }
+  .who b { font-weight: 400; overflow-wrap: anywhere; line-height: 20px; align-self: end; }
+  .who small { font-size: 16px; color: var(--label); }
+  .runs { list-style: none; margin: 0; padding: 0; }
+  .run { padding: 2px 0 3px; border-radius: 6px; }
+  .run.sel { background: var(--select); box-shadow: 0 0 0 2px var(--frame-inner); }
+  .run .id { color: var(--text); }
+  .run.sel .id { color: var(--gold); }
+  .meta { grid-column: 3 / -1; color: var(--label); white-space: nowrap; }
+  .meta b { font-weight: 400; color: var(--text); margin: 0 18px 0 6px; }
+  .d-bad { color: var(--bad-text); }
+  .d-ok { color: var(--text); }
+  .st-ok { color: var(--ok); }
+  .st-run { color: var(--charge); }
+  .st-wait { color: var(--label); }
+  .ko {
+    display: inline-block; background: var(--bad); color: var(--frame); padding: 0 6px; border-radius: 3px; margin-right: 6px; line-height: 20px;
+  }
+  .err { grid-column: 3 / -1; color: var(--bad-text); }
+  .gauge.empty { border-style: dashed; border-color: var(--label); }
+  .legend { margin: auto 0 0; padding-top: 4px; border-top: 2px solid var(--window-deep); color: var(--label); display: grid; grid-template-columns: 64px 1fr; column-gap: 12px; row-gap: 0; }
+  .legend b, .legend .lbl-t { font-weight: 400; color: var(--text); }
+
+  /* ---------- right column ---------- */
+  .right { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 28px; min-height: 0; }
+  .top { display: grid; grid-template-columns: 208px 1fr; gap: 16px; }
+  .cmd { padding: 16px 12px 10px 8px; }
+  .cmd ul { list-style: none; margin: 0; padding: 0; }
+  .cmd li { display: flex; align-items: center; height: 28px; }
+  .cmd li .cursor { visibility: hidden; margin-right: 4px; }
+  .cmd li.cur .cursor { visibility: visible; }
+  .cmd li.cur a { color: var(--gold); }
+  .cmd a { color: var(--text); text-decoration: none; flex: 1; display: flex; justify-content: space-between; }
+  .cmd a:hover { color: var(--gold); }
+  .cmd .loading { color: var(--label); }
+  .cmd .loading i { font-style: normal; animation: dots 1.2s steps(4) infinite; display: inline-block; width: 3ch; overflow: hidden; vertical-align: bottom; }
+  @keyframes dots { from { width: 0; } to { width: 4ch; } }
+
+  .purse { padding: 16px 16px 10px; line-height: 28px; }
+  .purse dl { margin: 0; display: grid; grid-template-columns: 1fr auto; column-gap: 12px; }
+  .purse dt { color: var(--label); }
+  .purse dd { margin: 0; text-align: right; }
+  .purse .total dt, .purse .total dd { color: var(--gold); }
+  .purse .total { display: contents; }
+  .purse .fail { color: var(--bad-text); }
+
+  .status { padding: 20px 20px 14px; min-height: 0; }
+  .hit-note { line-height: 22px; }
+  .s-head { display: grid; grid-template-columns: 64px 1fr; column-gap: 12px; }
+  .s-head .portrait { width: 64px; height: 64px; }
+  .s-head .portrait svg { width: 48px; height: 48px; }
+  .nw { white-space: nowrap; }
+  .s-head h2 { font-size: var(--t-head); font-weight: 400; line-height: 28px; margin: 0; }
+  .s-head p { margin: 2px 0 0; color: var(--label); }
+  .s-head p b { color: var(--text); font-weight: 400; }
+  .hit { display: flex; align-items: flex-end; gap: 14px; margin: 8px 0 2px; }
+  .hit .score { font-size: var(--t-huge); line-height: 56px; }
+  .hit .dmg { font-size: var(--t-big); line-height: 36px; color: var(--bad-text); position: relative; top: -18px; }
+  .hit .why { color: var(--text); line-height: 22px; margin-bottom: 2px; }
+  .stats { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .stats th { font-weight: 400; color: var(--label); text-align: left; padding: 0 0 2px; }
+  .stats th.num { text-align: right; }
+  .stats td { padding: 1px 0; }
+  .stats td.g { width: 118px; padding: 0 12px; }
+  .stats .warn { color: var(--charge); }
+
+  .actions {
+    position: absolute; left: -40px; bottom: -22px; width: 384px; padding: 10px 14px 8px 6px;
+  }
+  .actions ul { list-style: none; margin: 0; padding: 0; }
+  .actions li { display: flex; align-items: center; min-height: 28px; }
+  .actions li .cursor { visibility: hidden; margin-right: 4px; }
+  .actions li.cur .cursor { visibility: visible; }
+  .actions button:hover:not(:disabled) { color: var(--gold); }
+  .actions button:disabled { color: var(--disabled); cursor: not-allowed; text-decoration: line-through; text-decoration-thickness: 2px; }
+  .actions .reason { color: var(--label); margin-left: 16px; }
+
+  /* ---------- dialogue ---------- */
+  .dialog { padding: 18px 28px 8px; }
+  .dialog p { margin: 0 0 6px; }
+  .dialog pre { font: inherit; margin: 0; white-space: pre; color: var(--text); }
+  .dialog pre .k { color: var(--label); }
+  .dialog pre .w { color: var(--charge); }
+  .next { position: absolute; right: 20px; bottom: 12px; width: 16px; height: 10px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .next { animation: bob 1s steps(2) infinite; }
+    @keyframes bob { 50% { transform: translateY(4px); } }
+  }
+
+  /* ---------- chart ---------- */
+  .chart { padding: 18px 16px 8px; }
+  .chart .cap { color: var(--label); display: flex; justify-content: space-between; }
+  .chart svg { display: block; margin-top: 4px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="px-hand" viewBox="0 0 16 10"><path fill="#080C26" d="M2 0h5v1h-5zM1 1h1v1h-1zM7 1h8v1h-8zM0 2h1v1h-1zM15 2h1v1h-1zM0 3h1v1h-1zM9 3h6v1h-6zM0 4h1v1h-1zM10 4h1v1h-1zM0 5h1v1h-1zM9 5h2v1h-2zM0 6h1v1h-1zM10 6h1v1h-1zM0 7h1v1h-1zM9 7h1v1h-1zM1 8h1v1h-1zM9 8h1v1h-1zM2 9h7v1h-7z"/><path fill="#EDEFF7" d="M2 1h5v1h-5zM2 2h13v1h-13zM2 3h6v1h-6zM2 4h8v1h-8zM2 5h6v1h-6zM2 6h8v1h-8zM2 7h6v1h-6zM3 8h6v1h-6z"/><path fill="#B9C3E8" d="M1 2h1v1h-1zM1 3h1v1h-1zM1 4h1v1h-1zM1 5h1v1h-1zM1 6h1v1h-1zM1 7h1v1h-1zM2 8h1v1h-1z"/><path fill="#8FA3EE" d="M8 3h1v1h-1zM8 5h1v1h-1zM8 7h1v1h-1z"/></symbol><symbol id="px-scroll" viewBox="0 0 16 16"><path fill="#080C26" d="M2 1h12v1h-12zM1 2h1v1h-1zM14 2h1v1h-1zM1 3h1v1h-1zM4 3h1v1h-1zM14 3h1v1h-1zM2 4h2v1h-2zM13 4h1v1h-1zM3 5h1v1h-1zM13 5h1v1h-1zM3 6h1v1h-1zM13 6h1v1h-1zM3 7h1v1h-1zM13 7h1v1h-1zM3 8h1v1h-1zM13 8h1v1h-1zM3 9h1v1h-1zM13 9h1v1h-1zM3 10h1v1h-1zM13 10h1v1h-1zM3 11h1v1h-1zM13 11h2v1h-2zM2 12h11v1h-11zM15 12h1v1h-1zM1 13h1v1h-1zM15 13h1v1h-1zM2 14h13v1h-13z"/><path fill="#F4C542" d="M2 2h2v1h-2zM2 3h2v1h-2zM13 12h2v1h-2zM2 13h2v1h-2zM13 13h2v1h-2z"/><path fill="#EDEFF7" d="M4 2h10v1h-10zM5 3h9v1h-9zM4 4h1v1h-1zM12 4h1v1h-1zM4 5h9v1h-9zM4 6h1v1h-1zM11 6h2v1h-2zM4 7h9v1h-9zM4 8h1v1h-1zM12 8h1v1h-1zM4 9h9v1h-9zM4 10h1v1h-1zM10 10h3v1h-3zM4 11h9v1h-9zM4 13h9v1h-9z"/><path fill="#8FA3EE" d="M5 4h7v1h-7zM5 6h6v1h-6zM5 8h7v1h-7zM5 10h5v1h-5z"/></symbol><symbol id="px-sign" viewBox="0 0 16 16"><path fill="#080C26" d="M7 0h2v1h-2zM2 1h12v1h-12zM2 2h1v1h-1zM14 2h1v1h-1zM2 3h1v1h-1zM15 3h1v1h-1zM2 4h1v1h-1zM14 4h1v1h-1zM2 5h12v1h-12zM7 6h1v1h-1zM9 6h1v1h-1zM2 7h12v1h-12zM1 8h1v1h-1zM13 8h1v1h-1zM0 9h1v1h-1zM13 9h1v1h-1zM1 10h1v1h-1zM13 10h1v1h-1zM2 11h12v1h-12zM7 12h1v1h-1zM9 12h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM6 14h5v1h-5z"/><path fill="#EDEFF7" d="M3 2h10v1h-10zM3 3h1v1h-1zM11 3h3v1h-3zM3 4h10v1h-10zM3 8h10v1h-10zM2 9h3v1h-3zM12 9h1v1h-1zM3 10h10v1h-10z"/><path fill="#F4C542" d="M13 2h1v1h-1zM14 3h1v1h-1zM13 4h1v1h-1zM8 6h1v1h-1zM2 8h1v1h-1zM1 9h1v1h-1zM2 10h1v1h-1zM8 12h1v1h-1zM8 13h1v1h-1z"/><path fill="#8FA3EE" d="M4 3h7v1h-7zM5 9h7v1h-7z"/></symbol><symbol id="px-braces" viewBox="0 0 16 16"><path fill="#080C26" d="M3 1h3v1h-3zM10 1h3v1h-3zM2 2h1v1h-1zM5 2h1v1h-1zM10 2h1v1h-1zM13 2h1v1h-1zM2 3h1v1h-1zM4 3h1v1h-1zM11 3h1v1h-1zM13 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM11 5h1v1h-1zM13 5h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM6 6h3v1h-3zM12 6h1v1h-1zM14 6h1v1h-1zM0 7h1v1h-1zM2 7h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1zM13 7h1v1h-1zM15 7h1v1h-1zM1 8h1v1h-1zM3 8h1v1h-1zM6 8h3v1h-3zM12 8h1v1h-1zM14 8h1v1h-1zM2 9h1v1h-1zM4 9h1v1h-1zM11 9h1v1h-1zM13 9h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM11 10h1v1h-1zM13 10h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM11 11h1v1h-1zM13 11h1v1h-1zM2 12h1v1h-1zM5 12h1v1h-1zM10 12h1v1h-1zM13 12h1v1h-1zM3 13h3v1h-3zM10 13h3v1h-3z"/><path fill="#EDEFF7" d="M3 2h2v1h-2zM11 2h2v1h-2zM3 3h1v1h-1zM12 3h1v1h-1zM3 4h1v1h-1zM12 4h1v1h-1zM3 5h1v1h-1zM12 5h1v1h-1zM2 6h1v1h-1zM13 6h1v1h-1zM1 7h1v1h-1zM14 7h1v1h-1zM2 8h1v1h-1zM13 8h1v1h-1zM3 9h1v1h-1zM12 9h1v1h-1zM3 10h1v1h-1zM12 10h1v1h-1zM3 11h1v1h-1zM12 11h1v1h-1zM3 12h2v1h-2zM11 12h2v1h-2z"/><path fill="#F4C542" d="M7 7h1v1h-1z"/></symbol><symbol id="px-bubble" viewBox="0 0 16 16"><path fill="#080C26" d="M2 1h12v1h-12zM1 2h1v1h-1zM14 2h1v1h-1zM0 3h1v1h-1zM15 3h1v1h-1zM0 4h1v1h-1zM15 4h1v1h-1zM0 5h1v1h-1zM15 5h1v1h-1zM0 6h1v1h-1zM15 6h1v1h-1zM1 7h1v1h-1zM14 7h1v1h-1zM2 8h3v1h-3zM7 8h7v1h-7zM4 9h1v1h-1zM6 9h1v1h-1zM3 10h1v1h-1zM5 10h1v1h-1zM2 11h2v1h-2z"/><path fill="#EDEFF7" d="M2 2h12v1h-12zM1 3h14v1h-14zM1 4h2v1h-2zM5 4h2v1h-2zM9 4h2v1h-2zM13 4h2v1h-2zM1 5h2v1h-2zM5 5h2v1h-2zM9 5h2v1h-2zM13 5h2v1h-2zM1 6h14v1h-14zM2 7h12v1h-12zM5 8h2v1h-2zM5 9h1v1h-1zM4 10h1v1h-1z"/><path fill="#8FA3EE" d="M3 4h2v1h-2zM7 4h2v1h-2zM11 4h2v1h-2zM3 5h2v1h-2zM7 5h2v1h-2zM11 5h2v1h-2z"/></symbol></svg>
+<main class="screen">
+
+  <section class="win party" aria-label="Runs">
+    <span class="plate">Party: last night's runs</span>
+    <label class="search"><input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets"><span class="key" title="Press / to search">/</span></label>
+    <div class="runs-grid cols"><span></span><span>Run</span><span>Dataset</span><span class="num">Score</span><span>Score gauge</span><span class="num">Δ base</span><span>Status</span></div>
+
+    <section class="member">
+      <div class="who"><div class="portrait"><svg class="px" viewBox="0 0 16 16"><use href="#px-scroll"/></svg></div><b>summarize-v3</b><small>2 runs</small></div>
+      <ol class="runs">
+        <li class="run sel" aria-current="true">
+          <div class="run-line"><svg class="cursor px held" viewBox="0 0 16 10"><use href="#px-hand"/></svg><span class="id">r-2291</span><span>news-digest-2k</span><span class="num">0.812</span><span class="gauge bad"><i style="width:81.2%"></i><span class="tick" style="left:85.3%"></span></span><span class="num d-bad">−0.041</span><span class="st-ok">Passed</span>
+            <span class="meta">Took<b>14m 02s</b>By<b>schedule</b>Started<b>02:00</b></span></div>
+        </li>
+        <li class="run">
+          <div class="run-line"><span></span><span class="id">r-2290</span><span>multilingual-legal-contracts-longform-eval-2026-q3</span><span class="num">0.774</span><span class="gauge"><i style="width:77.4%"></i><span class="tick" style="left:76.8%"></span></span><span class="num d-ok">+0.006</span><span class="st-ok">Passed</span>
+            <span class="meta">Took<b>41m 55s</b>By<b>M. Okafor</b>Started<b>01:12</b></span></div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="member">
+      <div class="who"><div class="portrait"><svg class="px" viewBox="0 0 16 16"><use href="#px-sign"/></svg></div><b>router-small</b><small>2 runs</small></div>
+      <ol class="runs">
+        <li class="run">
+          <div class="run-line"><span></span><span class="id">r-2289</span><span>intent-routing-v7</span><span class="num">0.931</span><span class="gauge"><i style="width:93.1%"></i><span class="tick" style="left:91.9%"></span></span><span class="num d-ok">+0.012</span><span class="st-ok">Passed</span>
+            <span class="meta">Took<b>3m 48s</b>By<b>schedule</b>Started<b>01:00</b></span></div>
+        </li>
+        <li class="run">
+          <div class="run-line"><span></span><span class="id">r-2288</span><span>adversarial-prompts</span><span class="num">—</span><span class="gauge charge" title="Running, 62% of samples scored"><i style="width:62%"></i></span><span class="num">—</span><span class="st-run">Running 62%</span>
+            <span class="meta">Took<b>9m 10s so far</b>By<b>CI #4812</b>Started<b>00:51</b></span></div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="member">
+      <div class="who"><div class="portrait"><svg class="px" viewBox="0 0 16 16"><use href="#px-braces"/></svg></div><b>extract-json</b><small>2 runs</small></div>
+      <ol class="runs">
+        <li class="run">
+          <div class="run-line"><span></span><span class="id">r-2287</span><span>invoices-ocr</span><span class="num">0.000</span><span class="gauge"><i style="width:0"></i><span class="tick" style="left:88.4%"></span></span><span class="num d-bad">−0.884</span><span><span class="ko">KO</span><span class="d-bad">Failed</span></span>
+            <span class="err">KeyError: 'line_items' — 212 of 212 samples failed schema validation</span>
+            <span class="meta">Took<b>0m 41s</b>By<b>CI #4809</b>Started<b>00:40</b></span></div>
+        </li>
+        <li class="run">
+          <div class="run-line"><span></span><span class="id">r-2286</span><span>receipts-small</span><span class="num">0.902</span><span class="gauge"><i style="width:90.2%"></i><span class="tick" style="left:90.2%"></span></span><span class="num d-ok">+0.000</span><span class="st-ok">Passed</span>
+            <span class="meta">Took<b>2m 15s</b>By<b>L. Brandt</b>Started<b>23:58</b></span></div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="member">
+      <div class="who"><div class="portrait"><svg class="px" viewBox="0 0 16 16"><use href="#px-bubble"/></svg></div><b>chat-core-8b</b><small>2 runs</small></div>
+      <ol class="runs">
+        <li class="run">
+          <div class="run-line"><span></span><span class="id">r-2285</span><span>helpfulness-pairwise</span><span class="num">0.668</span><span class="gauge"><i style="width:66.8%"></i><span class="tick" style="left:64.7%"></span></span><span class="num d-ok">+0.021</span><span class="st-ok">Passed</span>
+            <span class="meta">Took<b>1h 06m</b>By<b>schedule</b>Started<b>23:00</b></span></div>
+        </li>
+        <li class="run">
+          <div class="run-line"><span></span><span class="id">r-2284</span><span>safety-refusals</span><span class="num">—</span><span class="gauge empty"><i style="width:0"></i></span><span class="num">—</span><span class="st-wait">Queued</span>
+            <span class="meta">Took<b>—</b>By<b>schedule</b>Started<b>—</b></span></div>
+        </li>
+      </ol>
+    </section>
+
+    <div class="legend">
+      <b>—</b><span>not computed yet (queued or running). <span class="lbl-t">0.000</span> is computed, and zero (r-2287).</span>
+      <b>gauge</b><span>score 0 to 1. Gold tick is the baseline. Red is below the ±0.02 noise band.</span>
+    </div>
+  </section>
+
+  <div class="right">
+    <div class="top">
+      <nav class="win cmd" aria-label="Sections">
+        <span class="plate">Evals</span>
+        <ul>
+          <li class="cur"><svg class="cursor px held" viewBox="0 0 16 10"><use href="#px-hand"/></svg><a href="#" aria-current="page"><span>Runs</span><span>8</span></a></li>
+          <li><svg class="cursor px" viewBox="0 0 16 10"><use href="#px-hand"/></svg><a href="#"><span>Datasets</span><span class="loading">loading<i>...</i></span></a></li>
+          <li><svg class="cursor px" viewBox="0 0 16 10"><use href="#px-hand"/></svg><a href="#">Models</a></li>
+          <li><svg class="cursor px" viewBox="0 0 16 10"><use href="#px-hand"/></svg><a href="#">Baselines</a></li>
+          <li><svg class="cursor px" viewBox="0 0 16 10"><use href="#px-hand"/></svg><a href="#">Settings</a></li>
+        </ul>
+      </nav>
+      <section class="win purse" aria-label="Summary">
+        <span class="plate">atlas-research</span>
+        <dl>
+          <div class="total"><dt>Runs</dt><dd>8</dd></div>
+          <dt>Passed</dt><dd>5</dd>
+          <dt>Failed</dt><dd class="fail">1</dd>
+          <dt>Running</dt><dd>1</dd>
+          <dt>Queued</dt><dd>1</dd>
+        </dl>
+      </section>
+    </div>
+
+    <section class="win status" aria-label="Selected run r-2291">
+      <span class="plate">Status: r-2291</span>
+      <div class="s-head">
+        <div class="portrait"><svg class="px" viewBox="0 0 16 16"><use href="#px-scroll"/></svg></div>
+        <div>
+          <h2><span class="nw">summarize-v3</span> on <span class="nw">news-digest-2k</span></h2>
+          <p>Baseline <b>summarize-v2 @ r-2203 (0.853)</b></p>
+        </div>
+      </div>
+      <div class="hit">
+        <span class="score">0.812</span>
+        <span class="dmg">−0.041</span>
+      </div>
+      <div class="hit-note">Regressed: twice the ±0.02 noise band.</div>
+      <table class="stats">
+        <thead><tr><th>Metric</th><th class="num">Score</th><th></th><th class="num">Base</th><th class="num">Δ</th></tr></thead>
+        <tbody>
+          <tr><td>ROUGE-L</td><td class="num">0.412</td><td class="g"><span class="gauge bad"><i style="width:41.2%"></i><span class="tick" style="left:44.7%"></span></span></td><td class="num">0.447</td><td class="num d-bad">−0.035</td></tr>
+          <tr><td>Faithfulness</td><td class="num">0.861</td><td class="g"><span class="gauge bad"><i style="width:86.1%"></i><span class="tick" style="left:90.2%"></span></span></td><td class="num">0.902</td><td class="num d-bad">−0.041</td></tr>
+          <tr><td>Coverage</td><td class="num">0.790</td><td class="g"><span class="gauge"><i style="width:79%"></i><span class="tick" style="left:80.1%"></span></span></td><td class="num">0.801</td><td class="num">−0.011</td></tr>
+          <tr><td>Length ratio</td><td class="num">1.18</td><td class="g warn">above 1.15</td><td class="num">1.02</td><td class="num warn">+0.16</td></tr>
+        </tbody>
+      </table>
+      <div class="win actions" role="menu" aria-label="Run commands">
+        <ul>
+          <li class="cur"><svg class="cursor px" viewBox="0 0 16 10"><use href="#px-hand"/></svg><button role="menuitem" autofocus>Rerun</button></li>
+          <li><svg class="cursor px" viewBox="0 0 16 10"><use href="#px-hand"/></svg><button role="menuitem">Compare with baseline</button></li>
+          <li><svg class="cursor px" viewBox="0 0 16 10"><use href="#px-hand"/></svg><button role="menuitem" disabled aria-describedby="cancel-why">Cancel</button><span class="reason" id="cancel-why">already finished 02:14:02</span></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <section class="win dialog" aria-label="Log for r-2291">
+    <span class="plate">r-2291 log</span>
+    <p>r-2291 fell below its baseline. Faithfulness dropped the most, and length ratio went up.</p>
+<pre><span class="k">02:13:48  eval</span>  1996/2000 samples scored
+<span class="k">02:13:55  eval</span>  2000/2000 samples scored
+<span class="k">02:13:55  </span><span class="w">warn</span>  length_ratio above 1.15 on 38% of samples
+<span class="k">02:14:01  agg </span>  faithfulness=0.861 (baseline 0.902)
+<span class="k">02:14:02  done</span>  run r-2291 finished in 14m 02s</pre>
+    <svg class="next px" viewBox="0 0 8 5" aria-hidden="true"><path fill="#F4C542" d="M0 0h8v1h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h-1z"/></svg>
+  </section>
+
+  <section class="win chart" aria-label="Score history">
+    <span class="plate">History</span>
+    <div class="cap"><span>summarize-v3, last 12 runs</span><span>band 0.833–0.873</span></div>
+    <svg width="416" height="116" viewBox="0 0 416 116" class="px" role="img" aria-label="Scores 0.846 to 0.857 for eleven runs, then 0.812 on r-2291, below the noise band 0.833 to 0.873">
+      <rect x="44" y="18" width="364" height="56" fill="#26388A"/>
+      <line x1="44" x2="408" y1="46" y2="46" stroke="#F4C542" stroke-width="2" stroke-dasharray="6 4"/>
+      <g fill="#A9B8F2" font-family="DotGothic16" font-size="16">
+        <text x="0" y="24">.873</text>
+        <text x="0" y="52">.853</text>
+        <text x="0" y="80">.833</text>
+      </g>
+      <polyline fill="none" stroke="#EDEFF7" stroke-width="2" points="56,56 88,49 120,51 152,43 184,46 216,50 248,40 280,47 312,53 344,49 376,46 400,103"/>
+      <g fill="#EDEFF7">
+        <rect x="53" y="53" width="6" height="6"/><rect x="85" y="46" width="6" height="6"/><rect x="117" y="48" width="6" height="6"/><rect x="149" y="40" width="6" height="6"/><rect x="181" y="43" width="6" height="6"/><rect x="213" y="47" width="6" height="6"/><rect x="245" y="37" width="6" height="6"/><rect x="277" y="44" width="6" height="6"/><rect x="309" y="50" width="6" height="6"/><rect x="341" y="46" width="6" height="6"/><rect x="373" y="43" width="6" height="6"/>
+      </g>
+      <rect x="395" y="98" width="10" height="10" fill="#E5484D" stroke="#EDEFF7" stroke-width="2"/>
+      <text x="384" y="108" fill="#FF9496" font-family="DotGothic16" font-size="16" text-anchor="end">0.812 r-2291</text>
+    </svg>
+  </section>
+
+</main>
+</body>
+</html>

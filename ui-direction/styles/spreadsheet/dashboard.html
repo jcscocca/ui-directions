@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Evals: Runs sheet</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="titlebar">
+  <svg class="logo" viewBox="0 0 18 18" aria-hidden="true"><rect x="0.5" y="0.5" width="17" height="17" fill="none" stroke="#fff"/><path d="M0.5 6.5H17.5M0.5 12H17.5M6 0.5V17.5M12 0.5V17.5" stroke="#fff"/><rect x="6" y="6.5" width="6" height="5.5" fill="#fff"/></svg>
+  <span class="book">Evals</span>
+  <span class="ws">Workspace <b>atlas-research</b></span>
+  <label class="search"><svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.2" fill="none" stroke="#737B85" stroke-width="1.5"/><path d="M8.6 8.6L12 12" stroke="#737B85" stroke-width="1.5"/></svg><input type="search" placeholder="Search runs, models, datasets" aria-label="Search runs, models, datasets"><kbd>/</kbd></label>
+  <span class="meta">Last event 02:14:02</span>
+</header>
+<div class="toolbar" role="toolbar" aria-label="Format">
+  <button class="tb">Undo</button><button class="tb">Redo</button><span class="sep"></span>
+  <button class="tb drop" style="width:118px">Source Sans 3</button><button class="tb drop" style="width:44px">10</button><span class="sep"></span>
+  <button class="tb" style="font-weight:700">B</button><button class="tb" style="font-style:italic">I</button><button class="tb" style="text-decoration:underline">U</button>
+  <button class="tb" aria-label="Fill colour"><span style="display:grid;gap:1px;justify-items:center"><span style="font-size:11px;line-height:1">A</span><span class="swatch" style="background:var(--bad-fill)"></span></span></button><span class="sep"></span>
+  <button class="tb fmt">0.000</button><button class="tb fmt">%</button><button class="tb fmt">+/&minus;</button><span class="sep"></span>
+  <button class="tb on" aria-pressed="true">Filter</button><button class="tb">Sort</button><button class="tb on" aria-pressed="true">Freeze row 1</button><span class="sep"></span>
+  <button class="tb">Conditional format</button><button class="tb">Insert chart</button><button class="tb">Note</button>
+</div>
+<div class="fbar">
+  <div class="namebox" aria-label="Selected cell">E2</div>
+  <div class="fx" aria-hidden="true">fx</div>
+  <div class="formula" aria-label="Formula">=<span class="r1">D2</span>&thinsp;-&thinsp;<span class="fn">VLOOKUP</span>(<span class="r2">B2</span>,&thinsp;Baselines!A:C,&thinsp;3,&thinsp;FALSE)</div>
+</div>
+<main class="sheetwrap">
+<div class="sheet" role="grid" aria-label="Runs" style="grid-template-columns:var(--rowhdr) 66px 104px 186px 68px 114px 104px 86px 104px 74px 18px 120px 76px 76px 76px 104px 90px;grid-template-rows:var(--colhdr) 24px var(--row) 40px var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) 30px var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row) var(--row)">
+<div class="corner" style="grid-area:1/1" aria-hidden="true"></div>
+<div class="ch" style="grid-area:1/2" aria-hidden="true">A</div>
+<div class="ch" style="grid-area:1/3" aria-hidden="true">B</div>
+<div class="ch" style="grid-area:1/4" aria-hidden="true">C</div>
+<div class="ch" style="grid-area:1/5" aria-hidden="true">D</div>
+<div class="ch on" style="grid-area:1/6" aria-hidden="true">E</div>
+<div class="ch" style="grid-area:1/7" aria-hidden="true">F</div>
+<div class="ch" style="grid-area:1/8" aria-hidden="true">G</div>
+<div class="ch" style="grid-area:1/9" aria-hidden="true">H</div>
+<div class="ch" style="grid-area:1/10" aria-hidden="true">I</div>
+<div class="ch" style="grid-area:1/11" aria-hidden="true">J</div>
+<div class="ch" style="grid-area:1/12" aria-hidden="true">K</div>
+<div class="ch" style="grid-area:1/13" aria-hidden="true">L</div>
+<div class="ch" style="grid-area:1/14" aria-hidden="true">M</div>
+<div class="ch" style="grid-area:1/15" aria-hidden="true">N</div>
+<div class="ch" style="grid-area:1/16" aria-hidden="true">O</div>
+<div class="ch" style="grid-area:1/17" aria-hidden="true">P</div>
+<div class="rh" style="grid-area:2/1" aria-hidden="true">1</div>
+<div class="rh on" style="grid-area:3/1" aria-hidden="true">2</div>
+<div class="rh" style="grid-area:4/1" aria-hidden="true">3</div>
+<div class="rh" style="grid-area:5/1" aria-hidden="true">4</div>
+<div class="rh" style="grid-area:6/1" aria-hidden="true">5</div>
+<div class="rh" style="grid-area:7/1" aria-hidden="true">6</div>
+<div class="rh" style="grid-area:8/1" aria-hidden="true">7</div>
+<div class="rh" style="grid-area:9/1" aria-hidden="true">8</div>
+<div class="rh" style="grid-area:10/1" aria-hidden="true">9</div>
+<div class="rh" style="grid-area:11/1" aria-hidden="true">10</div>
+<div class="rh" style="grid-area:12/1" aria-hidden="true">11</div>
+<div class="rh" style="grid-area:13/1" aria-hidden="true">12</div>
+<div class="rh" style="grid-area:14/1" aria-hidden="true">13</div>
+<div class="rh" style="grid-area:15/1" aria-hidden="true">14</div>
+<div class="rh" style="grid-area:16/1" aria-hidden="true">15</div>
+<div class="rh" style="grid-area:17/1" aria-hidden="true">16</div>
+<div class="rh" style="grid-area:18/1" aria-hidden="true">17</div>
+<div class="rh" style="grid-area:19/1" aria-hidden="true">18</div>
+<div class="rh" style="grid-area:20/1" aria-hidden="true">19</div>
+<div class="rh" style="grid-area:21/1" aria-hidden="true">20</div>
+<div class="rh" style="grid-area:22/1" aria-hidden="true">21</div>
+<div class="rh" style="grid-area:23/1" aria-hidden="true">22</div>
+<div class="rh" style="grid-area:24/1" aria-hidden="true">23</div>
+<div class="rh" style="grid-area:25/1" aria-hidden="true">24</div>
+<div class="rh" style="grid-area:26/1" aria-hidden="true">25</div>
+<div class="rh" style="grid-area:27/1" aria-hidden="true">26</div>
+<div class="rh" style="grid-area:28/1" aria-hidden="true">27</div>
+<div class="rh" style="grid-area:29/1" aria-hidden="true">28</div>
+<div class="rh" style="grid-area:30/1" aria-hidden="true">29</div>
+<div class="rh" style="grid-area:31/1" aria-hidden="true">30</div>
+<div class="rh" style="grid-area:32/1" aria-hidden="true">31</div>
+<div class="rh" style="grid-area:33/1" aria-hidden="true">32</div>
+<div class="rh" style="grid-area:34/1" aria-hidden="true">33</div>
+<div class="rh" style="grid-area:35/1" aria-hidden="true">34</div>
+<i class="c" style="grid-area:2/11"></i>
+<i class="c" style="grid-area:2/17"></i>
+<i class="c" style="grid-area:3/11"></i>
+<i class="c" style="grid-area:3/17"></i>
+<i class="c" style="grid-area:4/11"></i>
+<i class="c" style="grid-area:4/17"></i>
+<i class="c" style="grid-area:5/11"></i>
+<i class="c" style="grid-area:5/17"></i>
+<i class="c" style="grid-area:6/11"></i>
+<i class="c" style="grid-area:6/17"></i>
+<i class="c" style="grid-area:7/11"></i>
+<i class="c" style="grid-area:7/16"></i>
+<i class="c" style="grid-area:7/17"></i>
+<i class="c" style="grid-area:8/11"></i>
+<i class="c" style="grid-area:8/16"></i>
+<i class="c" style="grid-area:8/17"></i>
+<i class="c" style="grid-area:9/11"></i>
+<i class="c" style="grid-area:9/16"></i>
+<i class="c" style="grid-area:9/17"></i>
+<i class="c" style="grid-area:10/11"></i>
+<i class="c" style="grid-area:10/17"></i>
+<i class="c" style="grid-area:11/11"></i>
+<i class="c" style="grid-area:11/12"></i>
+<i class="c" style="grid-area:11/13"></i>
+<i class="c" style="grid-area:11/14"></i>
+<i class="c" style="grid-area:11/15"></i>
+<i class="c" style="grid-area:11/16"></i>
+<i class="c" style="grid-area:11/17"></i>
+<i class="c" style="grid-area:12/2"></i>
+<i class="c" style="grid-area:12/3"></i>
+<i class="c" style="grid-area:12/4"></i>
+<i class="c" style="grid-area:12/5"></i>
+<i class="c" style="grid-area:12/6"></i>
+<i class="c" style="grid-area:12/7"></i>
+<i class="c" style="grid-area:12/8"></i>
+<i class="c" style="grid-area:12/9"></i>
+<i class="c" style="grid-area:12/10"></i>
+<i class="c" style="grid-area:12/11"></i>
+<i class="c" style="grid-area:12/16"></i>
+<i class="c" style="grid-area:12/17"></i>
+<i class="c" style="grid-area:13/7"></i>
+<i class="c" style="grid-area:13/8"></i>
+<i class="c" style="grid-area:13/9"></i>
+<i class="c" style="grid-area:13/10"></i>
+<i class="c" style="grid-area:13/11"></i>
+<i class="c" style="grid-area:13/17"></i>
+<i class="c" style="grid-area:14/7"></i>
+<i class="c" style="grid-area:14/8"></i>
+<i class="c" style="grid-area:14/9"></i>
+<i class="c" style="grid-area:14/10"></i>
+<i class="c" style="grid-area:14/11"></i>
+<i class="c" style="grid-area:14/12"></i>
+<i class="c" style="grid-area:14/13"></i>
+<i class="c" style="grid-area:14/14"></i>
+<i class="c" style="grid-area:14/15"></i>
+<i class="c" style="grid-area:14/16"></i>
+<i class="c" style="grid-area:14/17"></i>
+<i class="c" style="grid-area:15/7"></i>
+<i class="c" style="grid-area:15/8"></i>
+<i class="c" style="grid-area:15/9"></i>
+<i class="c" style="grid-area:15/10"></i>
+<i class="c" style="grid-area:15/11"></i>
+<i class="c" style="grid-area:15/12"></i>
+<i class="c" style="grid-area:15/13"></i>
+<i class="c" style="grid-area:15/14"></i>
+<i class="c" style="grid-area:15/15"></i>
+<i class="c" style="grid-area:15/16"></i>
+<i class="c" style="grid-area:15/17"></i>
+<i class="c" style="grid-area:16/7"></i>
+<i class="c" style="grid-area:16/8"></i>
+<i class="c" style="grid-area:16/9"></i>
+<i class="c" style="grid-area:16/10"></i>
+<i class="c" style="grid-area:16/11"></i>
+<i class="c" style="grid-area:16/12"></i>
+<i class="c" style="grid-area:16/13"></i>
+<i class="c" style="grid-area:16/14"></i>
+<i class="c" style="grid-area:16/15"></i>
+<i class="c" style="grid-area:16/16"></i>
+<i class="c" style="grid-area:16/17"></i>
+<i class="c" style="grid-area:17/7"></i>
+<i class="c" style="grid-area:17/8"></i>
+<i class="c" style="grid-area:17/9"></i>
+<i class="c" style="grid-area:17/10"></i>
+<i class="c" style="grid-area:17/11"></i>
+<i class="c" style="grid-area:17/12"></i>
+<i class="c" style="grid-area:17/13"></i>
+<i class="c" style="grid-area:17/14"></i>
+<i class="c" style="grid-area:17/15"></i>
+<i class="c" style="grid-area:17/16"></i>
+<i class="c" style="grid-area:17/17"></i>
+<i class="c" style="grid-area:18/2"></i>
+<i class="c" style="grid-area:18/3"></i>
+<i class="c" style="grid-area:18/4"></i>
+<i class="c" style="grid-area:18/5"></i>
+<i class="c" style="grid-area:18/6"></i>
+<i class="c" style="grid-area:18/7"></i>
+<i class="c" style="grid-area:18/8"></i>
+<i class="c" style="grid-area:18/9"></i>
+<i class="c" style="grid-area:18/10"></i>
+<i class="c" style="grid-area:18/11"></i>
+<i class="c" style="grid-area:18/12"></i>
+<i class="c" style="grid-area:18/13"></i>
+<i class="c" style="grid-area:18/14"></i>
+<i class="c" style="grid-area:18/15"></i>
+<i class="c" style="grid-area:18/16"></i>
+<i class="c" style="grid-area:18/17"></i>
+<i class="c" style="grid-area:19/11"></i>
+<i class="c" style="grid-area:19/12"></i>
+<i class="c" style="grid-area:19/13"></i>
+<i class="c" style="grid-area:19/14"></i>
+<i class="c" style="grid-area:19/15"></i>
+<i class="c" style="grid-area:19/16"></i>
+<i class="c" style="grid-area:19/17"></i>
+<i class="c" style="grid-area:20/11"></i>
+<i class="c" style="grid-area:20/12"></i>
+<i class="c" style="grid-area:20/13"></i>
+<i class="c" style="grid-area:20/14"></i>
+<i class="c" style="grid-area:20/15"></i>
+<i class="c" style="grid-area:20/16"></i>
+<i class="c" style="grid-area:20/17"></i>
+<i class="c" style="grid-area:21/11"></i>
+<i class="c" style="grid-area:21/12"></i>
+<i class="c" style="grid-area:21/13"></i>
+<i class="c" style="grid-area:21/14"></i>
+<i class="c" style="grid-area:21/15"></i>
+<i class="c" style="grid-area:21/16"></i>
+<i class="c" style="grid-area:21/17"></i>
+<i class="c" style="grid-area:22/11"></i>
+<i class="c" style="grid-area:22/12"></i>
+<i class="c" style="grid-area:22/13"></i>
+<i class="c" style="grid-area:22/14"></i>
+<i class="c" style="grid-area:22/15"></i>
+<i class="c" style="grid-area:22/16"></i>
+<i class="c" style="grid-area:22/17"></i>
+<i class="c" style="grid-area:23/11"></i>
+<i class="c" style="grid-area:23/12"></i>
+<i class="c" style="grid-area:23/13"></i>
+<i class="c" style="grid-area:23/14"></i>
+<i class="c" style="grid-area:23/15"></i>
+<i class="c" style="grid-area:23/16"></i>
+<i class="c" style="grid-area:23/17"></i>
+<i class="c" style="grid-area:24/11"></i>
+<i class="c" style="grid-area:24/12"></i>
+<i class="c" style="grid-area:24/13"></i>
+<i class="c" style="grid-area:24/14"></i>
+<i class="c" style="grid-area:24/15"></i>
+<i class="c" style="grid-area:24/16"></i>
+<i class="c" style="grid-area:24/17"></i>
+<i class="c" style="grid-area:25/2"></i>
+<i class="c" style="grid-area:25/3"></i>
+<i class="c" style="grid-area:25/4"></i>
+<i class="c" style="grid-area:25/5"></i>
+<i class="c" style="grid-area:25/6"></i>
+<i class="c" style="grid-area:25/7"></i>
+<i class="c" style="grid-area:25/8"></i>
+<i class="c" style="grid-area:25/9"></i>
+<i class="c" style="grid-area:25/10"></i>
+<i class="c" style="grid-area:25/11"></i>
+<i class="c" style="grid-area:25/12"></i>
+<i class="c" style="grid-area:25/13"></i>
+<i class="c" style="grid-area:25/14"></i>
+<i class="c" style="grid-area:25/15"></i>
+<i class="c" style="grid-area:25/16"></i>
+<i class="c" style="grid-area:25/17"></i>
+<i class="c" style="grid-area:26/11"></i>
+<i class="c" style="grid-area:26/12"></i>
+<i class="c" style="grid-area:26/13"></i>
+<i class="c" style="grid-area:26/14"></i>
+<i class="c" style="grid-area:26/15"></i>
+<i class="c" style="grid-area:26/16"></i>
+<i class="c" style="grid-area:26/17"></i>
+<i class="c" style="grid-area:27/11"></i>
+<i class="c" style="grid-area:27/12"></i>
+<i class="c" style="grid-area:27/13"></i>
+<i class="c" style="grid-area:27/14"></i>
+<i class="c" style="grid-area:27/15"></i>
+<i class="c" style="grid-area:27/16"></i>
+<i class="c" style="grid-area:27/17"></i>
+<i class="c" style="grid-area:28/2"></i>
+<i class="c" style="grid-area:28/3"></i>
+<i class="c" style="grid-area:28/4"></i>
+<i class="c" style="grid-area:28/5"></i>
+<i class="c" style="grid-area:28/6"></i>
+<i class="c" style="grid-area:28/7"></i>
+<i class="c" style="grid-area:28/8"></i>
+<i class="c" style="grid-area:28/9"></i>
+<i class="c" style="grid-area:28/10"></i>
+<i class="c" style="grid-area:28/11"></i>
+<i class="c" style="grid-area:28/12"></i>
+<i class="c" style="grid-area:28/13"></i>
+<i class="c" style="grid-area:28/14"></i>
+<i class="c" style="grid-area:28/15"></i>
+<i class="c" style="grid-area:28/16"></i>
+<i class="c" style="grid-area:28/17"></i>
+<i class="c" style="grid-area:29/2"></i>
+<i class="c" style="grid-area:29/3"></i>
+<i class="c" style="grid-area:29/4"></i>
+<i class="c" style="grid-area:29/5"></i>
+<i class="c" style="grid-area:29/6"></i>
+<i class="c" style="grid-area:29/7"></i>
+<i class="c" style="grid-area:29/8"></i>
+<i class="c" style="grid-area:29/9"></i>
+<i class="c" style="grid-area:29/10"></i>
+<i class="c" style="grid-area:29/11"></i>
+<i class="c" style="grid-area:29/17"></i>
+<i class="c" style="grid-area:30/2"></i>
+<i class="c" style="grid-area:30/3"></i>
+<i class="c" style="grid-area:30/4"></i>
+<i class="c" style="grid-area:30/5"></i>
+<i class="c" style="grid-area:30/6"></i>
+<i class="c" style="grid-area:30/7"></i>
+<i class="c" style="grid-area:30/8"></i>
+<i class="c" style="grid-area:30/9"></i>
+<i class="c" style="grid-area:30/10"></i>
+<i class="c" style="grid-area:30/11"></i>
+<i class="c" style="grid-area:30/17"></i>
+<i class="c" style="grid-area:31/2"></i>
+<i class="c" style="grid-area:31/3"></i>
+<i class="c" style="grid-area:31/4"></i>
+<i class="c" style="grid-area:31/5"></i>
+<i class="c" style="grid-area:31/6"></i>
+<i class="c" style="grid-area:31/7"></i>
+<i class="c" style="grid-area:31/8"></i>
+<i class="c" style="grid-area:31/9"></i>
+<i class="c" style="grid-area:31/10"></i>
+<i class="c" style="grid-area:31/11"></i>
+<i class="c" style="grid-area:31/12"></i>
+<i class="c" style="grid-area:31/13"></i>
+<i class="c" style="grid-area:31/14"></i>
+<i class="c" style="grid-area:31/15"></i>
+<i class="c" style="grid-area:31/16"></i>
+<i class="c" style="grid-area:31/17"></i>
+<i class="c" style="grid-area:32/2"></i>
+<i class="c" style="grid-area:32/3"></i>
+<i class="c" style="grid-area:32/4"></i>
+<i class="c" style="grid-area:32/5"></i>
+<i class="c" style="grid-area:32/6"></i>
+<i class="c" style="grid-area:32/7"></i>
+<i class="c" style="grid-area:32/8"></i>
+<i class="c" style="grid-area:32/9"></i>
+<i class="c" style="grid-area:32/10"></i>
+<i class="c" style="grid-area:32/11"></i>
+<i class="c" style="grid-area:32/12"></i>
+<i class="c" style="grid-area:32/13"></i>
+<i class="c" style="grid-area:32/14"></i>
+<i class="c" style="grid-area:32/15"></i>
+<i class="c" style="grid-area:32/16"></i>
+<i class="c" style="grid-area:32/17"></i>
+<i class="c" style="grid-area:33/2"></i>
+<i class="c" style="grid-area:33/3"></i>
+<i class="c" style="grid-area:33/4"></i>
+<i class="c" style="grid-area:33/5"></i>
+<i class="c" style="grid-area:33/6"></i>
+<i class="c" style="grid-area:33/7"></i>
+<i class="c" style="grid-area:33/8"></i>
+<i class="c" style="grid-area:33/9"></i>
+<i class="c" style="grid-area:33/10"></i>
+<i class="c" style="grid-area:33/11"></i>
+<i class="c" style="grid-area:33/12"></i>
+<i class="c" style="grid-area:33/13"></i>
+<i class="c" style="grid-area:33/14"></i>
+<i class="c" style="grid-area:33/15"></i>
+<i class="c" style="grid-area:33/16"></i>
+<i class="c" style="grid-area:33/17"></i>
+<i class="c" style="grid-area:34/2"></i>
+<i class="c" style="grid-area:34/3"></i>
+<i class="c" style="grid-area:34/4"></i>
+<i class="c" style="grid-area:34/5"></i>
+<i class="c" style="grid-area:34/6"></i>
+<i class="c" style="grid-area:34/7"></i>
+<i class="c" style="grid-area:34/8"></i>
+<i class="c" style="grid-area:34/9"></i>
+<i class="c" style="grid-area:34/10"></i>
+<i class="c" style="grid-area:34/11"></i>
+<i class="c" style="grid-area:34/12"></i>
+<i class="c" style="grid-area:34/13"></i>
+<i class="c" style="grid-area:34/14"></i>
+<i class="c" style="grid-area:34/15"></i>
+<i class="c" style="grid-area:34/16"></i>
+<i class="c" style="grid-area:34/17"></i>
+<i class="c" style="grid-area:35/2"></i>
+<i class="c" style="grid-area:35/3"></i>
+<i class="c" style="grid-area:35/4"></i>
+<i class="c" style="grid-area:35/5"></i>
+<i class="c" style="grid-area:35/6"></i>
+<i class="c" style="grid-area:35/7"></i>
+<i class="c" style="grid-area:35/8"></i>
+<i class="c" style="grid-area:35/9"></i>
+<i class="c" style="grid-area:35/10"></i>
+<i class="c" style="grid-area:35/11"></i>
+<i class="c" style="grid-area:35/12"></i>
+<i class="c" style="grid-area:35/13"></i>
+<i class="c" style="grid-area:35/14"></i>
+<i class="c" style="grid-area:35/15"></i>
+<i class="c" style="grid-area:35/16"></i>
+<i class="c" style="grid-area:35/17"></i>
+<div class="x th" style="grid-area:2/2/3/3;"><span class="grow">Run</span><button class="fb" aria-label="Filter Run"></button></div>
+<div class="x th" style="grid-area:2/3/3/4;"><span class="grow">Model</span><button class="fb" aria-label="Filter Model"></button></div>
+<div class="x th" style="grid-area:2/4/3/5;"><span class="grow">Dataset</span><button class="fb" aria-label="Filter Dataset"></button></div>
+<div class="x th" style="grid-area:2/5/3/6;"><span class="grow" style="text-align:right">Score</span><button class="fb" aria-label="Filter Score"></button></div>
+<div class="x th" style="grid-area:2/6/3/7;"><span class="grow" style="text-align:right">&Delta; vs baseline</span><button class="fb" aria-label="Filter Delta vs baseline"></button></div>
+<div class="x th" style="grid-area:2/7/3/8;"><span class="grow">Status</span><button class="fb" aria-label="Filter Status"></button></div>
+<div class="x th" style="grid-area:2/8/3/9;"><span class="grow" style="text-align:right">Duration</span><button class="fb" aria-label="Filter Duration"></button></div>
+<div class="x th" style="grid-area:2/9/3/10;"><span class="grow">Triggered by</span><button class="fb" aria-label="Filter Triggered by"></button></div>
+<div class="x th" style="grid-area:2/10/3/11;"><span class="grow" style="text-align:right">Started</span><button class="fb sorted" aria-label="Filter Started"></button></div>
+<div class="x b" style="grid-area:3/2/4/3;">r-2291</div>
+<div class="x " style="grid-area:3/3/4/4;">summarize-v3</div>
+<div class="x " style="grid-area:3/4/4/5;">news-digest-2k</div>
+<div class="x r" style="grid-area:3/5/4/6;">0.812</div>
+<div class="x r bad b flag" style="grid-area:3/6/4/7;" title="Regression: 0.041 below baseline, outside the ±0.020 noise band.">&minus;0.041</div>
+<div class="x good" style="grid-area:3/7/4/8;">Passed</div>
+<div class="x r" style="grid-area:3/8/4/9;">14m 02s</div>
+<div class="x " style="grid-area:3/9/4/10;">schedule</div>
+<div class="x r" style="grid-area:3/10/4/11;">02:00</div>
+<div class="x " style="grid-area:4/2/5/3;">r-2290</div>
+<div class="x " style="grid-area:4/3/5/4;">summarize-v3</div>
+<div class="x wrap" style="grid-area:4/4/5/5;">multilingual-legal-contracts-longform-eval-2026-q3</div>
+<div class="x r" style="grid-area:4/5/5/6;">0.774</div>
+<div class="x r" style="grid-area:4/6/5/7;">+0.006</div>
+<div class="x good" style="grid-area:4/7/5/8;">Passed</div>
+<div class="x r" style="grid-area:4/8/5/9;">41m 55s</div>
+<div class="x " style="grid-area:4/9/5/10;">M. Okafor</div>
+<div class="x r" style="grid-area:4/10/5/11;">01:12</div>
+<div class="x " style="grid-area:5/2/6/3;">r-2289</div>
+<div class="x " style="grid-area:5/3/6/4;">router-small</div>
+<div class="x " style="grid-area:5/4/6/5;">intent-routing-v7</div>
+<div class="x r" style="grid-area:5/5/6/6;">0.931</div>
+<div class="x r" style="grid-area:5/6/6/7;">+0.012</div>
+<div class="x good" style="grid-area:5/7/6/8;">Passed</div>
+<div class="x r" style="grid-area:5/8/6/9;">3m 48s</div>
+<div class="x " style="grid-area:5/9/6/10;">schedule</div>
+<div class="x r" style="grid-area:5/10/6/11;">01:00</div>
+<div class="x " style="grid-area:6/2/7/3;">r-2288</div>
+<div class="x " style="grid-area:6/3/7/4;">router-small</div>
+<div class="x " style="grid-area:6/4/7/5;">adversarial-prompts</div>
+<div class="x r muted" style="grid-area:6/5/7/6;">&mdash;</div>
+<div class="x r muted" style="grid-area:6/6/7/7;">&mdash;</div>
+<div class="x " style="grid-area:6/7/7/8;" title="Running, 62% of samples scored"><span class="bar" style="width:62%"></span><span>Running</span><span style="margin-left:auto">62%</span></div>
+<div class="x r" style="grid-area:6/8/7/9;">9m 10s so far</div>
+<div class="x " style="grid-area:6/9/7/10;">CI #4812</div>
+<div class="x r" style="grid-area:6/10/7/11;">00:51</div>
+<div class="x " style="grid-area:7/2/8/3;">r-2287</div>
+<div class="x " style="grid-area:7/3/8/4;">extract-json</div>
+<div class="x " style="grid-area:7/4/8/5;">invoices-ocr</div>
+<div class="x r" style="grid-area:7/5/8/6;">0.000</div>
+<div class="x r" style="grid-area:7/6/8/7;">&minus;0.884</div>
+<div class="x bad b flag" style="grid-area:7/7/8/8;" title="KeyError: &#x27;line_items&#x27; — 212 of 212 samples failed schema validation">Failed</div>
+<div class="x r" style="grid-area:7/8/8/9;">0m 41s</div>
+<div class="x " style="grid-area:7/9/8/10;">CI #4809</div>
+<div class="x r" style="grid-area:7/10/8/11;">00:40</div>
+<div class="x " style="grid-area:8/2/9/3;">r-2286</div>
+<div class="x " style="grid-area:8/3/9/4;">extract-json</div>
+<div class="x " style="grid-area:8/4/9/5;">receipts-small</div>
+<div class="x r" style="grid-area:8/5/9/6;">0.902</div>
+<div class="x r" style="grid-area:8/6/9/7;">+0.000</div>
+<div class="x good" style="grid-area:8/7/9/8;">Passed</div>
+<div class="x r" style="grid-area:8/8/9/9;">2m 15s</div>
+<div class="x " style="grid-area:8/9/9/10;">L. Brandt</div>
+<div class="x r" style="grid-area:8/10/9/11;">23:58</div>
+<div class="x " style="grid-area:9/2/10/3;">r-2285</div>
+<div class="x " style="grid-area:9/3/10/4;">chat-core-8b</div>
+<div class="x " style="grid-area:9/4/10/5;">helpfulness-pairwise</div>
+<div class="x r" style="grid-area:9/5/10/6;">0.668</div>
+<div class="x r" style="grid-area:9/6/10/7;">+0.021</div>
+<div class="x good" style="grid-area:9/7/10/8;">Passed</div>
+<div class="x r" style="grid-area:9/8/10/9;">1h 06m</div>
+<div class="x " style="grid-area:9/9/10/10;">schedule</div>
+<div class="x r" style="grid-area:9/10/10/11;">23:00</div>
+<div class="x " style="grid-area:10/2/11/3;">r-2284</div>
+<div class="x " style="grid-area:10/3/11/4;">chat-core-8b</div>
+<div class="x " style="grid-area:10/4/11/5;">safety-refusals</div>
+<div class="x r muted" style="grid-area:10/5/11/6;">&mdash;</div>
+<div class="x r muted" style="grid-area:10/6/11/7;">&mdash;</div>
+<div class="x muted i" style="grid-area:10/7/11/8;">Queued</div>
+<div class="x r muted" style="grid-area:10/8/11/9;">&mdash;</div>
+<div class="x " style="grid-area:10/9/11/10;">schedule</div>
+<div class="x r muted" style="grid-area:10/10/11/11;">&mdash;</div>
+<div class="x tot" style="grid-area:11/2/12/3;">Total</div>
+<div class="x tot" style="grid-area:11/3/12/7;">8 runs: 5 passed, 1 failed, 1 running, 1 queued</div>
+<div class="x tot" style="grid-area:11/7/12/8;"></div>
+<div class="x tot" style="grid-area:11/8/12/9;"></div>
+<div class="x tot" style="grid-area:11/9/12/10;"></div>
+<div class="x tot" style="grid-area:11/10/12/11;"></div>
+<div class="x b" style="grid-area:13/2/14/7;">Key</div>
+<div class="x r muted" style="grid-area:14/2/15/3;">&mdash;</div>
+<div class="x " style="grid-area:14/3/15/7;">Not computed. The run is queued or still running.</div>
+<div class="x r" style="grid-area:15/2/16/3;">0.000</div>
+<div class="x " style="grid-area:15/3/16/7;">Computed, and the score is zero (r-2287 failed before scoring).</div>
+<div class="x r bad b" style="grid-area:16/2/17/3;">&minus;0.041</div>
+<div class="x " style="grid-area:16/3/17/7;">Regression: &Delta; is beyond the &plusmn;0.020 noise band.</div>
+<div class="x good" style="grid-area:17/2/18/3;">Passed</div>
+<div class="x " style="grid-area:17/3/18/7;">Finished and scored. A red corner means the cell has a note.</div>
+<div class="x th" style="grid-area:19/2/20/11;">Log tail, r-2291 <span class="dim">last 5 lines</span></div>
+<div class="x mono" style="grid-area:20/2/21/3;">02:13:48</div>
+<div class="x mono" style="grid-area:20/3/21/4;">eval</div>
+<div class="x mono" style="grid-area:20/4/21/11;">1996/2000 samples scored</div>
+<div class="x mono" style="grid-area:21/2/22/3;">02:13:55</div>
+<div class="x mono" style="grid-area:21/3/22/4;">eval</div>
+<div class="x mono" style="grid-area:21/4/22/11;">2000/2000 samples scored</div>
+<div class="x mono" style="grid-area:22/2/23/3;">02:13:55</div>
+<div class="x mono warn" style="grid-area:22/3/23/4;">warn</div>
+<div class="x mono" style="grid-area:22/4/23/11;">length_ratio above 1.15 on 38% of samples</div>
+<div class="x mono" style="grid-area:23/2/24/3;">02:14:01</div>
+<div class="x mono" style="grid-area:23/3/24/4;">agg</div>
+<div class="x mono" style="grid-area:23/4/24/11;">faithfulness=0.861 (baseline 0.902)</div>
+<div class="x mono" style="grid-area:24/2/25/3;">02:14:02</div>
+<div class="x mono" style="grid-area:24/3/25/4;">done</div>
+<div class="x mono" style="grid-area:24/4/25/11;">run r-2291 finished in 14m 02s</div>
+<div class="x th" style="grid-area:26/2/27/11;">Pinned comparisons</div>
+<div class="x muted i" style="grid-area:27/2/28/11;">None yet. Compare with baseline, then pin the result to keep it here.</div>
+<div class="x th" style="grid-area:2/12/3/17;">r-2291 <span style="font-weight:400">summarize-v3 on news-digest-2k</span></div>
+<div class="x sub" style="grid-area:3/12/4/13;">Baseline</div>
+<div class="x " style="grid-area:3/13/4/17;">summarize-v2 @ r-2203 (0.853)</div>
+<div class="x sub" style="grid-area:4/12/5/13;">Score</div>
+<div class="x big r" style="grid-area:4/13/5/14;">0.812</div>
+<div class="x sub wrap mid" style="grid-area:4/14/5/15;line-height:1.15">&Delta; vs baseline</div>
+<div class="x big r bad" style="grid-area:4/15/5/16;">&minus;0.041</div>
+<div class="x sub wrap mid" style="grid-area:4/16/5/17;line-height:1.15">about 2&times; the noise band</div>
+<div class="x bad" style="grid-area:5/12/6/17;">Regression: outside the &plusmn;0.020 noise band (0.833 to 0.873).</div>
+<div class="x th" style="grid-area:6/12/7/13;">Metric</div>
+<div class="x th r" style="grid-area:6/13/7/14;">Score</div>
+<div class="x th r" style="grid-area:6/14/7/15;">Baseline</div>
+<div class="x th r" style="grid-area:6/15/7/16;">&Delta;</div>
+<div class="x th" style="grid-area:6/16/7/17;"></div>
+<div class="x " style="grid-area:7/12/8/13;">ROUGE-L</div>
+<div class="x r" style="grid-area:7/13/8/14;">0.412</div>
+<div class="x r" style="grid-area:7/14/8/15;">0.447</div>
+<div class="x r bad" style="grid-area:7/15/8/16;">&minus;0.035</div>
+<div class="x " style="grid-area:8/12/9/13;">Faithfulness</div>
+<div class="x r" style="grid-area:8/13/9/14;">0.861</div>
+<div class="x r" style="grid-area:8/14/9/15;">0.902</div>
+<div class="x r bad" style="grid-area:8/15/9/16;">&minus;0.041</div>
+<div class="x " style="grid-area:9/12/10/13;">Coverage</div>
+<div class="x r" style="grid-area:9/13/10/14;">0.790</div>
+<div class="x r" style="grid-area:9/14/10/15;">0.801</div>
+<div class="x r" style="grid-area:9/15/10/16;">&minus;0.011</div>
+<div class="x " style="grid-area:10/12/11/13;">Length ratio</div>
+<div class="x r" style="grid-area:10/13/11/14;">1.18</div>
+<div class="x r" style="grid-area:10/14/11/15;">1.02</div>
+<div class="x r" style="grid-area:10/15/11/16;">+0.16</div>
+<div class="x sub" style="grid-area:10/16/11/17;">ratio, not a score</div>
+<div class="x btncell" style="grid-area:12/12/13/13;"><button class="btn pri">Rerun</button></div>
+<div class="x btncell" style="grid-area:12/13/13/15;"><button class="btn">Compare with baseline</button></div>
+<div class="x btncell" style="grid-area:12/15/13/16;"><button class="btn" disabled aria-describedby="cancel-why">Cancel</button></div>
+<div class="x muted i" style="grid-area:13/12/14/17;"><span id="cancel-why">Cancel is unavailable: r-2291 finished at 02:14:02.</span></div>
+<div class="x th" style="grid-area:29/12/30/17;">Datasets</div>
+<div class="x sub" style="grid-area:30/12/31/13;">Rows</div>
+<div class="x i" style="grid-area:30/13/31/17;"><span style="color:var(--ink-3)">Loading. Counting rows in each dataset&hellip;</span></div>
+<div class="note" style="grid-area:13/7/18/11;" role="note"><b>r-2287 failed</b><span style="font-family:var(--font-formula);font-size:11.5px">KeyError: 'line_items' &mdash; 212 of 212 samples failed schema validation</span><br>A failure, not a regression. Fix the extractor&rsquo;s output schema, then rerun r-2287.</div>
+<div class="leader" style="grid-area:7/7/13/8;" aria-hidden="true"><svg width="104" height="136" viewBox="0 0 104 136" style="display:block"><path d="M103 1 L78 134" stroke="#8C8350" stroke-width="1" fill="none"/><circle cx="103" cy="1" r="2" fill="#8C8350"/></svg></div>
+<div class="obj" style="grid-area:15/12/28/17;" role="figure"><div style="padding:6px 10px 0">
+<div style="font-weight:600;font-size:13px">Score, last 12 runs</div>
+<div style="font-size:11px;color:var(--ink-3)">summarize-v3 on news-digest-2k, oldest to newest. Source: History!B2:M2</div>
+</div>
+<svg viewBox="0 0 450 222" width="100%" style="display:block;font-family:var(--font-cell);font-size:10px;fill:#5F6670" role="img" aria-label="Score over the last 12 runs: steady between 0.846 and 0.857, then 0.812 on the latest run, below the 0.833 to 0.873 noise band.">
+<rect x="46" y="31.8" width="386" height="90.0" fill="#E7EDF6"/>
+<line x1="46" x2="432" y1="196.0" y2="196.0" stroke="#E1E4E8"/><text x="40" y="199.5" text-anchor="end">0.80</text><line x1="46" x2="432" y1="151.0" y2="151.0" stroke="#E1E4E8"/><text x="40" y="154.5" text-anchor="end">0.82</text><line x1="46" x2="432" y1="106.0" y2="106.0" stroke="#E1E4E8"/><text x="40" y="109.5" text-anchor="end">0.84</text><line x1="46" x2="432" y1="61.0" y2="61.0" stroke="#E1E4E8"/><text x="40" y="64.5" text-anchor="end">0.86</text><line x1="46" x2="432" y1="16.0" y2="16.0" stroke="#E1E4E8"/><text x="40" y="19.5" text-anchor="end">0.88</text>
+<line x1="46" x2="432" y1="76.8" y2="76.8" stroke="#737B85" stroke-dasharray="4 3"/>
+<text x="50" y="42.8" style="fill:#4B535D">noise band 0.833 to 0.873</text>
+<text x="50" y="72.8" style="fill:#4B535D">baseline 0.853</text>
+<polyline points="46.0,92.5 81.1,81.3 116.2,85.8 151.3,72.3 186.4,76.8 221.5,83.5 256.5,67.8 291.6,79.0 326.7,88.0 361.8,81.3 396.9,76.8 432.0,169.0" fill="none" stroke="#4472C4" stroke-width="2"/>
+<circle cx="46.0" cy="92.5" r="2.6" fill="#4472C4"/><circle cx="81.1" cy="81.3" r="2.6" fill="#4472C4"/><circle cx="116.2" cy="85.8" r="2.6" fill="#4472C4"/><circle cx="151.3" cy="72.3" r="2.6" fill="#4472C4"/><circle cx="186.4" cy="76.8" r="2.6" fill="#4472C4"/><circle cx="221.5" cy="83.5" r="2.6" fill="#4472C4"/><circle cx="256.5" cy="67.8" r="2.6" fill="#4472C4"/><circle cx="291.6" cy="79.0" r="2.6" fill="#4472C4"/><circle cx="326.7" cy="88.0" r="2.6" fill="#4472C4"/><circle cx="361.8" cy="81.3" r="2.6" fill="#4472C4"/><circle cx="396.9" cy="76.8" r="2.6" fill="#4472C4"/>
+<circle cx="432.0" cy="169.0" r="4" fill="#C9211E"/>
+<text x="424.0" y="173.0" text-anchor="end" style="fill:#9C0006;font-weight:600;font-size:11px">r-2291 0.812</text>
+<text x="46.0" y="210" text-anchor="middle">1</text><text x="81.1" y="210" text-anchor="middle">2</text><text x="116.2" y="210" text-anchor="middle">3</text><text x="151.3" y="210" text-anchor="middle">4</text><text x="186.4" y="210" text-anchor="middle">5</text><text x="221.5" y="210" text-anchor="middle">6</text><text x="256.5" y="210" text-anchor="middle">7</text><text x="291.6" y="210" text-anchor="middle">8</text><text x="326.7" y="210" text-anchor="middle">9</text><text x="361.8" y="210" text-anchor="middle">10</text><text x="396.9" y="210" text-anchor="middle">11</text><text x="432.0" y="210" text-anchor="middle">12</text>
+</svg></div>
+<div class="freeze-h" style="grid-area:2/2/3/18;" aria-hidden="true"></div>
+<div class="refbox" style="grid-area:3/5/4/6;" aria-hidden="true"></div>
+<div class="refbox r2" style="grid-area:3/3/4/4;" aria-hidden="true"></div>
+<div class="selbox " style="grid-area:3/6/4/7;" aria-hidden="true"></div>
+</div>
+</main>
+<nav class="tabs" aria-label="Sections">
+  <div class="tabnav"><button aria-label="Previous sheet">&lsaquo;</button><button aria-label="Next sheet">&rsaquo;</button></div>
+  <a class="tab" href="#" aria-current="page">Runs</a>
+  <a class="tab" href="#">Datasets <span class="dim">loading&hellip;</span></a>
+  <a class="tab" href="#">Models</a>
+  <a class="tab" href="#">Baselines</a>
+  <a class="tab" href="#">Settings</a>
+  <button class="tab add" aria-label="Add sheet">+</button>
+  <div class="hscroll" aria-hidden="true"><span></span></div>
+</nav>
+<footer class="status">
+  <span>Ready</span>
+  <span class="calc">Calculating Datasets <i></i></span>
+  <span class="push">E2: regression, outside the noise band</span>
+  <span>100%</span>
+</footer>
+</div>
+</body>
+</html>

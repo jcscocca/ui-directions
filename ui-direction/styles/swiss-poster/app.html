@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--white); }
+body {
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+  color: var(--black);
+  background: var(--white);
+  overflow-x: hidden;
+  padding-bottom: 64px;
+}
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 3px solid var(--black); outline-offset: 3px; }
+.pad { padding: 0 20px; }
+
+.top { display: flex; align-items: baseline; justify-content: space-between; padding: 16px 20px 0; }
+.top .brand { font-stretch: var(--w-compressed); font-weight: 900; font-size: 30px; line-height: 1; }
+.top .date { font-size: 15px; font-weight: 600; }
+
+/* poster: title crossing the drawn cover */
+.poster { position: relative; height: 338px; margin-top: 12px; overflow: hidden; }
+.cover {
+  position: absolute; left: 226px; top: 0; width: 164px; height: 338px;
+  background: var(--ultramarine); color: var(--white);
+  border-left: 9px solid var(--ultramarine-deep);
+}
+.cover .disc {
+  position: absolute; right: 14px; top: 14px; width: 54px; height: 54px; border-radius: 50%;
+  background: linear-gradient(90deg, var(--white) 50%, var(--black) 50%);
+}
+.cover .by { position: absolute; left: 14px; bottom: 14px; font-size: 11px; font-weight: 700; font-stretch: var(--w-expanded); line-height: 1.2; }
+.title {
+  position: absolute; left: -4px; top: 4px; width: 400px;
+  font-stretch: var(--w-compressed); font-weight: 800; font-size: 116px;
+  line-height: .84; letter-spacing: -0.02em;
+}
+.title span { display: block; white-space: nowrap; }
+.title.ink { clip-path: inset(0 170px 0 0); }
+.title.paper { color: var(--white); clip-path: inset(0 0 0 230px); }
+
+.who { padding: 12px 20px 0; display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; }
+.who b { font-weight: 700; font-size: 17px; }
+
+/* giant numerals */
+.pages { display: flex; align-items: flex-end; gap: 14px; padding: 10px 20px 0 14px; }
+.pages .n { font-stretch: var(--w-compressed); font-weight: 800; font-size: 136px; line-height: .78; letter-spacing: -0.03em; }
+.pages .of { font-stretch: var(--w-compressed); font-weight: 200; font-size: 64px; line-height: .8; letter-spacing: -0.02em; }
+.pages p { margin-left: auto; font-size: 14px; line-height: 1.3; text-align: left; padding-bottom: 2px; }
+.pages p b { font-weight: 800; font-size: 22px; display: block; font-stretch: var(--w-condensed); }
+.track { height: 10px; margin: 14px 20px 0; background: #E3E3E3; position: relative; }
+.track::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 61%; background: var(--black); }
+
+/* the unfinished goal: a full-bleed yellow band, 40% filled */
+.goal { margin-top: 22px; border-top: var(--rule) solid var(--black); border-bottom: var(--rule) solid var(--black); position: relative; height: 76px; }
+.goal .fill { position: absolute; inset: 0 60% 0 0; background: var(--yellow); }
+.goal .l { position: absolute; left: 20px; top: 12px; }
+.goal .l b { display: block; font-stretch: var(--w-compressed); font-weight: 800; font-size: 44px; line-height: .9; }
+.goal .l span { font-size: 13px; font-weight: 600; }
+.goal .r { position: absolute; left: calc(40% + 12px); top: 14px; font-size: 14px; line-height: 1.3; }
+.goal .r b { font-weight: 800; }
+.goal-note { padding: 8px 20px 0; font-size: 13px; }
+
+.act { display: flex; align-items: stretch; gap: 16px; padding: 20px 20px 0; }
+.streak { display: flex; align-items: baseline; gap: 6px; }
+.streak b { font-stretch: var(--w-compressed); font-weight: 800; font-size: 64px; line-height: .8; }
+.streak span { font-size: 14px; line-height: 1.15; font-weight: 600; }
+.log {
+  flex: 1; font: inherit; font-stretch: var(--w-condensed); font-weight: 800; font-size: 22px;
+  background: var(--black); color: var(--white); border: 0; min-height: 56px; cursor: pointer; text-align: left; padding: 0 18px;
+}
+.log:hover { background: var(--ultramarine); }
+.log:active { background: var(--yellow); color: var(--black); }
+.log:focus-visible { outline-offset: 3px; }
+
+h2 { font-stretch: var(--w-expanded); font-size: 12px; font-weight: 700; padding: 0 20px; }
+.next { margin-top: 44px; }
+.next ol { list-style: none; margin-top: 10px; border-top: var(--rule) solid var(--black); }
+.next li { display: grid; grid-template-columns: 34px 1fr auto; column-gap: 6px; padding: 12px 20px 12px; align-items: baseline; }
+.next li + li { border-top: 1px solid var(--black); }
+.next .i { font-stretch: var(--w-compressed); font-weight: 800; font-size: 30px; line-height: .9; }
+.next .t { font-stretch: var(--w-condensed); font-weight: 700; font-size: 21px; line-height: 1.05; overflow-wrap: anywhere; }
+.next .a { display: block; font-stretch: var(--w-normal); font-weight: 400; font-size: 14px; margin-top: 4px; line-height: 1.25; }
+.next .p { font-size: 14px; font-weight: 600; white-space: nowrap; }
+
+.hl { margin-top: 36px; background: var(--ultramarine); color: var(--white); padding: 22px 20px 24px; }
+.hl h2 { padding: 0; }
+.hl blockquote { font-stretch: var(--w-condensed); font-weight: 300; font-size: 30px; line-height: 1.05; margin-top: 12px; letter-spacing: -0.01em; }
+.hl p { font-size: 14px; margin-top: 12px; color: var(--on-blue-soft); }
+
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; height: 56px; background: var(--white); border-top: var(--rule) solid var(--black); display: flex; gap: 18px; align-items: center; padding: 0 20px; }
+nav.tabs a { font-stretch: var(--w-condensed); font-size: 21px; font-weight: 300; line-height: 1; padding: 8px 0; }
+nav.tabs a[aria-current] { font-weight: 800; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="brand">Shelf</span>
+  <span class="date">Thu 24 Sep</span>
+</header>
+
+<section class="poster" aria-label="Currently reading">
+  <div class="cover" aria-hidden="true">
+    <span class="disc"></span>
+    <span class="by">Ursula K.<br>Le Guin</span>
+  </div>
+  <h1 class="title ink"><span>The Left</span><span>Hand of</span><span>Darkness</span></h1>
+  <div class="title paper" aria-hidden="true"><span>The Left</span><span>Hand of</span><span>Darkness</span></div>
+</section>
+
+<p class="who"><b>Ursula K. Le Guin</b><span>Last read yesterday</span></p>
+
+<div class="pages" aria-label="Page 184 of 304, 61 percent">
+  <span class="n">184</span><span class="of">/304</span>
+  <p><b>61%</b>120 pages left</p>
+</div>
+<div class="track" aria-hidden="true"></div>
+
+<section class="goal" aria-label="Today's goal: 8 of 20 pages read, not met">
+  <div class="fill"></div>
+  <div class="l"><b>8/20</b><span>pages today</span></div>
+  <div class="r"><b>12 to go.</b><br>Goal not met yet.</div>
+</section>
+
+<div class="act">
+  <div class="streak"><b>11</b><span>day<br>streak</span></div>
+  <button class="log" type="button">Log pages</button>
+</div>
+
+<section class="next">
+  <h2>Up next</h2>
+  <ol>
+    <li><span class="i">1</span><span class="t">Piranesi<span class="a">Susanna Clarke</span></span><span class="p">272 pp</span></li>
+    <li><span class="i">2</span><span class="t">The Remains of the Day<span class="a">Kazuo Ishiguro</span></span><span class="p">245 pp</span></li>
+    <li><span class="i">3</span><span class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone<span class="a">J. Placeholder-Smythe</span></span><span class="p">1,104 pp</span></li>
+  </ol>
+</section>
+
+<section class="hl">
+  <h2>Saved highlight</h2>
+  <blockquote>&ldquo;Light is the left hand of darkness and darkness the right hand of light.&rdquo;</blockquote>
+  <p>The Left Hand of Darkness, p. 222</p>
+</section>
+
+<nav class="tabs" aria-label="Sections">
+  <a href="#" aria-current="page">Today</a>
+  <a href="#">Library</a>
+  <a href="#">Highlights</a>
+  <a href="#">Stats</a>
+</nav>
+
+</body>
+</html>

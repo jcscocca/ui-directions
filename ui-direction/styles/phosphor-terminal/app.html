@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+body {
+  font-family: var(--font-mono);
+  font-size: min(var(--t), calc(100vw / 30));
+  line-height: var(--row);
+  font-variant-numeric: tabular-nums;
+  font-variant-ligatures: none;
+  color: var(--amber);
+  background: var(--bg);
+  text-shadow: var(--glow);
+  overflow-x: hidden;
+  padding: var(--row) 0 calc(3 * var(--row));
+}
+a, button { font: inherit; color: inherit; background: none; border: 0; text-shadow: inherit; text-decoration: none; }
+:focus-visible { outline: none; background: var(--amber) !important; color: var(--bg) !important; text-shadow: none; }
+.dim { color: var(--dim-text); }
+.b { font-weight: 700; }
+.rev { background: var(--amber); color: var(--bg); text-shadow: none; }
+p, .ln { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.bar-top { position: fixed; top: 0; left: 0; right: 0; height: var(--row); display: flex; white-space: pre; background: var(--bg); z-index: 2; }
+.bar-top .r { margin-left: auto; }
+
+/* panes: borders through cell centres, heights in whole rows */
+.pane {
+  position: relative; margin: 10px calc(0.5ch) 10px calc(0.5ch);
+  border: 1px solid var(--dim); padding: 9px calc(1.5ch - 1px);
+}
+.pane.focus { border-color: var(--amber); }
+.pane > h2 {
+  position: absolute; top: -11px; left: calc(1.5ch - 1px);
+  font-size: inherit; font-weight: 400; background: var(--bg); padding: 0 1ch; white-space: pre;
+}
+.pane.focus > h2 { font-weight: 700; }
+
+.book { display: grid; grid-template-columns: 12ch 1fr; column-gap: 2ch; }
+.cover {
+  height: calc(7 * var(--row)); background: var(--amber); color: var(--bg); text-shadow: none;
+  white-space: pre; font-weight: 700; padding: 0 1ch; position: relative;
+}
+.cover .au { position: absolute; bottom: 0; left: 1ch; font-weight: 400; }
+.cover .yy { position: absolute; top: calc(3.5 * var(--row)); left: 4.5ch; width: 2ch; height: var(--row); }
+.cover .yy::before, .cover .yy::after { content: ""; position: absolute; top: 3px; width: 7px; height: 14px; }
+.cover .yy::before { left: 1px; border: 2px solid var(--bg); border-right: 0; border-radius: 7px 0 0 7px; }
+.cover .yy::after { left: 8px; background: var(--bg); border-radius: 0 7px 7px 0; }
+.readout { font-family: var(--font-readout); font-size: 60px; line-height: calc(3 * var(--row)); letter-spacing: 0.02em; }
+.readout small { font-size: 30px; color: var(--dim-text); }
+
+.prog { white-space: pre; margin-top: var(--row); }
+.prog i { font-style: normal; color: var(--dim-text); text-shadow: none; }
+
+.log {
+  display: block; width: calc(49ch); margin: 10px 0.5ch 0; height: calc(2 * var(--row));
+  background: var(--amber); color: var(--bg); text-shadow: none; font-weight: 700; text-align: left; padding: 0 1.5ch; cursor: pointer; white-space: pre;
+}
+.log:hover { background: var(--cyan); }
+.log:active { transform: translateY(1px); }
+.log .k { font-weight: 400; }
+.log:focus-visible { background: var(--cyan) !important; }
+
+ol { list-style: none; }
+.next li { display: grid; grid-template-columns: 3ch 1fr 9ch; }
+.next li + li { margin-top: var(--row); }
+.next .pp { text-align: right; }
+
+.keys { position: fixed; left: 0; right: 0; bottom: 0; height: calc(2 * var(--row)); background: var(--bg); border-top: 1px solid var(--dim); display: flex; align-items: center; padding: 0 1ch; gap: 1ch; white-space: pre; }
+.keys a { padding: 0 0.5ch; line-height: calc(2 * var(--row) - 2px); }
+.keys a kbd { font: inherit; color: var(--bg); background: var(--dim); text-shadow: none; padding: 0 0.5ch; margin-right: 0.5ch; }
+.keys a[aria-current] { background: var(--amber); color: var(--bg); text-shadow: none; font-weight: 700; }
+.keys a[aria-current] kbd { background: var(--bg); color: var(--amber); }
+</style>
+</head>
+<body>
+
+<header class="bar-top"><span class="rev b"> shelf </span><span> today</span><span class="r dim">thu 24 sep </span></header>
+
+<section class="pane focus" aria-label="Currently reading">
+  <h2>[1] reading</h2>
+  <div class="book">
+    <div class="cover" aria-hidden="true">THE LEFT
+HAND OF
+DARKNESS
+<span class="yy"></span>
+<span class="au">LE GUIN</span></div>
+    <div>
+      <p class="b">The Left Hand of Darkness</p>
+      <p class="dim">Ursula K. Le Guin</p>
+      <p></p>
+      <p class="readout" aria-label="page 184 of 304">184<small>/304</small></p>
+      <p class="dim">last read yesterday</p>
+    </div>
+  </div>
+  <p class="prog" aria-label="61 percent read">[█████████████████████████<i>░░░░░░░░░░░░░░░░</i>] 61%</p>
+</section>
+
+<section class="pane" aria-label="Today">
+  <h2>[2] today</h2>
+  <p>goal 20 pages   <span class="b">8 read</span>   12 to go</p>
+  <p class="prog" style="margin-top:0" aria-label="8 of 20 pages">[████████<i>░░░░░░░░░░░░</i>]  8/20  <span class="b">open</span></p>
+  <p class="dim">goal not met yet today</p>
+  <p></p>
+  <p>streak  <span aria-hidden="true">■■■■■■■■■■■</span>  <span class="b">11 days</span></p>
+</section>
+
+<button class="log" type="button"><span class="k">[enter]</span>  log pages</button>
+
+<section class="pane" aria-label="Up next" style="margin-top: 30px">
+  <h2>[3] up next</h2>
+  <ol class="next">
+    <li><span class="dim">1</span><span><span class="b">Piranesi</span><br><span class="dim">Susanna Clarke</span></span><span class="pp">272 pp</span></li>
+    <li><span class="dim">2</span><span><span class="b">The Remains of the Day</span><br><span class="dim">Kazuo Ishiguro</span></span><span class="pp">245 pp</span></li>
+    <li><span class="dim">3</span><span style="overflow-wrap:anywhere"><span class="b">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</span><br><span class="dim">J. Placeholder-Smythe</span></span><span class="pp">1,104 pp</span></li>
+  </ol>
+</section>
+
+<section class="pane" aria-label="Saved highlight">
+  <h2>[4] highlight</h2>
+  <p>"Light is the left hand of darkness and darkness the right hand of light."</p>
+  <p class="dim">  The Left Hand of Darkness, p. 222</p>
+</section>
+
+<nav class="keys" aria-label="Sections">
+  <a href="#" aria-current="page"><kbd>t</kbd>today</a>
+  <a href="#"><kbd>l</kbd>library</a>
+  <a href="#"><kbd>h</kbd>highlights</a>
+  <a href="#"><kbd>s</kbd>stats</a>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--paper); min-height: 100%; }
+body {
+  font-family: var(--font-gothic);
+  font-size: var(--t-body);
+  line-height: var(--line);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--paper) var(--dots);
+  overflow-x: hidden;
+  padding: 20px 16px 100px 80px;
+  position: relative;
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+.n { font-family: var(--font-mincho); }
+
+/* the date gutter */
+.gutter { position: absolute; left: 0; top: 0; bottom: 0; width: 64px; background: var(--paper-fold); border-right: 1px solid var(--rule); }
+.gutter::after { content: ""; position: absolute; right: 6px; top: 0; bottom: 0; border-right: 1px solid var(--rule); }
+.day { position: absolute; left: 0; width: 58px; top: 18px; text-align: center; font-family: var(--font-mincho); }
+.day b { display: block; font-weight: 500; font-size: 40px; line-height: 40px; }
+.day span { display: block; font-size: 15px; line-height: 20px; }
+.date { position: absolute; left: 17px; top: 108px; writing-mode: vertical-rl; font-family: var(--font-mincho); font-size: 22px; line-height: 24px; letter-spacing: 0.12em; }
+.vl { position: absolute; left: 20px; writing-mode: vertical-rl; font-family: var(--font-mincho); font-size: 15px; line-height: 18px; letter-spacing: 0.08em; font-weight: 500; }
+
+.top { height: 40px; display: flex; align-items: flex-start; }
+.top h1 { font-family: var(--font-mincho); font-weight: 500; font-size: var(--t-head); line-height: 20px; }
+
+/* the goal: 20 tick boxes, dominant */
+.goal { margin-top: 20px; }
+.goal h2 { font-family: var(--font-mincho); font-weight: 500; font-size: var(--t-lead); line-height: 20px; }
+.boxes { display: grid; grid-template-columns: repeat(10, 22px); justify-content: space-between; row-gap: 6px; margin-top: 10px; list-style: none; max-width: 300px; }
+.boxes li { width: 22px; height: 22px; border: 1.5px solid var(--pencil); border-radius: 2px; }
+.boxes li.on { background: var(--ink); border-color: var(--ink); }
+.goal p { margin-top: 20px; }
+.goal p b { font-weight: 700; }
+
+.acts { margin-top: 20px; height: 60px; display: flex; align-items: flex-start; gap: 16px; }
+.log {
+  font-family: var(--font-mincho); font-size: var(--t-lead); font-weight: 600; color: var(--ink);
+  background: var(--paper); border: 1.5px solid var(--ink); border-radius: 3px; height: 48px; padding: 0 22px;
+  cursor: pointer; position: relative; white-space: nowrap; flex: none;
+}
+.log::after { content: ""; position: absolute; left: 5px; right: -5px; bottom: -5px; height: 1.5px; background: var(--ink); opacity: .35; }
+.log:hover { background: var(--ink-wash); }
+.log:active { transform: translateY(1px); }
+.acts p { font-size: 12px; line-height: 18px; color: var(--pencil-text); }
+
+.streak { margin-top: 20px; display: flex; align-items: flex-start; gap: 14px; height: 60px; }
+.streak svg { transform: rotate(-5deg); mix-blend-mode: multiply; flex: none; }
+.streak p { font-size: 13px; line-height: 20px; }
+.streak p b { font-family: var(--font-mincho); font-size: 17px; font-weight: 600; display: block; line-height: 20px; }
+
+/* the book, taped in as a title slip */
+.slip {
+  margin-top: 40px; position: relative; background: #F7F9F8; border: 1px solid var(--rule);
+  padding: 18px 16px 29px 16px; border-top: 6px solid var(--ink);
+}
+.slip::before {
+  content: ""; position: absolute; left: -10px; top: -16px; width: 74px; height: 22px; transform: rotate(-6deg);
+  background: var(--tape) repeating-linear-gradient(45deg, rgba(63,78,115,.10) 0 4px, transparent 4px 10px);
+  clip-path: polygon(0 8%, 5% 0, 10% 10%, 100% 0, 95% 50%, 100% 100%, 4% 94%, 0 50%);
+}
+.slip::after { content: ""; position: absolute; right: -8px; top: -13px; width: 56px; height: 22px; transform: rotate(5deg); background: var(--tape) repeating-linear-gradient(45deg, rgba(63,78,115,.10) 0 4px, transparent 4px 10px); clip-path: polygon(0 0, 100% 8%, 96% 50%, 100% 96%, 0 100%, 5% 50%); }
+.slip h2 { font-family: var(--font-mincho); font-weight: 500; font-size: 24px; line-height: 30px; overflow-wrap: anywhere; }
+.slip .by { margin-top: 6px; }
+.slip .when { color: var(--pencil-text); font-size: 13px; }
+
+.pages { margin-top: 20px; display: flex; align-items: baseline; gap: 10px; height: 40px; }
+.pages .n { font-size: 32px; line-height: 40px; background: var(--paper); padding: 0 4px; margin-left: -4px; }
+.pages .of, .pages .pc { background: var(--paper); padding: 0 3px; }
+.pages .of { font-family: var(--font-mincho); font-size: 16px; color: var(--pencil-text); }
+.pages .pc { margin-left: auto; font-size: 13px; color: var(--pencil-text); }
+.line { height: 20px; position: relative; }
+.line::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; border-top: 1px solid var(--pencil); }
+.line::after { content: ""; position: absolute; left: 0; width: 61%; top: 9px; height: 3px; background: var(--ink); }
+
+h3 { font-family: var(--font-mincho); font-weight: 500; font-size: 15px; color: var(--ink); }
+.next { margin-top: 40px; }
+.next ol { list-style: none; }
+.next li { display: grid; grid-template-columns: 22px 1fr; padding: 0 0 19px; margin-top: 20px; border-bottom: 1px solid var(--rule); }
+.next li:first-child { margin-top: 0; }
+.next li .i { font-family: var(--font-mincho); color: var(--pencil-text); }
+.next li .t { font-family: var(--font-mincho); font-size: 16px; overflow-wrap: anywhere; }
+.next li .a { display: block; font-family: var(--font-gothic); font-size: 12px; color: var(--pencil-text); }
+
+.kept { margin-top: 40px; }
+.kept blockquote { margin-top: 20px; padding-left: 16px; border-left: 2px solid var(--ink); font-family: var(--font-mincho); font-size: 17px; line-height: 20px; }
+.kept p { margin-top: 20px; padding-left: 18px; font-size: 12px; color: var(--pencil-text); }
+
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; height: 56px; background: var(--paper); border-top: 1px solid var(--pencil); display: flex; padding: 0 16px 0 80px; gap: 18px; align-items: center; }
+@media (max-width: 380px) { nav.tabs { padding-left: 72px; gap: 14px; } }
+nav.tabs a { font-size: 14px; padding: 6px 0 3px; border-bottom: 2px solid transparent; }
+nav.tabs a[aria-current] { border-bottom-color: var(--ink); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="gutter" aria-hidden="true"></div>
+<p class="day" aria-hidden="true"><b>24</b><span>Sep</span></p>
+<p class="date">Thu 24 Sep</p>
+<span class="vl" style="top:470px" aria-hidden="true">reading</span>
+
+<header class="top"><h1>Shelf</h1></header>
+
+<section class="goal" aria-label="Today's goal">
+  <h2>Today, 20 pages</h2>
+  <ol class="boxes" aria-hidden="true">
+    <li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li></li><li></li>
+    <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+  </ol>
+  <p><b>8 read,</b> 12 to go. Not done yet today.</p>
+</section>
+
+<div class="acts">
+  <button class="log" type="button">Log pages</button>
+  <p>Each page you log inks a box.</p>
+</div>
+
+<div class="streak">
+  <svg width="60" height="60" viewBox="0 0 54 54" role="img" aria-label="Seal: 11 days">
+    <defs><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="1.6"/></filter></defs>
+    <g filter="url(#grain)">
+      <rect x="3" y="3" width="48" height="48" rx="3" fill="none" stroke="#C23B22" stroke-width="3"/>
+      <text x="27" y="26" text-anchor="middle" font-family="Shippori Mincho, serif" font-weight="600" font-size="18" fill="#C23B22">11</text>
+      <text x="27" y="45" text-anchor="middle" font-family="Shippori Mincho, serif" font-weight="600" font-size="17" fill="#C23B22">日</text>
+    </g>
+  </svg>
+  <p><b>11 days in a row</b>Read today to keep it.</p>
+</div>
+
+<section class="slip" aria-label="Currently reading: cover slip">
+  <h2>The Left Hand of Darkness</h2>
+  <p class="by">Ursula K. Le Guin</p>
+  <p class="when">Last read yesterday</p>
+</section>
+
+<div class="pages"><span class="n">184</span><span class="of">of 304 pages</span><span class="pc">61% read</span></div>
+<div class="line" role="img" aria-label="61 percent of the book read"></div>
+
+<section class="next">
+  <h3>Up next</h3>
+  <ol>
+    <li><span class="i">1</span><span class="t">Piranesi<span class="a">Susanna Clarke, 272 pp</span></span></li>
+    <li><span class="i">2</span><span class="t">The Remains of the Day<span class="a">Kazuo Ishiguro, 245 pp</span></span></li>
+    <li><span class="i">3</span><span class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone<span class="a">J. Placeholder-Smythe, 1,104 pp</span></span></li>
+  </ol>
+</section>
+
+<section class="kept">
+  <h3>Kept from this book</h3>
+  <blockquote>&ldquo;Light is the left hand of darkness and darkness the right hand of light.&rdquo;</blockquote>
+  <p>The Left Hand of Darkness, p. 222</p>
+</section>
+
+<nav class="tabs" aria-label="Sections">
+  <a href="#" aria-current="page">Today</a>
+  <a href="#">Library</a>
+  <a href="#">Highlights</a>
+  <a href="#">Stats</a>
+</nav>
+
+</body>
+</html>

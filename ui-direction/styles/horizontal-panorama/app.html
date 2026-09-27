@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shelf: today</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  :root { --gutter: 16px; }
+  .topline { height: 38px; gap: 12px; }
+  .topline .date { font-size: var(--t-s); color: var(--ink-2); }
+  .pivot { height: 58px; gap: 22px; }
+  .pivot a { font-size: 44px; }
+
+  .pano { overflow-y: hidden; }
+  .strip { gap: 16px; height: auto; }
+  .panel { flex: none; width: calc(100vw - 60px); max-width: 330px; scroll-snap-align: start; scroll-margin-left: var(--gutter); }
+
+  /* live tile: current book */
+  .book {
+    display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px;
+    background: var(--accent); padding: 12px; color: #fff; text-decoration: none;
+  }
+  .cover {
+    width: 112px; height: 168px; background: #E4ECEE; color: #13233A;
+    padding: 10px 9px; display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .cover .ct { font-size: 15px; font-weight: 600; line-height: 1.05; letter-spacing: -.01em; position: relative; }
+  .cover .ca { font-size: 10px; font-weight: 500; letter-spacing: .02em; position: relative; }
+  .cover svg { position: absolute; right: -18px; top: 58px; width: 92px; height: 92px; }
+  .book .lbl { font-size: var(--t-xs); }
+  .book .title { font-size: var(--t-l); font-weight: var(--w-pivot); line-height: 1.12; margin: 2px 0 2px; overflow-wrap: anywhere; }
+  .book .author { font-size: var(--t-xs); }
+  .book .page { margin-top: 10px; display: flex; align-items: baseline; gap: 6px; }
+  .book .page b { font-size: 52px; font-weight: var(--w-hero); line-height: .9; letter-spacing: -.03em; }
+  .book .page span { font-size: var(--t-s); }
+  .bar { height: 4px; background: rgba(255,255,255,.3); margin: 8px 0 5px; }
+  .bar i { display: block; height: 100%; width: 61%; background: #fff; }
+  .book .meta { display: flex; justify-content: space-between; font-size: var(--t-xs); }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .sq {
+    position: relative; height: 142px; background: var(--tile); padding: 8px 10px;
+    display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
+  }
+  .sq > * { position: relative; }
+  .sq .big { font-size: 64px; font-weight: var(--w-hero); line-height: .95; letter-spacing: -.03em; }
+  .sq .big small { font-size: var(--t-s); font-weight: var(--w-body); letter-spacing: 0; margin-left: 4px; }
+  .sq .lbl { font-size: var(--t-xs); line-height: 1.3; }
+  .sq .lbl b { font-weight: var(--w-label); font-size: var(--t-s); display: block; }
+  .goal::before {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40%;
+    background: var(--tile-2);
+  }
+  .goal .tick { position: absolute; right: 0; left: 0; bottom: 40%; border-top: 1px dashed var(--ink-2); }
+  .streak-cells { display: flex; gap: 3px; }
+  .streak-cells i { width: 9px; height: 9px; background: var(--accent); }
+  .streak-cells i.off { background: var(--tile-2); }
+
+  .log {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; margin-top: 8px; height: 54px; padding: 0 14px;
+    background: #fff; color: #000; border: 0; cursor: pointer;
+    font-size: var(--t-l); font-weight: var(--w-body);
+  }
+  .log span { font-size: var(--t-xs); color: #333; }
+  .log:hover { background: #E6E6E6; }
+  .log:active { background: var(--accent); color: #fff; }
+  .log:active span { color: #fff; }
+
+  .sub { font-size: var(--t-xl); font-weight: var(--w-title); margin: 20px 0 6px; letter-spacing: -.01em; line-height: 1; }
+  .next { list-style: none; margin: 0; padding: 0; }
+  .next li { display: grid; grid-template-columns: 8px minmax(0,1fr); gap: 12px; padding: 7px 0; }
+  .next .spine { width: 8px; }
+  .next .t { font-size: var(--t-l); font-weight: var(--w-pivot); line-height: 1.15; overflow-wrap: anywhere; display: block; }
+  .next .a { font-size: var(--t-xs); color: var(--ink-2); display: block; margin-top: 2px; }
+
+  blockquote { margin: 0; font-size: 22px; font-weight: var(--w-title); line-height: 1.25; }
+  .src { font-size: var(--t-xs); color: var(--ink-2); margin: 8px 0 32px; }
+
+  /* library panel, only its edge is visible on load */
+  .shelfgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .shelfgrid div { height: 150px; padding: 8px; font-size: var(--t-xs); display: flex; align-items: flex-end; }
+</style>
+</head>
+<body>
+<div class="shelf">
+  <header class="topline">
+    <span class="appname">SHELF</span>
+    <span class="spacer"></span>
+    <span class="date">Thu 24 Sep</span>
+  </header>
+  <nav class="pivot" aria-label="Sections">
+    <a href="#" aria-current="page">today</a>
+    <a href="#">library</a>
+    <a href="#">highlights</a>
+    <a href="#">stats</a>
+  </nav>
+
+  <main class="pano" tabindex="0" aria-label="Today. Swipe sideways for library.">
+    <div class="strip">
+      <section class="panel" aria-label="Today">
+        <a class="book tilt" href="#">
+          <span class="cover" aria-hidden="true">
+            <span class="ct">The Left Hand of Darkness</span>
+            <svg viewBox="0 0 92 92"><circle cx="34" cy="46" r="30" fill="#13233A"/><circle cx="58" cy="46" r="30" fill="none" stroke="#13233A" stroke-width="2"/></svg>
+            <span class="ca">URSULA K. LE GUIN</span>
+          </span>
+          <span>
+            <span class="lbl">currently reading</span>
+            <span class="title" style="display:block">The Left Hand of Darkness</span>
+            <span class="author">Ursula K. Le Guin</span>
+            <span class="page"><b>184</b><span>of 304 pages</span></span>
+            <span class="bar" style="display:block" role="progressbar" aria-valuemin="0" aria-valuemax="304" aria-valuenow="184" aria-label="Page 184 of 304"><i></i></span>
+            <span class="meta"><span>61%</span><span>last read yesterday</span></span>
+          </span>
+        </a>
+
+        <div class="pair">
+          <div class="sq">
+            <span class="big">11<small>days</small></span>
+            <span class="streak-cells" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            <span class="lbl"><b>streak</b>days in a row with pages logged</span>
+          </div>
+          <div class="sq goal" role="group" aria-label="Today's goal: 8 of 20 pages read, 12 to go">
+            <span class="tick" aria-hidden="true"></span>
+            <span class="big">8<small>of 20 pages</small></span>
+            <span class="lbl"><b>12 to go</b>today's goal, not met yet</span>
+          </div>
+        </div>
+
+        <button class="log" type="button">log pages<span>p. 184 now</span></button>
+
+        <h2 class="sub">up next</h2>
+        <ol class="next">
+          <li><span class="spine" style="background:#00827F"></span><span><span class="t">Piranesi</span><span class="a">Susanna Clarke, 272 pp</span></span></li>
+          <li><span class="spine" style="background:#A6A6A6"></span><span><span class="t">The Remains of the Day</span><span class="a">Kazuo Ishiguro, 245 pp</span></span></li>
+          <li><span class="spine" style="background:#D80073"></span><span><span class="t">A Very Long Book Title That Will Absolutely Need To Wrap Onto Several Lines On A Phone</span><span class="a">J. Placeholder-Smythe, 1,104 pp</span></span></li>
+        </ol>
+
+        <h2 class="sub">saved highlight</h2>
+        <blockquote>“Light is the left hand of darkness and darkness the right hand of light.”</blockquote>
+        <p class="src">The Left Hand of Darkness, p. 222</p>
+      </section>
+
+      <section class="panel" aria-label="Library">
+        <div class="shelfgrid" aria-hidden="true">
+          <div style="background:#E4ECEE;color:#13233A">The Left Hand of Darkness</div>
+          <div style="background:#00827F">Piranesi</div>
+          <div style="background:#333">The Remains of the Day</div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
+</html>

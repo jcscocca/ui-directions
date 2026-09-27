@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wildbook: Saltmarsh Reach index</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  body { height: 100vh; min-height: 900px; overflow: hidden; }
+  .binder {
+    height: 100%; padding: 12px 20px 16px;
+    display: grid; grid-template-columns: 470px 40px 470px 32px 372px; column-gap: 0;
+    grid-template-rows: 52px 92px 1fr; row-gap: 10px;
+  }
+  .binder > .detail { margin-left: 16px; }
+  .binder > .page.left { grid-area: 3 / 1; } .binder > .gutter { grid-area: 3 / 2; } .binder > .page.right { grid-area: 3 / 3; } .binder > .dividers { grid-area: 3 / 4; }
+
+  /* top strip */
+  .strip { grid-column: 1 / 5; display: flex; align-items: center; gap: 18px; color: var(--vinyl-ink); }
+  .region { font-family: var(--font-card); font-weight: 600; font-size: var(--t-18); color: var(--card); }
+  .region small { font-family: var(--font-ui); font-weight: 400; font-size: var(--t-12); color: var(--vinyl-ink); display: block; }
+  .strip .search { margin-left: auto; width: 360px; margin-right: 16px; }
+
+  /* completion and filters */
+  .controls { grid-column: 1 / 5; display: grid; grid-template-columns: 250px 1fr; gap: 20px; align-items: center; color: var(--vinyl-ink); }
+  .done .big { font-family: var(--font-card); font-weight: 700; font-size: 44px; line-height: 1; color: var(--card); }
+  .done .big small { font-size: var(--t-18); font-weight: 500; color: var(--vinyl-ink); }
+  .done p { font-size: var(--t-13); margin-top: 6px; }
+  .done p b { color: var(--card); }
+  .filters { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; font-size: var(--t-12); }
+  .filters .lbl { color: var(--vinyl-ink); text-align: right; }
+  .filters .row { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 9px; border-radius: 3px; border: 1px solid var(--vinyl-deep); background: var(--sleeve-edge); color: var(--ink); font-size: var(--t-12); font-weight: 500; cursor: pointer; }
+  .chip:hover { background: var(--card); }
+  .chip[aria-pressed="true"] { background: var(--card); border-color: var(--card); font-weight: 700; box-shadow: inset 0 -3px 0 var(--gold); }
+  .chip svg { width: 11px; height: 11px; }
+  .filters .gap { width: 10px; }
+
+  /* pages */
+  .page.left, .page.right { display: flex; flex-direction: column; }
+  .page.left { padding: 12px 26px 8px 12px; }
+  .page.right { padding: 12px 12px 8px 26px; }
+  .sheet { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; }
+  .foot { display: flex; gap: 12px; white-space: nowrap; align-items: center; padding-top: 7px; font-size: var(--t-12); color: var(--ink-2); min-height: 22px; }
+  .foot .pg { margin-left: auto; }
+  .foot svg { width: 11px; height: 11px; vertical-align: -1px; margin-right: 3px; }
+
+  /* creature cards in pockets */
+  .ck .card { padding: 5px; gap: 4px; }
+  .ck a.card { text-decoration: none; }
+  .ck a.card:hover { border-color: var(--ink-2); }
+  .ck-name { height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 0 2px; }
+  .ck-name .card-name { font-size: 14.5px; }
+  .ck-name .card-name.long { font-size: 12.5px; line-height: 1.05; }
+  .mark { width: 12px; height: 12px; flex: none; }
+  .ck-art { flex: 1; position: relative; border: 1px solid var(--ink); border-radius: 3px; overflow: hidden; display: grid; place-items: center; }
+  .ck-art img, .ck-art .ph { grid-area: 1 / 1; }
+  .ck-art img { width: 94%; height: 94%; object-fit: contain; position: relative; }
+  .ck-type { font-size: 11px; font-weight: 600; padding: 0 2px; }
+  .ck-foot { display: flex; justify-content: space-between; align-items: center; font-size: var(--t-10); color: var(--ink-2); padding: 3px 2px 0; border-top: 1px solid var(--card-edge); }
+  .ck-foot b { font-family: var(--font-card); color: var(--ink); font-weight: 700; font-size: 12px; }
+  .ck-foot .setmk { width: 11px; height: 11px; color: var(--gold); vertical-align: -1px; margin-right: 3px; }
+
+  .tide { background: var(--t-tide); } .moss { background: var(--t-moss); } .ember { background: var(--t-ember); }
+  .gale { background: var(--t-gale); } .stone { background: var(--t-stone); }
+
+  /* seen: a grey proxy card with the silhouette */
+  .ck.seen .card { background: #EDF0EF; border-style: dashed; border-color: var(--print); }
+  .ck.seen .ck-art { background: #E2E8E9; border-color: var(--print); border-style: dashed; }
+  .ck.seen img { filter: brightness(0); opacity: .5; }
+  .ck.seen .ck-type { font-style: italic; font-weight: 500; color: var(--ink-2); }
+
+  /* mythic: foil frame round the whole card */
+  .ck.mythic .card { background: var(--foil); border: 1px solid #8E7DB8; border-style: solid; padding: 7px; }
+  .ck.mythic .card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: repeating-linear-gradient(118deg, rgba(255,255,255,0) 0 7px, rgba(255,255,255,.35) 7px 9px); }
+  .ck.mythic .face { flex: 1; display: flex; flex-direction: column; gap: 4px; background: #EDF0EF; border-radius: 4px; padding: 0 4px 4px; position: relative; z-index: 1; }
+  .ck.mythic .ck-name .card-name::after { content: " Mythic"; font-family: var(--font-ui); font-size: 10px; font-weight: 700; color: #5B4A86; }
+
+  /* unknown: empty pocket, only the number printed on the page */
+  .ck.unknown { display: grid; place-items: center; }
+  .ck.unknown .slot-no { font-size: 30px; }
+  .ck.unknown .vh { position: absolute; }
+
+  .ck.spare { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-size: 11px; }
+
+  /* broken image: neutral box with the name sits behind the img */
+  .ph { width: 72%; height: 70%; border: 1.5px solid var(--print); border-radius: 4px; background: #E7ECED; display: grid; place-items: center; text-align: center; font-size: var(--t-10); color: var(--ink-2); line-height: 1.25; padding: 4px; }
+  .ph b { display: block; font-family: var(--font-card); color: var(--ink); font-size: 13px; }
+
+  /* selected: rides up out of its pocket */
+  .ck.sel .card { transform: translateY(-9px); border: 2px solid var(--ink); box-shadow: 0 3px 0 var(--gold); }
+
+  /* detail: Lanternfin lying on the vinyl, out of its sleeve */
+  .detail { grid-column: 5; grid-row: 1 / 4; display: flex; flex-direction: column; gap: 14px; padding-top: 4px; }
+  .big { height: auto; padding: 10px; gap: 7px; }
+  .bd-name { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; padding: 0 3px; }
+  .bd-name .no { font-family: var(--font-card); font-weight: 600; font-size: var(--t-15); color: var(--ink-2); display: block; }
+  .bd-name .card-name { font-size: 30px; }
+  .bd-name .rar { display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: var(--t-13); padding-bottom: 5px; }
+  .bd-name .rar svg { width: 17px; height: 17px; }
+  .bd-art { height: 188px; border: 1px solid var(--ink); border-radius: 4px; display: grid; place-items: center; box-shadow: inset 0 0 0 3px var(--card), inset 0 0 0 4px var(--gold); }
+  .bd-art img { height: 176px; width: auto; }
+  .bd-type { display: flex; justify-content: space-between; font-size: var(--t-13); font-weight: 600; padding: 0 3px 5px; border-bottom: 1px solid var(--card-edge); }
+  .bd-type span:last-child { font-weight: 500; color: var(--ink-2); }
+  .flavor { font-family: var(--font-card); font-style: italic; font-size: 14.5px; line-height: 1.32; padding: 0 3px; }
+  .statblock { display: grid; grid-template-columns: 58px 28px 1fr; gap: 5px 8px; align-items: center; padding: 6px 3px 2px; border-top: 1px solid var(--card-edge); }
+  .statblock dt { font-size: var(--t-12); font-weight: 600; }
+  .statblock dd { font-family: var(--font-card); font-weight: 700; font-size: var(--t-15); text-align: right; }
+  .statblock .bar { height: 9px; background: var(--pocket); border: 1px solid var(--seam); border-radius: 2px; position: relative; overflow: hidden; }
+  .statblock .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--vinyl);
+    background-image: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(251,250,245,.8) calc(10% - 1px) 10%); background-size: 1000% 100%; }
+  .facts { display: grid; grid-template-columns: 86px 1fr; gap: 3px 8px; font-size: var(--t-12); padding: 6px 3px 0; border-top: 1px solid var(--card-edge); }
+  .facts dt { color: var(--ink-2); }
+  .facts dd b { font-family: var(--font-card); font-size: 14px; }
+  .bd-foot { display: flex; justify-content: space-between; font-size: var(--t-10); color: var(--ink-2); padding: 3px 3px 0; border-top: 1px solid var(--card-edge); }
+  .bd-foot svg { width: 11px; height: 11px; color: var(--gold); vertical-align: -1px; margin-right: 3px; }
+
+  .under { background: var(--page); border-radius: 4px; padding: 10px 12px 12px; }
+  .under h2 { font-family: var(--font-card); font-size: var(--t-15); font-weight: 700; }
+  .evo { display: flex; align-items: flex-start; justify-content: space-between; margin-top: 8px; }
+  .evo-item { width: 92px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .evo .arrow { margin-top: 34px; }
+  .evo .pocket { width: 62px; height: 80px; padding: 3px; flex: none; }
+  .evo .pocket::before { width: 22px; height: 9px; margin-left: -11px; }
+  .evo .card { padding: 2px; }
+  .evo .card img { width: 100%; height: 100%; object-fit: contain; }
+  .evo .unk { display: grid; place-items: center; }
+  .evo .unk .slot-no { font-size: var(--t-15); }
+  .evo .arrow { width: 16px; height: 10px; color: var(--ink-2); flex: none; }
+  .evo .lbl { font-size: 11px; line-height: 1.25; text-align: center; }
+  .evo .lbl b { font-family: var(--font-card); display: block; font-size: 12px; }
+  .evo .here .card { border: 2px solid var(--ink); }
+  .evo .unk .slot-no { color: var(--print); }
+  .acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
+  .acts .btn { font-size: 12.5px; padding: 6px 6px; }
+  .acts .why { grid-column: 1 / -1; font-size: var(--t-12); color: var(--ink-2); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="foilg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9B8EC"/><stop offset=".35" stop-color="#A8DDD6"/><stop offset=".65" stop-color="#F0DE96"/><stop offset="1" stop-color="#EDB9CF"/></linearGradient>
+  </defs>
+  <symbol id="m-common" viewBox="0 0 12 12"><circle cx="6" cy="6" r="3" fill="#1B2428"/></symbol>
+  <symbol id="m-uncommon" viewBox="0 0 12 12"><path d="M6 1.2 10.8 6 6 10.8 1.2 6z" fill="#1B2428"/></symbol>
+  <symbol id="m-rare" viewBox="0 0 12 12"><path d="M6 .6l1.62 3.4 3.73.5-2.74 2.58.7 3.7L6 9l-3.3 1.78.7-3.7L.65 4.5l3.73-.5z" fill="#B8892B"/></symbol>
+  <symbol id="m-mythic" viewBox="0 0 12 12"><path d="M6 .6l1.62 3.4 3.73.5-2.74 2.58.7 3.7L6 9l-3.3 1.78.7-3.7L.65 4.5l3.73-.5z" fill="url(#foilg)" stroke="#1B2428" stroke-width=".9" stroke-linejoin="round"/></symbol>
+  <symbol id="s-reach" viewBox="0 0 12 12"><path d="M1 8.5c1.5-1.4 3-1.4 4.5 0s3 1.4 4.5 0M3.5 7V2M6 6V1.2M8.5 7V3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="arrow" viewBox="0 0 16 10"><path d="M1 5h13M10 1.5 14 5l-4 3.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="binder">
+  <header class="strip">
+    <div class="spine-label"><b>Wildbook</b></div>
+    <p class="region">Saltmarsh Reach<small>Region binder, 16 entries</small></p>
+    <label class="search"><span class="vh">Search</span><input type="search" placeholder="Search by name, number or type"></label>
+  </header>
+
+  <div class="controls">
+    <div class="done">
+      <p class="big">10<small> of 16 caught, 62%</small></p>
+      <p><b>3</b> seen but not caught, <b>3</b> never seen</p>
+    </div>
+    <div class="filters">
+      <span class="lbl">Status</span>
+      <div class="row">
+        <button class="chip" aria-pressed="true">All</button><button class="chip" aria-pressed="false">Caught</button><button class="chip" aria-pressed="false">Seen</button><button class="chip" aria-pressed="false">Unknown</button>
+        <span class="gap"></span><span class="lbl">Sort</span>
+        <button class="chip" aria-pressed="true">Number</button><button class="chip" aria-pressed="false">Name</button><button class="chip" aria-pressed="false">Rarity</button>
+      </div>
+      <span class="lbl">Type</span>
+      <div class="row">
+        <button class="chip" aria-pressed="false">Tide</button><button class="chip" aria-pressed="false">Moss</button><button class="chip" aria-pressed="false">Ember</button><button class="chip" aria-pressed="false">Gale</button><button class="chip" aria-pressed="false">Stone</button>
+        <span class="gap"></span><span class="lbl">Rarity</span>
+        <button class="chip" aria-pressed="false"><svg><use href="#m-common"/></svg>Common</button><button class="chip" aria-pressed="false"><svg><use href="#m-uncommon"/></svg>Uncommon</button><button class="chip" aria-pressed="false"><svg><use href="#m-rare"/></svg>Rare</button><button class="chip" aria-pressed="false"><svg><use href="#m-mythic"/></svg>Mythic</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- page 1: 001–009 -->
+  <section class="page left" aria-label="Index page 1, 001 to 009">
+    <ol class="sheet">
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Reedling</span><svg class="mark" aria-label="Common"><use href="#m-common"/></svg></div>
+        <div class="ck-art moss"><img src="../../art/reedling.svg" alt="Reedling"></div>
+        <p class="ck-type">Moss</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>001</b>/016</span><span>caught 14</span></p>
+      </a></li>
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Bogwhistle</span><svg class="mark" aria-label="Uncommon"><use href="#m-uncommon"/></svg></div>
+        <div class="ck-art moss"><img src="../../art/bogwhistle.svg" alt="Bogwhistle"></div>
+        <p class="ck-type">Moss / Gale</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>002</b>/016</span><span>caught 3</span></p>
+      </a></li>
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Cindermoth</span><svg class="mark" aria-label="Common"><use href="#m-common"/></svg></div>
+        <div class="ck-art ember"><img src="../../art/cindermoth.svg" alt="Cindermoth"></div>
+        <p class="ck-type">Ember</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>003</b>/016</span><span>caught 9</span></p>
+      </a></li>
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Pebblepup</span><svg class="mark" aria-label="Common"><use href="#m-common"/></svg></div>
+        <div class="ck-art stone"><img src="../../art/pebblepup.svg" alt="Pebblepup"></div>
+        <p class="ck-type">Stone</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>004</b>/016</span><span>caught 22</span></p>
+      </a></li>
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Saltcrab</span><svg class="mark" aria-label="Common"><use href="#m-common"/></svg></div>
+        <div class="ck-art tide"><img src="../../art/saltcrab.svg" alt="Saltcrab"></div>
+        <p class="ck-type">Tide / Stone</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>005</b>/016</span><span>caught 6</span></p>
+      </a></li>
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Glimmerfry</span><svg class="mark" aria-label="Uncommon"><use href="#m-uncommon"/></svg></div>
+        <div class="ck-art tide"><img src="../../art/glimmerfry.svg" alt="Glimmerfry"></div>
+        <p class="ck-type">Tide</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>006</b>/016</span><span>caught 5</span></p>
+      </a></li>
+      <li class="pocket ck sel"><a class="card" href="#lanternfin" aria-current="true">
+        <div class="ck-name"><span class="card-name">Lanternfin</span><svg class="mark" aria-label="Rare"><use href="#m-rare"/></svg></div>
+        <div class="ck-art tide"><img src="../../art/lanternfin.svg" alt="Lanternfin"></div>
+        <p class="ck-type">Tide / Ember</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>007</b>/016</span><span>caught 3</span></p>
+      </a></li>
+      <li class="pocket ck unknown"><span class="slot-no">008</span><span class="vh">Unknown, never seen</span></li>
+      <li class="pocket ck seen"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Mistheron</span><svg class="mark" aria-label="Uncommon"><use href="#m-uncommon"/></svg></div>
+        <div class="ck-art"><img src="../../art/mistheron.svg" alt="Mistheron silhouette"></div>
+        <p class="ck-type">Seen, not caught</p>
+        <p class="ck-foot"><span><b>009</b>/016</span><span>caught 0</span></p>
+      </a></li>
+    </ol>
+    <p class="foot">
+      <span>Card: caught</span><span>Grey proxy: seen</span><span>Number only: never seen</span>
+      <span class="pg">Page 1</span>
+    </p>
+    <div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>
+  </section>
+
+  <div class="gutter" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="ring"></span></div>
+
+  <!-- page 2: 010–016 and two spare pockets -->
+  <section class="page right" aria-label="Index page 2, 010 to 016">
+    <ol class="sheet">
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name long">Greater Spotted Marsh Wobbler</span><svg class="mark" aria-label="Uncommon"><use href="#m-uncommon"/></svg></div>
+        <div class="ck-art moss"><img src="../../art/marsh-wobbler.svg" alt="Greater Spotted Marsh Wobbler"></div>
+        <p class="ck-type">Moss / Tide</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>010</b>/016</span><span>caught 1</span></p>
+      </a></li>
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Emberkit</span><svg class="mark" aria-label="Common"><use href="#m-common"/></svg></div>
+        <div class="ck-art ember">
+          <div class="ph" aria-hidden="true"><span><b>Emberkit</b>Image missing</span></div>
+          <img src="../../art/emberkit.svg" alt="Emberkit" onerror="this.hidden=true">
+        </div>
+        <p class="ck-type">Ember</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>011</b>/016</span><span>caught 7</span></p>
+      </a></li>
+      <li class="pocket ck seen"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Stormgull</span><svg class="mark" aria-label="Rare"><use href="#m-rare"/></svg></div>
+        <div class="ck-art"><img src="../../art/stormgull.svg" alt="Stormgull silhouette"></div>
+        <p class="ck-type">Seen, not caught</p>
+        <p class="ck-foot"><span><b>012</b>/016</span><span>caught 0</span></p>
+      </a></li>
+      <li class="pocket ck unknown"><span class="slot-no">013</span><span class="vh">Unknown, never seen</span></li>
+      <li class="pocket ck"><a class="card" href="#">
+        <div class="ck-name"><span class="card-name">Cragback</span><svg class="mark" aria-label="Rare"><use href="#m-rare"/></svg></div>
+        <div class="ck-art stone"><img src="../../art/cragback.svg" alt="Cragback"></div>
+        <p class="ck-type">Stone</p>
+        <p class="ck-foot"><span><svg class="setmk"><use href="#s-reach"/></svg><b>014</b>/016</span><span>caught 2</span></p>
+      </a></li>
+      <li class="pocket ck seen mythic"><a class="card" href="#">
+        <div class="face">
+          <div class="ck-name"><span class="card-name">Duskmote</span><svg class="mark" aria-label="Mythic"><use href="#m-mythic"/></svg></div>
+          <div class="ck-art"><img src="../../art/duskmote.svg" alt="Duskmote silhouette"></div>
+          <p class="ck-type">Seen, not caught</p>
+          <p class="ck-foot"><span><b>015</b>/016</span><span>caught 0</span></p>
+        </div>
+      </a></li>
+      <li class="pocket ck unknown"><span class="slot-no">016</span><span class="vh">Unknown, never seen</span></li>
+      <li class="pocket ck spare"><span class="print">spare pocket</span></li>
+      <li class="pocket ck spare"><span class="print">spare pocket</span></li>
+    </ol>
+    <p class="foot">
+      <span><svg><use href="#m-common"/></svg>Common</span><span><svg><use href="#m-uncommon"/></svg>Uncommon</span><span><svg><use href="#m-rare"/></svg>Rare</span><span><svg><use href="#m-mythic"/></svg>Mythic, foil</span>
+      <span class="pg">Page 2</span>
+    </p>
+    <div class="holes" aria-hidden="true"><i></i><i></i><i></i></div>
+  </section>
+
+  <nav class="dividers" aria-label="Sections">
+    <a href="#" aria-current="page">Index</a>
+    <a href="#">Team <small>6 of 6</small></a>
+    <a href="#">Map</a>
+    <a href="#">Items</a>
+  </nav>
+
+  <!-- Lanternfin out of its sleeve -->
+  <aside class="detail" id="lanternfin" aria-label="Selected creature, #007 Lanternfin">
+    <article class="card big pulled">
+      <header class="bd-name">
+        <h1><span class="no">#007</span><span class="card-name">Lanternfin</span></h1>
+        <span class="rar"><svg><use href="#m-rare"/></svg>Rare</span>
+      </header>
+      <div class="bd-art tide"><img src="../../art/lanternfin.svg" alt="Lanternfin"></div>
+      <p class="bd-type"><span>Tide / Ember</span><span>Caught 3</span></p>
+      <p class="flavor">Hangs motionless in tidal caves at night, glowing to lure glimmerfry close. The light fades if it's kept out of salt water for more than a day.</p>
+      <dl class="statblock">
+        <dt>HP</dt><dd>62</dd><dd class="bar"><i style="width:62%"></i></dd>
+        <dt>Attack</dt><dd>48</dd><dd class="bar"><i style="width:48%"></i></dd>
+        <dt>Defense</dt><dd>55</dd><dd class="bar"><i style="width:55%"></i></dd>
+        <dt>Speed</dt><dd>81</dd><dd class="bar"><i style="width:81%"></i></dd>
+      </dl>
+      <dl class="facts">
+        <dt>Habitat</dt><dd>Tidal caves, night only</dd>
+        <dt>First caught</dt><dd>12 Aug</dd>
+        <dt>Drops</dt><dd>Lantern scale (common)<br>Deep pearl (rare, 4% chance)</dd>
+      </dl>
+      <p class="bd-foot"><span><svg><use href="#s-reach"/></svg>Saltmarsh Reach</span><span>007/016</span></p>
+    </article>
+
+    <div class="under">
+      <h2>Evolution line</h2>
+      <div class="evo">
+        <div class="evo-item"><div class="pocket"><div class="card"><img src="../../art/glimmerfry.svg" alt=""></div></div><p class="lbl"><b>#006</b>Glimmerfry</p></div>
+        <svg class="arrow" aria-hidden="true"><use href="#arrow"/></svg>
+        <div class="evo-item here"><div class="pocket"><div class="card"><img src="../../art/lanternfin.svg" alt=""></div></div><p class="lbl"><b>#007</b>Lanternfin</p></div>
+        <svg class="arrow" aria-hidden="true"><use href="#arrow"/></svg>
+        <div class="evo-item"><div class="pocket unk"><span class="slot-no">008</span></div><p class="lbl"><b>#008</b>Not seen yet</p></div>
+      </div>
+      <div class="acts">
+        <button class="btn primary" type="button">Show on map</button>
+        <button class="btn" type="button">Mark as favourite</button>
+        <button class="btn" type="button" disabled aria-describedby="why-team">Add to team</button>
+        <p class="why" id="why-team">Team is full (6 of 6). Remove one to add Lanternfin.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

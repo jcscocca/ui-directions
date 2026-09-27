@@ -1,0 +1,42 @@
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&family=Sometype+Mono:wght@400;500;700&display=swap");
+
+:root {
+  --font-print: "Libre Franklin", "Franklin Gothic Medium", "Arial Narrow", sans-serif;
+  --font-typed: "Sometype Mono", "Courier New", monospace;
+
+  /* printed form */
+  --paper: #FDFDFA;
+  --form: #1E5C3A;
+  --form-2: #3F7A58;
+  --screen: #E3EEE6;
+  --screen-2: #F1F6F2;
+
+  /* typed in, stamped on */
+  --typed: #1B1A18;
+  --typed-2: #55534E;
+  --stamp: #5B3FA6;
+  --reject: #C0392B;
+
+  /* stationery */
+  --carbon: #FFF6C8;
+  --carbon-edge: #E8D98A;
+  --folder: #D3B77D;
+  --folder-2: #C1A266;
+  --folder-ink: #46351A;
+  --focus: #5B3FA6;
+
+  --rule: 1px;
+  --rule-heavy: 2px;
+  --rule-part: 3px;
+
+  --t-fine: 9.5px;
+  --t-label: 10.5px;
+  --t-typed: 13px;
+  --t-body: 13px;
+  --t-part: 13px;
+  --t-title: 24px;
+  --t-formno: 34px;
+
+  --u: 4px;
+  --radius: 0;
+}
